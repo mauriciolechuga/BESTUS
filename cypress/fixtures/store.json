@@ -1,0 +1,16 @@
+{
+  "baseUrl": "https://www.bestaccessdoors.com",
+  "knownProductUrls": [],
+  "testAccount": {
+    "email": "test@bigcommerce.com",
+    "password": "BigCommerce6340"
+  },
+  "forms": {
+    "productInfo": null,
+    "quoteRequest": "/request-a-quote/",
+    "contact": "/contact-us/",
+    "proClub": "/pro-club-application/",
+    "becomeVendor": null,
+    "architectInquiries": null
+  }
+}
