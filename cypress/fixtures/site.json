@@ -1,0 +1,30 @@
+{
+  "baseUrl": "https://www.bestaccessdoors.com",
+  "products": {
+    "default": "/24-x-24-fire-rated-insulated-access-door-with-exposed-flange/",
+    "known": [
+      "/24-x-24-fire-rated-insulated-access-door-with-exposed-flange/"
+    ]
+  },
+  "forms": {
+    "productInfo": {
+      "path": "default-product",
+      "submitUrlPattern": "**/forms.zohopublic.com/**/BESTProductForm/**/submit"
+    },
+    "quoteRequest": {
+      "path": "/request-a-quote/",
+      "submitUrlPattern": "**/forms.zohopublic.com/**/submit"
+    },
+    "contact": {
+      "path": "/contact-us/",
+      "submitUrlPattern": "**/forms.zohopublic.com/**/submit"
+    },
+    "proClub": {
+      "path": "/pro-club-application/",
+      "submitUrlPattern": "**/forms.zohopublic.com/**/submit"
+    },
+    "becomeVendor": null,
+    "architectInquiries": null
+  },
+  "testEmailTemplate": "mauricio+{ts}@bestaccessdoors.com"
+}

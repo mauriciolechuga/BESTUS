@@ -1,6 +1,7 @@
 const { defineConfig } = require("cypress");
 
 module.exports = defineConfig({
+  allowCypressEnv: true,
   e2e: {
     baseUrl: "https://www.bestaccessdoors.com",
     viewportWidth: 1920,
