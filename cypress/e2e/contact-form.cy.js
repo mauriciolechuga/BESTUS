@@ -49,7 +49,7 @@ describe('Contact Us form', () => {
     });
 
     // Requires cypress/fixtures/files/sample.pdf — unskip once confirmed working
-    it.skip('accepts an optional file attachment', () => {
+    it('accepts an optional file attachment', () => {
       cy.uniqueEmail().then((email) => {
         cy.interceptZoho('submit', submitPattern);
         page.visit().scrollToForm();
