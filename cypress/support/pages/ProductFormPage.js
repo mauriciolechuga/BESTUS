@@ -14,7 +14,6 @@ export class ProductFormPage extends ZohoFormPage {
   }
 
   get path() { return this._path; }
-  get submitUrlPattern() { return this._site.forms.productInfo.submitUrlPattern; }
 
   fillDetails(v) {
     cy.get('textarea[name="MultiLine"]').clear().type(v);

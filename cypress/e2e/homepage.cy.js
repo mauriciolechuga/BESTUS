@@ -15,7 +15,7 @@ describe('Homepage', () => {
         .filter((href) => href && !href.startsWith('#') && !href.startsWith('tel:') && !href.startsWith('mailto:') && !href.includes('amazon') && !href.includes('facebook'));
       const unique = [...new Set(hrefs)];
       unique.forEach((href) => {
-        const url = href.startsWith('http') ? href : `https://www.bestaccessdoors.com${href}`;
+        const url = href.startsWith('http') ? href : `${Cypress.config('baseUrl')}${href}`;
         cy.request({ url, failOnStatusCode: false }).its('status').should('not.eq', 404);
       });
     });
@@ -49,7 +49,7 @@ describe('Homepage', () => {
         .filter((href) => href && !href.startsWith('#') && !href.startsWith('tel:') && !href.startsWith('mailto:'));
       const unique = [...new Set(hrefs)];
       unique.forEach((href) => {
-        const url = href.startsWith('http') ? href : `https://www.bestaccessdoors.com${href}`;
+        const url = href.startsWith('http') ? href : `${Cypress.config('baseUrl')}${href}`;
         cy.request({ url, failOnStatusCode: false }).its('status').should('not.eq', 404);
       });
     });

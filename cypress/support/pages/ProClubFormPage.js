@@ -2,7 +2,6 @@ import { ZohoFormPage } from './ZohoFormPage.js';
 
 export class ProClubFormPage extends ZohoFormPage {
   get path() { return '/pro-club-application/'; }
-  get submitUrlPattern() { return '**/forms.zohopublic.com/**/submit'; }
 
   fillAddress1(v) {
     cy.get('input[name="Address_AddressLine1"]').clear().type(v);

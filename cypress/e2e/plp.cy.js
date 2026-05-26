@@ -129,7 +129,7 @@ describe('Product Listing Page', () => {
     cy.get('.categories-left .navList-item a[href]').then(($links) => {
       const hrefs = [...new Set([...$links].map((a) => a.getAttribute('href')).filter(Boolean))];
       hrefs.forEach((href) => {
-        const url = href.startsWith('http') ? href : `https://www.bestaccessdoors.com${href}`;
+        const url = href.startsWith('http') ? href : `${Cypress.config('baseUrl')}${href}`;
         cy.request({ url, failOnStatusCode: false }).its('status').should('not.eq', 404);
       });
     });

@@ -3,10 +3,6 @@ export class ZohoFormPage {
     throw new Error('ZohoFormPage subclass must define path');
   }
 
-  get submitUrlPattern() {
-    throw new Error('ZohoFormPage subclass must define submitUrlPattern');
-  }
-
   visit() {
     cy.visit(this.path);
     return this;

@@ -1,14 +1,5 @@
 import { QuoteFormPage } from '../support/pages/QuoteFormPage.js';
-
-/**
- * Extracts a field value from a multipart/form-data body string.
- * Zoho forms POST as multipart, so body is NOT URL-encoded.
- */
-function getMultipartField(body, fieldName) {
-  const re = new RegExp(`name="${fieldName}"\\r\\n\\r\\n([^\\r]*)`, '');
-  const match = body.match(re);
-  return match ? match[1] : null;
-}
+import { getMultipartField } from '../support/utils/getMultipartField.js';
 
 describe('Request a Quote form', () => {
   let page;
