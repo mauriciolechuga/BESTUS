@@ -160,9 +160,6 @@ BESTUS/
 │       ├── utils/                 Utility functions (email generation, URL picking, etc.)
 │       ├── commands.js            Custom test shortcuts
 │       └── e2e.js                 Global setup (runs before every test)
-│
-└── docs/
-    └── cypress-forms-plan.md      Detailed technical planning document
 ```
 
 ---
