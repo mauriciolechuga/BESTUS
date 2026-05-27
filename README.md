@@ -37,6 +37,8 @@ For each form, the tests verify:
 | **Homepage (mobile)** | Layout looks correct on 6 phone sizes and 4 tablet sizes, nothing overflows, touch targets are large enough to tap |
 | **Product Listing Page (PLP)** | Product grid loads, cards have images/titles/prices/links, pagination works, sidebar categories link correctly |
 | **PLP (mobile)** | Same device range as homepage mobile — grid, cards, and sidebar all present |
+| **Product Detail Page (PDP)** | Breadcrumbs, title, price, images, qty input, Add to Cart, PDF spec links, description, video, related products carousel, Yotpo reviews widget, product info form, SKU, lead time |
+| **PDP (mobile)** | Same 6 phones + 4 tablets device matrix; title, price, images, qty, Add to Cart, description, carousel, form, SKU, lead time, mobile nav, no horizontal overflow, touch targets, no console errors; landscape pass for phones |
 
 ---
 
@@ -145,6 +147,8 @@ BESTUS/
 │   │   ├── homepage.mobile.cy.js  Checks the homepage on phones and tablets
 │   │   ├── plp.cy.js              Checks the product listing page
 │   │   ├── plp.mobile.cy.js       Checks the product listing page on phones and tablets
+│   │   ├── pdp.cy.js              Checks the product detail page
+│   │   ├── pdp.mobile.cy.js       Checks the product detail page on phones and tablets
 │   │   ├── product-form.cy.js     Tests the Product Information form
 │   │   ├── contact-form.cy.js     Tests the Contact Us form
 │   │   ├── quote-form.cy.js       Tests the Request a Quote form

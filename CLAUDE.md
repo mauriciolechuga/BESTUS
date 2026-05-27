@@ -64,10 +64,12 @@ Subclasses add form-specific fields:
 - `homepage.mobile.cy.js` — 6 phones + 4 tablets (portrait + phone landscape); key elements, footer, contact info, payment icons, copyright, no horizontal overflow, mobile nav present, touch target sizes (≥44px phones, ≥24px tablets)
 - `plp.cy.js` — heading, breadcrumb, sidebar categories, best sellers, subcategory boxes, product grid (image/title/price/link on first 3 cards), PDP navigation, pagination controls + JSON blob validity, sidebar category link health, no console errors
 - `plp.mobile.cy.js` — same device matrix as homepage.mobile; heading, breadcrumb, product grid, product cards, subcategory boxes, sidebar DOM presence, no horizontal overflow, mobile nav, no console errors
+- `pdp.cy.js` — picks a random URL from `site.json`'s `pdp.popular` list each run; checks breadcrumbs, product title (`h1.productView-title`), price (`[data-product-price-without-tax]`), image gallery, quantity input + inc/dec buttons, Add to Cart button, PDF spec sheet links (open in `_blank`), description section, optional YouTube iframe, related products carousel (`.content-carousel .owl-carousel`), Yotpo reviews widget, SearchSpring recently-viewed script tag, product info request form fields, SKU, and lead time / stock status; no console errors
+- `pdp.mobile.cy.js` — same 6 phones + 4 tablets device matrix as other mobile specs; portrait pass per device covers header visible, breadcrumbs, title, price, image gallery, qty input, Add to Cart, description, carousel, SKU, lead time, product info form, mobile nav DOM presence, no horizontal overflow, no console errors, touch target height (44px phones / 24px tablets); landscape pass for phones only covers title and no horizontal overflow
 
 ### Fixtures
 
-- `site.json` — canonical source for base URL, form paths, Zoho submit URL glob patterns, product URLs, and `testEmailTemplate`
+- `site.json` — canonical source for base URL, form paths, Zoho submit URL glob patterns, product URLs (`products.known`), PDP URLs (`pdp.popular`), and `testEmailTemplate`
 - `personas.json` — fake customer data used as form input; `primary` is the only persona currently defined
 
 ### Environment Variables
