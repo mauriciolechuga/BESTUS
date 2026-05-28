@@ -53,22 +53,13 @@ describe('Request a Quote form', () => {
       cy.interceptZoho('submit', submitPattern);
     });
 
-    // Zoho renders validation errors in a sibling or ancestor container.
-    // Name fields (First/Last) share a group wrapper so we scan all ancestors.
-    function expectFieldError(selector) {
-      cy.get(selector)
-        .parents()
-        .find('[class*="error"], [class*="invalid"], [class*="Error"]')
-        .should('exist');
-    }
-
     it('shows an error when First Name is empty', () => {
       cy.uniqueEmail().then((email) => {
         cy.fillPersona(page, { ...persona, firstName: 'SKIP' }, email);
         cy.get('input[name="Name_First"]').clear();
         page.submit();
         cy.get('@submit.all').should('have.length', 0);
-        expectFieldError('input[name="Name_First"]');
+        cy.expectFieldError('input[name="Name_First"]');
       });
     });
 
@@ -78,7 +69,7 @@ describe('Request a Quote form', () => {
         cy.get('input[name="Name_Last"]').clear();
         page.submit();
         cy.get('@submit.all').should('have.length', 0);
-        expectFieldError('input[name="Name_Last"]');
+        cy.expectFieldError('input[name="Name_Last"]');
       });
     });
 
@@ -88,7 +79,7 @@ describe('Request a Quote form', () => {
         cy.get('input[name="Email"]').clear();
         page.submit();
         cy.get('@submit.all').should('have.length', 0);
-        expectFieldError('input[name="Email"]');
+        cy.expectFieldError('input[name="Email"]');
       });
     });
 
@@ -96,7 +87,7 @@ describe('Request a Quote form', () => {
       cy.fillPersona(page, persona, 'not-an-email');
       page.submit();
       cy.get('@submit.all').should('have.length', 0);
-      expectFieldError('input[name="Email"]');
+      cy.expectFieldError('input[name="Email"]');
     });
 
     it('lists the expected quantity options', () => {

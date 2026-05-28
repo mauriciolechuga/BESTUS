@@ -64,13 +64,6 @@ describe('Pro Club Application form', () => {
       cy.interceptZoho('submit', submitPattern);
     });
 
-    function expectFieldError(selector) {
-      cy.get(selector)
-        .parents()
-        .find('[class*="error"], [class*="invalid"], [class*="Error"]')
-        .should('exist');
-    }
-
     it('defaults the country dropdown to a placeholder selection', () => {
       cy.get('select[name="Address_Country"]').should(($sel) => {
         const selected = $sel.val();
@@ -87,7 +80,7 @@ describe('Pro Club Application form', () => {
         cy.get('input[name="Email"]').clear();
         page.submit();
         cy.get('@submit.all').should('have.length', 0);
-        expectFieldError('input[name="Email"]');
+        cy.expectFieldError('input[name="Email"]');
       });
     });
 

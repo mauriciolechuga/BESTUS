@@ -78,12 +78,12 @@ If you see a version number like `v20.11.0`, you're good. If you get an error, d
 
 ## Running the Tests
 
-> **Note:** The `npm test` and `npm run open` shortcuts are not configured. Use `npx cypress` directly as shown below.
+> **Note:** The `npm` shortcuts below are configured in `package.json`. You can also call `npx cypress` directly if you prefer.
 
 ### Option 1 — Fast & Safe (recommended for daily use)
 
 ```
-npx cypress run
+npm test
 ```
 
 This runs all tests in the background (no browser window opens). It does **not** submit real forms — it intercepts the form submissions and fakes a successful response so no leads are created in the CRM.
@@ -93,7 +93,7 @@ Best for: quickly checking that nothing is broken.
 ### Option 2 — Interactive (watch the tests run)
 
 ```
-npx cypress open
+npm run test:open
 ```
 
 This opens the Cypress app where you can pick which tests to run and watch them execute in a real browser window. Useful when you want to see exactly what's happening or when debugging a failing test.
@@ -101,13 +101,13 @@ This opens the Cypress app where you can pick which tests to run and watch them 
 ### Option 3 — Run a single test file
 
 ```
-npx cypress run --spec "cypress/e2e/contact-form.cy.js"
+npm test -- --spec "cypress/e2e/contact-form.cy.js"
 ```
 
 ### Option 4 — Live Submission (weekly smoke test only)
 
 ```
-LIVE_SUBMIT=true I_KNOW_THIS_IS_LIVE=true npx cypress run
+npm run test:live
 ```
 
 This runs the tests and submits **real forms** to the CRM. Use this sparingly — it creates actual leads in Zoho. Both environment variables must be set at the same time as a double safety gate against accidental use.

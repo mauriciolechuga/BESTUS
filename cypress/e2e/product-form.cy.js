@@ -56,20 +56,13 @@ describe('Product information form', () => {
       cy.interceptZoho('submit', submitPattern);
     });
 
-    function expectFieldError(selector) {
-      cy.get(selector)
-        .parents()
-        .find('[class*="error"], [class*="invalid"], [class*="Error"]')
-        .should('exist');
-    }
-
     it('shows an error when First Name is empty', () => {
       cy.uniqueEmail().then((email) => {
         cy.fillPersona(page, { ...persona, firstName: 'SKIP' }, email);
         cy.get('input[name="Name_First"]').clear();
         page.submit();
         cy.get('@submit.all').should('have.length', 0);
-        expectFieldError('input[name="Name_First"]');
+        cy.expectFieldError('input[name="Name_First"]');
       });
     });
 
@@ -79,7 +72,7 @@ describe('Product information form', () => {
         cy.get('input[name="Name_Last"]').clear();
         page.submit();
         cy.get('@submit.all').should('have.length', 0);
-        expectFieldError('input[name="Name_Last"]');
+        cy.expectFieldError('input[name="Name_Last"]');
       });
     });
 
@@ -89,7 +82,7 @@ describe('Product information form', () => {
         cy.get('input[name="Email"]').clear();
         page.submit();
         cy.get('@submit.all').should('have.length', 0);
-        expectFieldError('input[name="Email"]');
+        cy.expectFieldError('input[name="Email"]');
       });
     });
 
@@ -97,7 +90,7 @@ describe('Product information form', () => {
       cy.fillPersona(page, persona, 'not-an-email');
       page.submit();
       cy.get('@submit.all').should('have.length', 0);
-      expectFieldError('input[name="Email"]');
+      cy.expectFieldError('input[name="Email"]');
     });
 
     it('shows an error when Details are empty', () => {
@@ -106,7 +99,7 @@ describe('Product information form', () => {
         cy.get('textarea[name="MultiLine"]').clear();
         page.submit();
         cy.get('@submit.all').should('have.length', 0);
-        expectFieldError('textarea[name="MultiLine"]');
+        cy.expectFieldError('textarea[name="MultiLine"]');
       });
     });
 

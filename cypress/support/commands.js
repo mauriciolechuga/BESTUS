@@ -36,3 +36,45 @@ Cypress.Commands.add('interceptZoho', (alias, urlPattern) => {
     Cypress.env('I_KNOW_THIS_IS_LIVE') === true;
   setupZohoIntercept(alias, urlPattern, liveSubmit);
 });
+
+/**
+ * Asserts a Zoho validation error is shown for the field matched by `selector`.
+ * Zoho renders errors in a sibling or ancestor container (not always an <li>), so we
+ * scan all ancestors for an error/invalid class.
+ */
+Cypress.Commands.add('expectFieldError', (selector) => {
+  cy.get(selector)
+    .parents()
+    .find('[class*="error"], [class*="invalid"], [class*="Error"]')
+    .should('exist');
+});
+
+/**
+ * Asserts every href under `selector` resolves without a 404. Skips in-page (#),
+ * tel:, and mailto: links, plus any href containing a token in `exclude`.
+ * @param {string} selector — e.g. 'header a[href]'
+ * @param {{ exclude?: string[] }} options — extra substrings to skip (e.g. ['amazon','facebook'])
+ */
+Cypress.Commands.add('assertLinksResolve', (selector, options = {}) => {
+  const exclude = options.exclude || [];
+  cy.get(selector).then(($links) => {
+    const hrefs = [
+      ...new Set(
+        [...$links]
+          .map((a) => a.getAttribute('href'))
+          .filter(
+            (href) =>
+              href &&
+              !href.startsWith('#') &&
+              !href.startsWith('tel:') &&
+              !href.startsWith('mailto:') &&
+              !exclude.some((token) => href.includes(token))
+          )
+      ),
+    ];
+    hrefs.forEach((href) => {
+      const url = href.startsWith('http') ? href : `${Cypress.config('baseUrl')}${href}`;
+      cy.request({ url, failOnStatusCode: false }).its('status').should('not.eq', 404);
+    });
+  });
+});

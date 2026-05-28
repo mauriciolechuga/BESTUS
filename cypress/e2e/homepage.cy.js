@@ -1,69 +1,44 @@
-describe('Homepage', () => {
+import { assertFooterHeadings, makeConsoleErrorSpy } from '../support/checks.js';
+
+// All homepage checks are read-only, so the page is loaded once (testIsolation:false)
+// and every assertion runs against that single visit instead of re-loading per test.
+describe('Homepage', { testIsolation: false }, () => {
+  const consoleErrors = makeConsoleErrorSpy();
+
+  before(() => {
+    cy.visit('/', { onBeforeLoad: consoleErrors.onBeforeLoad });
+  });
+
+  // Runs first so it reflects load-time console errors only.
+  it('has no console errors', () => {
+    consoleErrors.assertClean();
+  });
 
   it('loads with key elements visible', () => {
-    cy.visit('/');
     cy.get('header').should('be.visible');
     cy.get('footer').should('be.visible');
     cy.get('[class*="carousel"], [class*="hero"], [class*="banner"], main, [role="main"]').first().should('be.visible');
   });
 
   it('header and nav links all resolve without 404', () => {
-    cy.visit('/');
-    cy.get('header a[href]').then(($links) => {
-      const hrefs = [...$links]
-        .map((a) => a.getAttribute('href'))
-        .filter((href) => href && !href.startsWith('#') && !href.startsWith('tel:') && !href.startsWith('mailto:') && !href.includes('amazon') && !href.includes('facebook'));
-      const unique = [...new Set(hrefs)];
-      unique.forEach((href) => {
-        const url = href.startsWith('http') ? href : `${Cypress.config('baseUrl')}${href}`;
-        cy.request({ url, failOnStatusCode: false }).its('status').should('not.eq', 404);
-      });
-    });
+    cy.assertLinksResolve('header a[href]', { exclude: ['amazon', 'facebook'] });
   });
 
   it('footer is visible with all four section headings', () => {
-    cy.visit('/');
-    cy.get('footer.tcsFooter').should('be.visible');
-    cy.get('footer .footer-top').should('be.visible');
-    cy.get('footer .footer-bottom').should('be.visible');
-    cy.get('footer .Copyright').should('be.visible');
-
-    const expectedHeadings = ["WHAT'S IN STORE", 'SECURE SHOPPING', 'MY ACCOUNT', 'Contact Info'];
-    cy.get('footer .box h3').then(($headings) => {
-      const texts = [...$headings].map((el) => {
-        const clone = el.cloneNode(true);
-        clone.querySelectorAll('svg').forEach((svg) => svg.remove());
-        return clone.textContent.trim();
-      });
-      expectedHeadings.forEach((heading) => {
-        expect(texts).to.include(heading);
-      });
-    });
+    assertFooterHeadings('be.visible');
   });
 
   it('footer links all resolve without 404', () => {
-    cy.visit('/');
-    cy.get('footer a[href]').then(($links) => {
-      const hrefs = [...$links]
-        .map((a) => a.getAttribute('href'))
-        .filter((href) => href && !href.startsWith('#') && !href.startsWith('tel:') && !href.startsWith('mailto:'));
-      const unique = [...new Set(hrefs)];
-      unique.forEach((href) => {
-        const url = href.startsWith('http') ? href : `${Cypress.config('baseUrl')}${href}`;
-        cy.request({ url, failOnStatusCode: false }).its('status').should('not.eq', 404);
-      });
-    });
+    cy.assertLinksResolve('footer a[href]');
   });
 
   it('footer nav links have non-empty visible text', () => {
-    cy.visit('/');
     cy.get('footer .box ul li a').each(($a) => {
       expect($a.text().trim()).to.not.be.empty;
     });
   });
 
   it('footer contact info shows phone, fax, address, and warehouses link', () => {
-    cy.visit('/');
     cy.get('footer .Contact-info-box').should('have.length.at.least', 3);
 
     // Phone and fax: verify tel: links exist and have non-empty text (not hardcoded)
@@ -77,12 +52,10 @@ describe('Homepage', () => {
   });
 
   it('footer payment icons section is visible', () => {
-    cy.visit('/');
     cy.get('footer .footer-payment-icons').should('be.visible');
   });
 
   it('footer copyright year is current', () => {
-    cy.visit('/');
     const currentYear = new Date().getFullYear().toString();
     cy.get('footer .Copyright p').should('contain.text', currentYear);
     cy.get('footer .Copyright p').should('contain.text', 'Best Access Doors');
@@ -99,19 +72,8 @@ describe('Homepage', () => {
   });
 
   it('phone number in header matches footer', () => {
-    cy.visit('/');
     cy.get('header [href^="tel:"]').first().invoke('text').then((headerPhone) => {
       cy.get('footer [href^="tel:"]').first().invoke('text').should('eq', headerPhone.trim());
     });
   });
-
-  it('has no console errors', () => {
-    cy.visit('/', {
-      onBeforeLoad(win) {
-        cy.spy(win.console, 'error').as('consoleError');
-      },
-    });
-    cy.get('@consoleError').should('not.have.been.called');
-  });
-
 });

@@ -62,13 +62,6 @@ describe('Contact Us form', () => {
       cy.interceptZoho('submit', submitPattern);
     });
 
-    function expectFieldError(selector) {
-      cy.get(selector)
-        .parents()
-        .find('[class*="error"], [class*="invalid"], [class*="Error"]')
-        .should('exist');
-    }
-
     it('lists both inquiry types in the dropdown', () => {
       cy.get('select[name="Dropdown"]').first().find('option').then(($options) => {
         const values = [...$options].map((o) => o.text.trim());
@@ -83,7 +76,7 @@ describe('Contact Us form', () => {
         cy.get('input[name="Name_First"]').clear();
         page.submit();
         cy.get('@submit.all').should('have.length', 0);
-        expectFieldError('input[name="Name_First"]');
+        cy.expectFieldError('input[name="Name_First"]');
       });
     });
 
@@ -93,7 +86,7 @@ describe('Contact Us form', () => {
         cy.get('input[name="Name_Last"]').clear();
         page.submit();
         cy.get('@submit.all').should('have.length', 0);
-        expectFieldError('input[name="Name_Last"]');
+        cy.expectFieldError('input[name="Name_Last"]');
       });
     });
 
@@ -103,7 +96,7 @@ describe('Contact Us form', () => {
         cy.get('input[name="Email"]').clear();
         page.submit();
         cy.get('@submit.all').should('have.length', 0);
-        expectFieldError('input[name="Email"]');
+        cy.expectFieldError('input[name="Email"]');
       });
     });
 
@@ -111,7 +104,7 @@ describe('Contact Us form', () => {
       cy.fillPersona(page, persona, 'not-an-email');
       page.submit();
       cy.get('@submit.all').should('have.length', 0);
-      expectFieldError('input[name="Email"]');
+      cy.expectFieldError('input[name="Email"]');
     });
 
     it('does not submit the form when required fields are missing', () => {

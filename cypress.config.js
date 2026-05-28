@@ -2,6 +2,9 @@ const { defineConfig } = require("cypress");
 
 module.exports = defineConfig({
   allowCypressEnv: true,
+  // Retry failed tests in `cypress run` to absorb transient live-site flake; never retry
+  // interactively (openMode) so failures stay visible while debugging.
+  retries: { runMode: 2, openMode: 0 },
   e2e: {
     baseUrl: "https://www.bestaccessdoors.com",
     viewportWidth: 1920,

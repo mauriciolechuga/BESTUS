@@ -1,5 +1,11 @@
 {
+  "scripts": {
+    "test": "cypress run",
+    "test:open": "cypress open",
+    "test:live": "cross-env LIVE_SUBMIT=true I_KNOW_THIS_IS_LIVE=true cypress run"
+  },
   "devDependencies": {
+    "cross-env": "^7.0.3",
     "cypress": "^15.14.2"
   },
   "dependencies": {
