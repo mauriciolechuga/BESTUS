@@ -5,8 +5,10 @@
     "test:live": "cross-env LIVE_SUBMIT=true I_KNOW_THIS_IS_LIVE=true cypress run"
   },
   "devDependencies": {
+    "@cypress-audit/lighthouse": "^1.4.2",
     "cross-env": "^7.0.3",
-    "cypress": "^15.14.2"
+    "cypress": "^15.14.2",
+    "lighthouse": "^10.4.0"
   },
   "dependencies": {
     "cypress-real-events": "^1.15.0"

@@ -27,6 +27,18 @@ LIVE_SUBMIT=true I_KNOW_THIS_IS_LIVE=true npx cypress run
 
 Note: `package.json` has no `scripts` section, so the `npm test` / `npm run open` commands in the README will not work. Use `npx cypress` directly.
 
+## Browser Baselines
+
+All specs (except `lighthouse.cy.js`) are browser-agnostic and pass in both Chrome and Firefox. `lighthouse.cy.js` skips itself automatically when run in Firefox.
+
+```bash
+# Chrome baseline (default — also runs Lighthouse)
+npx cypress run --browser chrome
+
+# Firefox baseline (lighthouse.cy.js is skipped automatically)
+npx cypress run --browser firefox
+```
+
 ## Architecture
 
 ### Stub vs. Live Mode
@@ -66,6 +78,11 @@ Subclasses add form-specific fields:
 - `plp.mobile.cy.js` — same device matrix as homepage.mobile; heading, breadcrumb, product grid, product cards, subcategory boxes, sidebar DOM presence, no horizontal overflow, mobile nav, no console errors
 - `pdp.cy.js` — picks a random URL from `site.json`'s `pdp.popular` list each run; checks breadcrumbs, product title (`h1.productView-title`), price (`[data-product-price-without-tax]`), image gallery, quantity input + inc/dec buttons, Add to Cart button, PDF spec sheet links (open in `_blank`), description section, optional YouTube iframe, related products carousel (`.content-carousel .owl-carousel`), Yotpo reviews widget, SearchSpring recently-viewed script tag, product info request form fields, SKU, and lead time / stock status; no console errors
 - `pdp.mobile.cy.js` — same 6 phones + 4 tablets device matrix as other mobile specs; portrait pass per device covers header visible, breadcrumbs, title, price, image gallery, qty input, Add to Cart, description, carousel, SKU, lead time, product info form, mobile nav DOM presence, no horizontal overflow, no console errors, touch target height (44px phones / 24px tablets); landscape pass for phones only covers title and no horizontal overflow
+
+**SEO, accessibility & performance tests:**
+- `seo.cy.js` — on homepage, PLP, and a random PDP: asserts `<title>` and `<meta name="description">` are present and non-empty; on PDP also validates the `Product` JSON-LD block (name, sku, description, image, price, currency, availability)
+- `images.cy.js` — on a random PDP: asserts all product gallery images have non-empty `alt` attributes; on homepage and a random PDP: requests all same-domain images and asserts none return 4xx/5xx
+- `lighthouse.cy.js` — Chrome only (auto-skipped in Firefox); runs Lighthouse on homepage, PLP, and a random PDP and fails if Performance < 50, Accessibility < 80, or SEO < 70
 
 ### Fixtures
 

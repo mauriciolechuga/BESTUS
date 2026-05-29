@@ -92,6 +92,38 @@ export function assertFooterHeadings(mode = 'exist') {
   });
 }
 
+/** Asserts <title> and <meta name="description"> are present and non-empty. */
+export function assertMetaTags() {
+  cy.title().should('not.be.empty');
+  cy.get('meta[name="description"]')
+    .invoke('attr', 'content')
+    .should('not.be.empty');
+}
+
+/**
+ * Finds the JSON-LD block with @type "Product" and asserts the key fields observed on
+ * live PDPs: name, sku, description, image, offers.price, offers.priceCurrency,
+ * offers.availability.
+ */
+export function assertProductJsonLd() {
+  cy.get('script[type="application/ld+json"]').then(($scripts) => {
+    const blocks = [...$scripts].map((el) => {
+      try { return JSON.parse(el.textContent); } catch { return null; }
+    }).filter(Boolean);
+    // Third-party widgets (Yotpo, etc.) can inject their own Product blocks at runtime
+    // that omit fields like sku. Require sku to ensure we match the site-rendered block.
+    const product = blocks.find((b) => b['@type'] === 'Product' && typeof b.sku === 'string');
+    expect(product, 'JSON-LD Product block with sku').to.exist;
+    expect(product.name, 'product name').to.be.a('string').and.not.be.empty;
+    expect(product.sku, 'product sku').to.be.a('string').and.not.be.empty;
+    expect(product.description, 'product description').to.be.a('string').and.not.be.empty;
+    expect(product.image, 'product image').to.be.a('string').and.not.be.empty;
+    expect(product.offers?.price, 'offers.price').to.match(/^\d+(\.\d+)?$/);
+    expect(product.offers?.priceCurrency, 'offers.priceCurrency').to.equal('USD');
+    expect(product.offers?.availability, 'offers.availability').to.be.a('string').and.not.be.empty;
+  });
+}
+
 /**
  * Creates a console.error spy to attach at page-load time and assert on later.
  * Returns { onBeforeLoad, assertClean }. Uses a closure ref (not a cy alias) so it
