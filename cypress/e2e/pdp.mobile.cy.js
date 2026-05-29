@@ -20,6 +20,20 @@ import {
   pickRandom,
 } from '../support/checks.js';
 
+// ─── Shared URL ──────────────────────────────────────────────────────────────
+// One product URL is picked once per spec run and reused across all devices so
+// that the overflow check is consistent. If each device picked independently via
+// pickRandom(), different products could produce different overflow results —
+// masking real bugs on some products and producing false failures on others
+// (confirmed: two 412px devices can disagree when testing different products).
+let pdpUrl;
+
+before(() => {
+  cy.fixture('site').then((site) => {
+    pdpUrl = pickRandom(site.pdp.popular);
+  });
+});
+
 // ═════════════════════════════════════════════════════════════════════════════
 // Portrait tests — all devices
 // ═════════════════════════════════════════════════════════════════════════════
@@ -28,10 +42,8 @@ ALL_DEVICES.forEach(({ name, width, height, touchTarget }) => {
     const consoleErrors = makeConsoleErrorSpy();
 
     before(() => {
-      cy.fixture('site').then((site) => {
-        cy.viewport(width, height);
-        cy.visit(pickRandom(site.pdp.popular), { onBeforeLoad: consoleErrors.onBeforeLoad });
-      });
+      cy.viewport(width, height);
+      cy.visit(pdpUrl, { onBeforeLoad: consoleErrors.onBeforeLoad });
     });
 
     // Cypress resets the viewport to the config default (1920x1080) before each test —
@@ -116,10 +128,8 @@ ALL_DEVICES.forEach(({ name, width, height, touchTarget }) => {
 PHONES.forEach(({ name, width, height }) => {
   describe(`PDP – ${name} landscape (${height}x${width})`, { testIsolation: false }, () => {
     before(() => {
-      cy.fixture('site').then((site) => {
-        cy.viewport(height, width); // landscape: swap width and height
-        cy.visit(pickRandom(site.pdp.popular));
-      });
+      cy.viewport(height, width); // landscape: swap width and height
+      cy.visit(pdpUrl);
     });
 
     beforeEach(() => {
