@@ -17,7 +17,12 @@ module.exports = defineConfig({
     videosFolder: "cypress/videos",
 
     setupNodeEvents(on, config) {
+      // Required inside setupNodeEvents so prepareAudit and lighthouse share the same
+      // module instance (and thus the same internal launchArgs closure variable).
+      const { lighthouse, prepareAudit } = require("@cypress-audit/lighthouse");
+
       on('before:browser:launch', (browser, launchOptions) => {
+        prepareAudit(launchOptions);
         if (browser.name === 'chrome' || browser.name === 'chromium') {
           const version = browser.majorVersion;
           launchOptions.args.push(
@@ -27,6 +32,7 @@ module.exports = defineConfig({
         }
         return launchOptions;
       });
+      on('task', { lighthouse: lighthouse() });
     }
   },
 });

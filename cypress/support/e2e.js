@@ -1,5 +1,6 @@
 import './commands';
 import 'cypress-real-events';
+import '@cypress-audit/lighthouse/commands';
 
 // Block analytics before every test
 beforeEach(() => {
