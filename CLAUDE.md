@@ -78,6 +78,8 @@ Subclasses add form-specific fields:
 - `plp.mobile.cy.js` — same device matrix as homepage.mobile; heading, breadcrumb, product grid, product cards, subcategory boxes, sidebar DOM presence, no horizontal overflow, mobile nav, no console errors
 - `pdp.cy.js` — picks a random URL from `site.json`'s `pdp.popular` list each run; checks breadcrumbs, product title (`h1.productView-title`), price (`[data-product-price-without-tax]`), image gallery, quantity input + inc/dec buttons, Add to Cart button, PDF spec sheet links (open in `_blank`), description section, optional YouTube iframe, related products carousel (`.content-carousel .owl-carousel`), Yotpo reviews widget, SearchSpring recently-viewed script tag, product info request form fields, SKU, and lead time / stock status; no console errors
 - `pdp.mobile.cy.js` — same 6 phones + 4 tablets device matrix as other mobile specs; portrait pass per device covers header visible, breadcrumbs, title, price, image gallery, qty input, Add to Cart, description, carousel, SKU, lead time, product info form, mobile nav DOM presence, no horizontal overflow, no console errors, touch target height (44px phones / 24px tablets); landscape pass for phones only covers title and no horizontal overflow
+- `discovery.cy.js` — search (known term returns relevant products checked against `expectedTokens`; nonsense term shows a no-results message or an empty grid), category/refinement pages render, sort by price low-to-high verified by `assertSortApplied` (the URL hash becomes `#/ps:calculated_price:asc` AND the grid re-renders to a different order than the default) rather than by asserting numeric price order — the cheapest items are "Call for pricing" with no price and sort to the top, so the visible grid often shows no prices; numeric ascending order is only checked opportunistically if priced products happen to be visible. Pagination advances to page 2 (`pp=2`) with a different product set, PDP handoff from results; one console-error check on a category load. Cross-page logic lives in `checks.js` helpers (`performHeaderSearch`, `assertSearchResults`, `assertNoSearchResults`, `assertDiscoveryPage`, `applySortOption`, `assertSortApplied`, `assertPaginationAdvanced`)
+- `discovery.mobile.cy.js` — same 6 phones + 4 tablets device matrix; per device, a category page (portrait) and a search-results page render with no horizontal overflow and no console errors
 
 **SEO, accessibility & performance tests:**
 - `seo.cy.js` — on homepage, PLP, and a random PDP: asserts `<title>` and `<meta name="description">` are present and non-empty; on PDP also validates the `Product` JSON-LD block (name, sku, description, image, price, currency, availability)
@@ -86,7 +88,7 @@ Subclasses add form-specific fields:
 
 ### Fixtures
 
-- `site.json` — canonical source for base URL, form paths, Zoho submit URL glob patterns, product URLs (`products.known`), PDP URLs (`pdp.popular`), and `testEmailTemplate`
+- `site.json` — canonical source for base URL, form paths, Zoho submit URL glob patterns, product URLs (`products.known`), PDP URLs (`pdp.popular`), discovery inputs (`discovery`: search terms/`expectedTokens`, representative `categories`, `mobileCategory`, `multiPageCategory`, and `sort` label/param/value), and `testEmailTemplate`
 - `personas.json` — fake customer data used as form input; `primary` is the only persona currently defined
 
 ### Environment Variables
@@ -100,7 +102,7 @@ Subclasses add form-specific fields:
 
 ### Global Setup (`cypress/support/e2e.js`)
 
-Runs before every test: imports `cypress-real-events`, blocks Google Analytics / Tag Manager requests (returns 204), and suppresses uncaught exceptions from third-party scripts so they don't fail tests.
+Runs before every test: imports `cypress-real-events`, calls `blockThirdParty()` (from `checks.js`) to stub ~17 third-party analytics/ad/tracking vendors with an empty 204 — GA, GTM, GA Connector, Zoho PageSense, Meta, Reddit, Spotify, Taboola, leadsy, iovation, Geotargetly, Affiliatly, plus SearchSpring's tracking beacons and the Zoho SalesIQ chat widget — and suppresses uncaught exceptions from third-party scripts so they don't fail tests. The block list was derived by auditing every host the live site loads; store-functional vendors (SearchSpring search API, Yotpo reviews, Zoho forms, PayPal, fonts, library CDNs, Klaviyo) are deliberately left loaded. See the `blockThirdParty()` doc comment in `checks.js` for the rationale.
 
 ### Anti-automation Countermeasures (`cypress.config.js`)
 

@@ -14,6 +14,7 @@ import {
   waitForProducts,
   assertProductCards,
   assertNoHorizontalOverflow,
+  blockThirdParty,
   makeConsoleErrorSpy,
 } from '../support/checks.js';
 
@@ -27,6 +28,7 @@ ALL_DEVICES.forEach(({ name, width, height }) => {
     const consoleErrors = makeConsoleErrorSpy();
 
     before(() => {
+      blockThirdParty();
       cy.viewport(width, height);
       cy.visit(PLP, { onBeforeLoad: consoleErrors.onBeforeLoad });
     });

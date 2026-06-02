@@ -1,4 +1,4 @@
-import { waitForProducts, assertProductCards, makeConsoleErrorSpy } from '../support/checks.js';
+import { waitForProducts, assertProductCards, blockThirdParty, makeConsoleErrorSpy } from '../support/checks.js';
 
 const PLP = '/products/';
 const SUBCAT = '/products/popular-picks/fire-rated/';
@@ -9,6 +9,7 @@ describe('Product Listing Page', { testIsolation: false }, () => {
   const consoleErrors = makeConsoleErrorSpy();
 
   before(() => {
+    blockThirdParty();
     cy.visit(PLP, { onBeforeLoad: consoleErrors.onBeforeLoad });
   });
 

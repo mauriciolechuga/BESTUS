@@ -16,6 +16,7 @@ import {
   assertProductInfoForm,
   assertNoHorizontalOverflow,
   assertMaxTouchTarget,
+  blockThirdParty,
   makeConsoleErrorSpy,
   pickRandom,
 } from '../support/checks.js';
@@ -42,6 +43,7 @@ ALL_DEVICES.forEach(({ name, width, height, touchTarget }) => {
     const consoleErrors = makeConsoleErrorSpy();
 
     before(() => {
+      blockThirdParty();
       cy.viewport(width, height);
       cy.visit(pdpUrl, { onBeforeLoad: consoleErrors.onBeforeLoad });
     });

@@ -1,4 +1,4 @@
-import { assertFooterHeadings, makeConsoleErrorSpy } from '../support/checks.js';
+import { assertFooterHeadings, blockThirdParty, makeConsoleErrorSpy } from '../support/checks.js';
 
 // All homepage checks are read-only, so the page is loaded once (testIsolation:false)
 // and every assertion runs against that single visit instead of re-loading per test.
@@ -6,6 +6,7 @@ describe('Homepage', { testIsolation: false }, () => {
   const consoleErrors = makeConsoleErrorSpy();
 
   before(() => {
+    blockThirdParty();
     cy.visit('/', { onBeforeLoad: consoleErrors.onBeforeLoad });
   });
 

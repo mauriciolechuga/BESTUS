@@ -27,6 +27,25 @@
     "architectInquiries": null
   },
   "testEmailTemplate": "mauricio+{ts}@bestaccessdoors.com",
+  "discovery": {
+    "search": {
+      "knownTerm": "fire-rated access door",
+      "expectedTokens": ["fire", "rated", "access", "door"],
+      "noResultsTerm": "zzzz-no-products-987654321"
+    },
+    "categories": [
+      "/products/",
+      "/products/access-doors-panels/",
+      "/products/popular-picks/fire-rated/"
+    ],
+    "mobileCategory": "/products/popular-picks/fire-rated/",
+    "multiPageCategory": "/products/",
+    "sort": {
+      "category": "/products/",
+      "label": "Price Low to High",
+      "urlHash": "#/ps:calculated_price:asc"
+    }
+  },
   "pdp": {
     "popular": [
       "/24-x-24-flush-universal-access-door-with-exposed-flange/",

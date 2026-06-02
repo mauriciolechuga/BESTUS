@@ -1,4 +1,4 @@
-import { assertBreadcrumbs, assertProductInfoForm, makeConsoleErrorSpy, pickRandom } from '../support/checks.js';
+import { assertBreadcrumbs, assertProductInfoForm, blockThirdParty, makeConsoleErrorSpy, pickRandom } from '../support/checks.js';
 
 // A random product URL from site.json's pdp.popular list is chosen each run. All checks
 // are read-only, so the page is loaded once (testIsolation:false) and shared across tests.
@@ -6,6 +6,7 @@ describe('Product Detail Page', { testIsolation: false }, () => {
   const consoleErrors = makeConsoleErrorSpy();
 
   before(() => {
+    blockThirdParty();
     cy.fixture('site').then((site) => {
       cy.visit(pickRandom(site.pdp.popular), { onBeforeLoad: consoleErrors.onBeforeLoad });
     });

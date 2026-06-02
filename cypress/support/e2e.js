@@ -1,13 +1,12 @@
 import './commands';
 import 'cypress-real-events';
 import '@cypress-audit/lighthouse/commands';
+import { blockThirdParty } from './checks';
 
-// Block analytics before every test
+// Block analytics/tracking before every test. Mobile specs (testIsolation:false) also call
+// blockThirdParty() in their before() hooks, since that hook runs before this beforeEach.
 beforeEach(() => {
-
-  cy.intercept('**/google-analytics.com/**', { statusCode: 204, body: '' });
-  cy.intercept('**/googletagmanager.com/**', { statusCode: 204, body: '' });
-  cy.intercept('**/analytics.google.com/**', { statusCode: 204, body: '' });
+  blockThirdParty();
 });
 
 // Suppress uncaught errors from third-party scripts
