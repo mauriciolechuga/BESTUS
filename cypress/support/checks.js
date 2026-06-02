@@ -133,15 +133,44 @@ export function assertProductJsonLd() {
  *   before(() => cy.visit(url, { onBeforeLoad: consoleErrors.onBeforeLoad }));
  *   it('has no console errors', () => consoleErrors.assertClean());
  */
-export function makeConsoleErrorSpy() {
+// Fetch failures are Cypress-intercept noise: GTM/analytics stubs return 204 instead of
+// valid JSON, which causes third-party scripts to log "Failed to fetch" to console.error.
+const DEFAULT_IGNORE = ['Failed to fetch'];
+
+/**
+ * @param {string[]} [ignore] - extra substrings; merged with DEFAULT_IGNORE. Calls whose
+ *   first arg contains any matching substring are excluded from the assertion.
+ */
+export function makeConsoleErrorSpy({ ignore = [] } = {}) {
+  const ignoreList = [...DEFAULT_IGNORE, ...ignore];
   const ref = {};
   return {
     onBeforeLoad: (win) => {
       ref.spy = cy.spy(win.console, 'error');
+      // Wrap fetch so failed requests are re-logged with their URL, making it easy
+      // to identify which script triggered "Failed to fetch" in assertClean output.
+      const origFetch = win.fetch.bind(win);
+      win.fetch = (...args) =>
+        origFetch(...args).catch((err) => {
+          win.console.error(`[fetch failed] ${args[0]}`, err);
+          return Promise.reject(err);
+        });
     },
     assertClean: () =>
       cy.then(() => {
-        expect(ref.spy, 'console.error').to.not.have.been.called;
+        const calls = (ref.spy.args || []).filter(
+          (args) => !ignoreList.some((substr) => String(args[0]).includes(substr))
+        );
+        if (calls.length) {
+          const summary = calls.map((args) => {
+            const first = args[0];
+            const msg = (first instanceof Error && first.stack)
+              ? first.stack
+              : args.map(String).join(' ');
+            return msg;
+          }).join('\n\n  ');
+          throw new Error(`Expected no console.error calls, but got ${calls.length}:\n  ${summary}`);
+        }
       }),
   };
 }
