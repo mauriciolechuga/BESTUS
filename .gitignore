@@ -5,3 +5,5 @@
 /cypress/screenshots
 /presentation.md
 /.vscode
+/.codegraph
+/.remember

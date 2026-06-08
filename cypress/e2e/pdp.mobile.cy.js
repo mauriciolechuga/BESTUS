@@ -130,6 +130,7 @@ ALL_DEVICES.forEach(({ name, width, height, touchTarget }) => {
 PHONES.forEach(({ name, width, height }) => {
   describe(`PDP – ${name} landscape (${height}x${width})`, { testIsolation: false }, () => {
     before(() => {
+      blockThirdParty();
       cy.viewport(height, width); // landscape: swap width and height
       cy.visit(pdpUrl);
     });

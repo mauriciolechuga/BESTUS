@@ -14,11 +14,14 @@ function assertNoBrokenImages() {
     const srcs = [...new Set(
       [...$imgs]
         .map((img) => img.getAttribute('src'))
-        .filter((src) =>
-          src &&
-          !src.startsWith('data:') &&
-          (src.startsWith('/') || src.includes('bestaccessdoors.com') || src.includes('bigcommerce.com'))
-        )
+        .filter((src) => {
+          if (!src || src.startsWith('data:')) return false;
+          if (!src.startsWith('/') && !src.includes('bestaccessdoors.com') && !src.includes('bigcommerce.com')) {
+            return false;
+          }
+          if (src.includes('yotpo') || src.includes('staticw2')) return false;
+          return true;
+        })
     )];
 
     expect(srcs.length, 'number of site images found').to.be.at.least(1);
