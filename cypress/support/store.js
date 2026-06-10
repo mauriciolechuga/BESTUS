@@ -68,6 +68,45 @@ export function footerConfig() {
   return { ...FOOTER_DEFAULTS, ...((branding && branding.footer) || {}) };
 }
 
+// PLP structure selectors for the BESTUS theme. Nullable keys (breadcrumbHome, sidebar,
+// bestSellers, subcategoryBox) make their tests skip when a store sets them to null.
+// Overridden per store via plp.selectors (see stores/adap.json).
+const PLP_SELECTOR_DEFAULTS = {
+  breadcrumbs: '.breadcrumbs.new_breadcrumbs',
+  breadcrumbHome: 'a.breadcrumb-home',
+  sidebar: '.categories-left',
+  sidebarBlocks: '.categories-left .sidebarBlock',
+  sidebarLinks: '.categories-left .navList-item a',
+  bestSellers: '#treeView li a',
+  subcategoryBox: '.subCategoriesBox',
+};
+
+/** The store's PLP structure selectors: BESTUS defaults merged with plp.selectors. */
+export function plpSelectors() {
+  const { plp } = getStore();
+  return { ...PLP_SELECTOR_DEFAULTS, ...((plp && plp.selectors) || {}) };
+}
+
+// PDP structure selectors for the BESTUS theme. Nullable keys (breadcrumbHome,
+// breadcrumbLabel, relatedCarousel, productInfoForm) make their checks skip when null.
+// Overridden per store via pdp.selectors (see stores/adap.json).
+const PDP_SELECTOR_DEFAULTS = {
+  breadcrumbs: '.breadcrumbs.new_breadcrumbs',
+  breadcrumbHome: 'a.breadcrumb-home',
+  breadcrumbLabel: '.breadcrumb-label',
+  galleryImage: 'section[data-image-gallery] .thumbnail_image',
+  description: '.productView-description1',
+  relatedCarousel: '.content-carousel .owl-carousel',
+  productInfoForm: '#have_a_product_question_request',
+  pdfNewTab: true,
+};
+
+/** The store's PDP structure selectors: BESTUS defaults merged with pdp.selectors. */
+export function pdpSelectors() {
+  const { pdp } = getStore();
+  return { ...PDP_SELECTOR_DEFAULTS, ...((pdp && pdp.selectors) || {}) };
+}
+
 /**
  * Builds a visitable URL from a store-relative path, honoring the store's
  * visitQuery quirk (e.g. AAP requires ?redirect=disable on every visit).

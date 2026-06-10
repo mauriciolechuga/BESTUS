@@ -20,7 +20,12 @@ export class QuoteFormPage extends ZohoFormPage {
   }
 
   fillAddress(v) {
-    cy.get('input[name="SingleLine3"]').clear().type(v);
+    // Address field exists on the BESTUS quote form but not on every store's (ADAP omits it).
+    cy.get('body').then(($body) => {
+      if ($body.find('input[name="SingleLine3"]').length) {
+        cy.get('input[name="SingleLine3"]').clear().type(v);
+      }
+    });
     return this;
   }
 }

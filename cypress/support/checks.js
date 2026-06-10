@@ -4,7 +4,7 @@
  * commands) so they read as plain functions with their rationale documented alongside.
  */
 
-import { homePath, footerConfig } from './store.js';
+import { homePath, footerConfig, pdpSelectors } from './store.js';
 
 const PRODUCT_CARD = 'ul.productGrid li.product';
 const PRODUCT_TITLE = '.card-title';
@@ -289,15 +289,18 @@ export function assertMaxTouchTarget(minHeight) {
 
 /** Asserts the breadcrumb trail has a Home link and at least two labels. */
 export function assertBreadcrumbs() {
-  cy.get('.breadcrumbs.new_breadcrumbs').should('be.visible').within(() => {
-    cy.get('a.breadcrumb-home').should('be.visible');
-    cy.get('.breadcrumb-label').should('have.length.at.least', 2);
+  // Selectors are theme-dependent (see PDP_SELECTOR_DEFAULTS in store.js); home/label
+  // checks only run when the store's theme has those elements.
+  const sel = pdpSelectors();
+  cy.get(sel.breadcrumbs).should('be.visible').within(() => {
+    if (sel.breadcrumbHome) cy.get(sel.breadcrumbHome).should('be.visible');
+    if (sel.breadcrumbLabel) cy.get(sel.breadcrumbLabel).should('have.length.at.least', 2);
   });
 }
 
 /** Asserts the on-PDP "have a product question" Zoho form is present with its required fields. */
 export function assertProductInfoForm() {
-  cy.get('#have_a_product_question_request').should('exist').within(() => {
+  cy.get(pdpSelectors().productInfoForm).should('exist').within(() => {
     cy.get('form[action*="zohopublic"]').should('exist');
     cy.get('input[name="Name_First"]').should('exist');
     cy.get('input[name="Name_Last"]').should('exist');

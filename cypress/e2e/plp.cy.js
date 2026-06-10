@@ -1,8 +1,9 @@
 import { waitForProducts, assertProductCards, blockThirdParty, makeConsoleErrorSpy } from '../support/checks.js';
-import { getStore, describeIfStore, storePath } from '../support/store.js';
+import { getStore, describeIfStore, itIfStore, storePath, plpSelectors } from '../support/store.js';
 
 const site = getStore();
 const plp = site.plp || {};
+const sel = plpSelectors();
 const PLP = plp.main && storePath(plp.main);
 const SUBCAT = plp.subcategory && storePath(plp.subcategory);
 
@@ -24,28 +25,28 @@ describeIfStore(site.plp, 'Product Listing Page', { testIsolation: false }, () =
 
   it('loads with correct heading and breadcrumb', () => {
     cy.get('h1.page-heading').should('contain.text', plp.mainHeading);
-    cy.get('.breadcrumbs.new_breadcrumbs').within(() => {
-      cy.get('a.breadcrumb-home').should('be.visible');
+    cy.get(sel.breadcrumbs).within(() => {
+      if (sel.breadcrumbHome) cy.get(sel.breadcrumbHome).should('be.visible');
       cy.contains('a', plp.breadcrumbLabel).should('be.visible');
     });
   });
 
-  it('sidebar is visible with category navigation', () => {
-    cy.get('.categories-left').should('be.visible');
-    cy.get('.categories-left .sidebarBlock').should('have.length.at.least', 2);
-    cy.get('.categories-left .navList-item a').each(($a) => {
+  itIfStore(sel.sidebar, 'sidebar is visible with category navigation', () => {
+    cy.get(sel.sidebar).should('be.visible');
+    cy.get(sel.sidebarBlocks).should('have.length.at.least', 2);
+    cy.get(sel.sidebarLinks).each(($a) => {
       expect($a.text().trim()).to.not.be.empty;
     });
   });
 
-  it('best sellers sidebar block renders with labelled links', () => {
-    cy.get('#treeView li a').should('have.length.at.least', 1).each(($a) => {
+  itIfStore(sel.bestSellers, 'best sellers sidebar block renders with labelled links', () => {
+    cy.get(sel.bestSellers).should('have.length.at.least', 1).each(($a) => {
       expect($a.text().trim()).to.not.be.empty;
     });
   });
 
-  it('subcategory boxes render with non-empty titles and valid links', () => {
-    cy.get('.subCategoriesBox').should('have.length.at.least', 1).each(($box) => {
+  itIfStore(sel.subcategoryBox, 'subcategory boxes render with non-empty titles and valid links', () => {
+    cy.get(sel.subcategoryBox).should('have.length.at.least', 1).each(($box) => {
       expect($box.find('.nameTitle').text().trim()).to.not.be.empty;
       const href = $box.find('a.navList-action').attr('href');
       expect(href).to.not.be.empty;
@@ -88,8 +89,8 @@ describeIfStore(site.plp, 'Product Listing Page', { testIsolation: false }, () =
 
   // ─── Link health ───────────────────────────────────────────────────────────
 
-  it('sidebar category links all resolve without 404', () => {
-    cy.assertLinksResolve('.categories-left .navList-item a[href]');
+  itIfStore(sel.sidebar, 'sidebar category links all resolve without 404', () => {
+    cy.assertLinksResolve(sel.sidebarLinks);
   });
 });
 
@@ -101,7 +102,7 @@ describeIfStore(site.plp && plp.subcategory, 'PLP subcategory page', { testIsola
 
   it('shows correct heading and breadcrumb trail', () => {
     cy.get('h1.page-heading').invoke('text').should('not.be.empty');
-    cy.get('.breadcrumbs.new_breadcrumbs').within(() => {
+    cy.get(sel.breadcrumbs).within(() => {
       cy.contains('a', plp.breadcrumbLabel).should('be.visible');
     });
   });

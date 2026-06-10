@@ -20,9 +20,10 @@ import {
   makeConsoleErrorSpy,
   pickRandom,
 } from '../support/checks.js';
-import { getStore, describeIfStore, storePath } from '../support/store.js';
+import { getStore, describeIfStore, itIfStore, storePath, pdpSelectors } from '../support/store.js';
 
 const site = getStore();
+const sel = pdpSelectors();
 
 // ─── Shared URL ──────────────────────────────────────────────────────────────
 // One product URL is picked once per spec run and reused across all devices so
@@ -74,7 +75,7 @@ ALL_DEVICES.forEach(({ name, width, height, touchTarget }) => {
 
     it('shows at least one product image with a valid src', () => {
       cy.get('section[data-image-gallery]').should('exist');
-      cy.get('section[data-image-gallery] .thumbnail_image').first().invoke('attr', 'src').should('not.be.empty');
+      cy.get(sel.galleryImage).first().invoke('attr', 'src').should('not.be.empty');
     });
 
     it('quantity input is visible and defaults to 1', () => {
@@ -88,11 +89,11 @@ ALL_DEVICES.forEach(({ name, width, height, touchTarget }) => {
     });
 
     it('description section is present and has content', () => {
-      cy.get('.productView-description1').invoke('text').should('not.be.empty');
+      cy.get(sel.description).invoke('text').should('not.be.empty');
     });
 
-    it('related products carousel renders with items', () => {
-      cy.get('.content-carousel .owl-carousel').should('exist').children().should('have.length.at.least', 1);
+    itIfStore(sel.relatedCarousel, 'related products carousel renders with items', () => {
+      cy.get(sel.relatedCarousel).should('exist').children().should('have.length.at.least', 1);
     });
 
     it('SKU is displayed', () => {
@@ -103,7 +104,7 @@ ALL_DEVICES.forEach(({ name, width, height, touchTarget }) => {
       cy.get('.leadtime_value').invoke('text').should('not.be.empty');
     });
 
-    it('product info request form is present with required fields', () => {
+    itIfStore(sel.productInfoForm, 'product info request form is present with required fields', () => {
       assertProductInfoForm();
     });
 

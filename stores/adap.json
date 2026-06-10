@@ -1,27 +1,100 @@
 {
-  "_todo": "Scaffold. null sections make their specs show as skipped. To enable: verify branding values on the live site, then fill plp, products, forms, discovery, and pdp (see stores/bestus.json for the full shape).",
+  "_notes": "Configured from the live site (June 2026). Quirks: /products/ root 301s to an external subdomain, so plp.main is the Access Doors category; no Pro Club; quote form lives at /new-request-a-quote/; theme differs from BESTUS (footer-v2, .Info-box contact column, plain .breadcrumbs, no sidebar .categories-left, no related-products carousel, product form in #crmWebToEntityForm).",
   "storeCode": "ADAP",
   "baseUrl": "https://www.accessdoorsandpanels.com",
   "homePath": "/",
   "visitQuery": null,
   "branding": {
-    "copyrightText": "Access Doors and Panels",
-    "footerLocationText": null,
-    "warehousesLink": null,
+    "copyrightText": "AccessDoorsAndPanels",
+    "footerLocationText": "Saint Louis",
+    "warehousesLink": { "href": "/warehouses/", "text": "Warehouses" },
     "imageHosts": ["accessdoorsandpanels.com", "bigcommerce.com"],
-    "partnerLinks": null
+    "partnerLinks": null,
+    "footer": {
+      "rootSelector": "footer.footer",
+      "sections": ["footer .footer-info", "footer .footer-bottom", "footer .footer-copyright"],
+      "headingSelector": "footer .footer-info-heading",
+      "headings": ["WHAT'S IN STORE", "Secure Shopping", "My Account", "Contact Info:"],
+      "navLinks": "footer .footer-info-col ul li a",
+      "contactInfoBox": "footer .Info-box",
+      "minContactBoxes": 3,
+      "phoneLinks": "footer .Info-box a[href^=\"tel:\"]",
+      "minPhoneLinks": 1,
+      "copyright": "footer .footer-copyright p",
+      "paymentIcons": "footer .footer-payment-icons"
+    }
   },
-  "plp": null,
-  "products": null,
+  "plp": {
+    "main": "/products/access-doors/",
+    "mainHeading": "Access Doors",
+    "breadcrumbLabel": "Products",
+    "subcategory": "/products/popular-picks/fire-rated/",
+    "selectors": {
+      "breadcrumbs": ".breadcrumbs",
+      "breadcrumbHome": null,
+      "sidebar": ".page-sidebar",
+      "sidebarBlocks": ".page-sidebar .sidebarBlock",
+      "sidebarLinks": ".page-sidebar .navList-item a",
+      "subcategoryBox": null
+    }
+  },
+  "products": {
+    "default": "/18-x-18-fire-resistive-steel-access-door-milcor/",
+    "known": ["/18-x-18-fire-resistive-steel-access-door-milcor/"]
+  },
   "forms": {
-    "productInfo": null,
-    "quoteRequest": null,
-    "contact": null,
+    "productInfo": {
+      "path": "default-product",
+      "submitUrlPattern": "**/forms.zohopublic.com/**/ADAPProductForm/**/submit"
+    },
+    "quoteRequest": {
+      "path": "/new-request-a-quote/",
+      "submitUrlPattern": "**/forms.zohopublic.com/**/ADAPRequestAQuote/**/submit"
+    },
+    "contact": {
+      "path": "/contact-us/",
+      "submitUrlPattern": "**/forms.zohopublic.com/**/ADAPContactUsNew/**/submit"
+    },
     "proClub": null,
     "becomeVendor": null,
     "architectInquiries": null
   },
   "testEmailTemplate": "mauricio+{ts}@accessdoorsandpanels.com",
-  "discovery": null,
-  "pdp": null
+  "discovery": {
+    "search": {
+      "knownTerm": "fire-rated access door",
+      "expectedTokens": ["fire", "rated", "access", "door"],
+      "noResultsTerm": "zzzz-no-products-987654321"
+    },
+    "categories": [
+      "/products/access-doors/",
+      "/products/roof-floor-hatches/",
+      "/products/popular-picks/fire-rated/"
+    ],
+    "mobileCategory": "/products/popular-picks/fire-rated/",
+    "multiPageCategory": "/products/access-doors/",
+    "sort": {
+      "category": "/products/access-doors/",
+      "label": "Price Low to High",
+      "urlHash": "#/ps:calculated_price:asc"
+    }
+  },
+  "pdp": {
+    "popular": [
+      "/18-x-18-fire-resistive-steel-access-door-milcor/",
+      "/16-x-16-drywall-inlay-access-panel-round/",
+      "/36-x-36-fire-rated-insulated-access-door-with-flange-for-drywall-acudor/",
+      "/20-x-24-architectural-grade-flush-door/"
+    ],
+    "selectors": {
+      "breadcrumbs": ".breadcrumbs",
+      "breadcrumbHome": null,
+      "breadcrumbLabel": null,
+      "galleryImage": "section[data-image-gallery] img",
+      "description": ".productView-description",
+      "relatedCarousel": null,
+      "productInfoForm": "#crmWebToEntityForm",
+      "pdfNewTab": false
+    }
+  }
 }

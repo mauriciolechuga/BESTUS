@@ -11,7 +11,9 @@ export class ZohoFormPage {
   }
 
   scrollToForm() {
-    cy.get('form#form').scrollIntoView();
+    // The Zoho form's id varies by store theme (form#form on BESTUS, no id on ADAP) —
+    // target it by its submit action instead.
+    cy.get('form[action*="zohopublic"]').first().scrollIntoView();
     return this;
   }
 
