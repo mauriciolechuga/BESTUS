@@ -1,0 +1,27 @@
+{
+  "_todo": "Scaffold. null sections make their specs show as skipped. To enable: verify branding values on the live site, then fill plp, products, forms, discovery, and pdp (see stores/bestus.json for the full shape).",
+  "storeCode": "BESTCA",
+  "baseUrl": "https://www.bestaccessdoors.ca",
+  "homePath": "/",
+  "visitQuery": null,
+  "branding": {
+    "copyrightText": "Best Access Doors",
+    "footerLocationText": null,
+    "warehousesLink": null,
+    "imageHosts": ["bestaccessdoors.ca", "bigcommerce.com"],
+    "partnerLinks": null
+  },
+  "plp": null,
+  "products": null,
+  "forms": {
+    "productInfo": null,
+    "quoteRequest": null,
+    "contact": null,
+    "proClub": null,
+    "becomeVendor": null,
+    "architectInquiries": null
+  },
+  "testEmailTemplate": "mauricio+{ts}@bestaccessdoors.ca",
+  "discovery": null,
+  "pdp": null
+}

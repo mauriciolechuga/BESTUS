@@ -3,9 +3,10 @@ import { getMultipartField } from '../support/utils/getMultipartField.js';
 import { getStore, describeIfStore } from '../support/store.js';
 
 const site = getStore();
-const submitPattern = site.forms.contact && site.forms.contact.submitUrlPattern;
+const contactForm = site.forms && site.forms.contact;
+const submitPattern = contactForm && contactForm.submitUrlPattern;
 
-describeIfStore(site.forms.contact, 'Contact Us form', () => {
+describeIfStore(contactForm, 'Contact Us form', () => {
   let page;
   let persona;
 

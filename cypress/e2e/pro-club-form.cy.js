@@ -3,9 +3,10 @@ import { getMultipartField } from '../support/utils/getMultipartField.js';
 import { getStore, describeIfStore } from '../support/store.js';
 
 const site = getStore();
-const submitPattern = site.forms.proClub && site.forms.proClub.submitUrlPattern;
+const proClubForm = site.forms && site.forms.proClub;
+const submitPattern = proClubForm && proClubForm.submitUrlPattern;
 
-describeIfStore(site.forms.proClub, 'Pro Club Application form', () => {
+describeIfStore(proClubForm, 'Pro Club Application form', () => {
   let page;
   let persona;
 

@@ -1,0 +1,27 @@
+{
+  "_todo": "Scaffold. null sections make their specs show as skipped. To enable: verify branding values on the live site, then fill plp, products, forms, discovery, and pdp (see stores/bestus.json for the full shape). Spanish-language store: text values (copyright, plp headings, discovery sort label and search terms) must be the Spanish strings shown on the live site.",
+  "storeCode": "PDA",
+  "baseUrl": "https://puertasdeacceso.com.mx",
+  "homePath": "/",
+  "visitQuery": null,
+  "branding": {
+    "copyrightText": "Puertas de Acceso",
+    "footerLocationText": null,
+    "warehousesLink": null,
+    "imageHosts": ["puertasdeacceso.com.mx", "bigcommerce.com"],
+    "partnerLinks": null
+  },
+  "plp": null,
+  "products": null,
+  "forms": {
+    "productInfo": null,
+    "quoteRequest": null,
+    "contact": null,
+    "proClub": null,
+    "becomeVendor": null,
+    "architectInquiries": null
+  },
+  "testEmailTemplate": "mauricio+{ts}@puertasdeacceso.com.mx",
+  "discovery": null,
+  "pdp": null
+}
