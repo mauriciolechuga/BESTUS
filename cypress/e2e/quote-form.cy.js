@@ -1,15 +1,15 @@
 import { QuoteFormPage } from '../support/pages/QuoteFormPage.js';
 import { getMultipartField } from '../support/utils/getMultipartField.js';
+import { getStore, describeIfStore } from '../support/store.js';
 
-describe('Request a Quote form', () => {
+const site = getStore();
+const submitPattern = site.forms.quoteRequest && site.forms.quoteRequest.submitUrlPattern;
+
+describeIfStore(site.forms.quoteRequest, 'Request a Quote form', () => {
   let page;
   let persona;
-  let submitPattern;
 
   before(() => {
-    cy.fixture('site').then((site) => {
-      submitPattern = site.forms.quoteRequest.submitUrlPattern;
-    });
     cy.fixture('personas').then((p) => { persona = p.primary; });
   });
 

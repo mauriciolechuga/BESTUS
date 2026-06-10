@@ -1,15 +1,15 @@
 import { ProClubFormPage } from '../support/pages/ProClubFormPage.js';
 import { getMultipartField } from '../support/utils/getMultipartField.js';
+import { getStore, describeIfStore } from '../support/store.js';
 
-describe('Pro Club Application form', () => {
+const site = getStore();
+const submitPattern = site.forms.proClub && site.forms.proClub.submitUrlPattern;
+
+describeIfStore(site.forms.proClub, 'Pro Club Application form', () => {
   let page;
   let persona;
-  let submitPattern;
 
   before(() => {
-    cy.fixture('site').then((site) => {
-      submitPattern = site.forms.proClub.submitUrlPattern;
-    });
     cy.fixture('personas').then((p) => { persona = p.primary; });
   });
 
