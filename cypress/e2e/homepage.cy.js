@@ -47,15 +47,17 @@ describe('Homepage', { testIsolation: false }, () => {
     cy.get(footer.contactInfoBox).should('have.length.at.least', footer.minContactBoxes);
 
     // Phone and fax: verify tel: links exist and have non-empty text (not hardcoded)
-    cy.get(`${footer.contactInfoBox} a[href^="tel:"]`)
+    cy.get(footer.phoneLinks)
       .should('have.length.at.least', footer.minPhoneLinks)
       .each(($a) => {
         expect($a.text().trim()).to.match(/[\d\-\(\)\s\+]+/);
       });
   });
 
-  itIfStore(branding.footerLocationText, 'footer contact info shows the store location', () => {
-    cy.get(footer.contactInfoBox).contains(branding.footerLocationText).should('exist');
+  itIfStore(branding.footerLocationText, 'footer shows the store location', () => {
+    // Searched footer-wide: some themes put the address in text nodes that are
+    // siblings of the contact-info elements, not inside them.
+    cy.get('footer').contains(branding.footerLocationText).should('exist');
   });
 
   itIfStore(branding.warehousesLink, 'footer shows the warehouses link', () => {
@@ -81,8 +83,19 @@ describe('Homepage', { testIsolation: false }, () => {
   });
 
   it('phone number in header matches footer', () => {
-    cy.get('header [href^="tel:"]').first().invoke('text').then((headerPhone) => {
-      cy.get('footer [href^="tel:"]').first().invoke('text').should('eq', headerPhone.trim());
-    });
+    // First tel link can be a text-less icon, call-tracking scripts rewrite numbers at
+    // runtime, and themes pad the text — so compare the first non-empty trimmed header
+    // number against all footer numbers, retrying while the rewrites settle.
+    const phoneTexts = ($links) =>
+      [...$links].map((a) => a.textContent.trim()).filter((t) => t.length > 0);
+
+    cy.get('header [href^="tel:"]')
+      .should(($h) => expect(phoneTexts($h), 'header shows a phone number').to.not.be.empty)
+      .then(($h) => {
+        const headerPhone = phoneTexts($h)[0];
+        cy.get('footer [href^="tel:"]').should(($f) => {
+          expect(phoneTexts($f), 'footer phone numbers').to.include(headerPhone);
+        });
+      });
   });
 });

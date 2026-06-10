@@ -74,7 +74,15 @@ Cypress.Commands.add('assertLinksResolve', (selector, options = {}) => {
       ),
     ];
     hrefs.forEach((href) => {
-      const url = href.startsWith('http') ? href : `${Cypress.config('baseUrl')}${href}`;
+      // Resolve relative/protocol-relative hrefs against baseUrl; drop anything that
+      // isn't http(s) after resolution (javascript:, data:, malformed values).
+      let url;
+      try {
+        url = new URL(href, Cypress.config('baseUrl')).href;
+      } catch {
+        return;
+      }
+      if (!/^https?:/.test(url)) return;
       cy.request({ url, failOnStatusCode: false }).its('status').should('not.eq', 404);
     });
   });

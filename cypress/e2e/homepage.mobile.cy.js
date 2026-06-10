@@ -62,15 +62,16 @@ ALL_DEVICES.forEach(({ name, width, height, touchTarget }) => {
 
     it('footer contact info has phone and fax links in the DOM', () => {
       cy.get(footer.contactInfoBox).should('have.length.at.least', footer.minContactBoxes);
-      cy.get(`${footer.contactInfoBox} a[href^="tel:"]`)
+      cy.get(footer.phoneLinks)
         .should('have.length.at.least', footer.minPhoneLinks)
         .each(($a) => {
           expect($a.text().trim()).to.match(/[\d\-\(\)\s\+]+/);
         });
     });
 
-    itIfStore(branding.footerLocationText, 'footer contact info shows the store location', () => {
-      cy.get(footer.contactInfoBox).contains(branding.footerLocationText).should('exist');
+    itIfStore(branding.footerLocationText, 'footer shows the store location', () => {
+      // Footer-wide: some themes keep the address in sibling text nodes (see homepage.cy.js).
+      cy.get('footer').contains(branding.footerLocationText).should('exist');
     });
 
     itIfStore(branding.warehousesLink, 'footer warehouses link is in the DOM', () => {

@@ -54,6 +54,9 @@ const FOOTER_DEFAULTS = {
   navLinks: 'footer .box ul li a',
   contactInfoBox: 'footer .Contact-info-box',
   minContactBoxes: 3,
+  // Some themes (BESTCA) render tel links as siblings of the contact-info label
+  // elements rather than inside them, so the phone-link selector is independent.
+  phoneLinks: 'footer .Contact-info-box a[href^="tel:"]',
   minPhoneLinks: 2,
   copyright: 'footer .Copyright p',
   paymentIcons: 'footer .footer-payment-icons',
