@@ -1,7 +1,8 @@
 import { ZohoFormPage } from './ZohoFormPage.js';
+import { getStore } from '../store.js';
 
 export class QuoteFormPage extends ZohoFormPage {
-  get path() { return '/request-a-quote/'; }
+  get path() { return getStore().forms.quoteRequest.path; }
 
   fillModel(v) {
     cy.get('input[name="SingleLine1"]').clear().type(v);

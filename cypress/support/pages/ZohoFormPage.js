@@ -1,10 +1,12 @@
+import { storePath } from '../store.js';
+
 export class ZohoFormPage {
   get path() {
     throw new Error('ZohoFormPage subclass must define path');
   }
 
   visit() {
-    cy.visit(this.path);
+    cy.visit(storePath(this.path));
     return this;
   }
 

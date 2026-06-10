@@ -1,8 +1,9 @@
 import { uniqueEmail } from './utils/uniqueEmail.js';
 import { setupZohoIntercept } from './utils/zohoIntercept.js';
+import { getStore } from './store.js';
 
 Cypress.Commands.add('uniqueEmail', () => {
-  return cy.fixture('site').then((site) => uniqueEmail(site.testEmailTemplate));
+  return cy.wrap(uniqueEmail(getStore().testEmailTemplate), { log: false });
 });
 
 /**
