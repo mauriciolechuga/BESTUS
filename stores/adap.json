@@ -56,7 +56,10 @@
       "submitUrlPattern": "**/forms.zohopublic.com/**/ADAPContactUsNew/**/submit"
     },
     "proClub": null,
-    "becomeVendor": null,
+    "becomeVendor": {
+      "path": "/bvl1/",
+      "submitUrlPattern": "**/forms.zohopublic.com/**/ADAPcomApplyForVendor/**/submit"
+    },
     "architectInquiries": null
   },
   "testEmailTemplate": "mauricio+{ts}@accessdoorsandpanels.com",

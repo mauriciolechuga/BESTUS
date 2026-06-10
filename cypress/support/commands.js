@@ -14,6 +14,7 @@ Cypress.Commands.add('fillPersona', (formPage, persona, email) => {
   if (typeof formPage.fillFirstName     === 'function') formPage.fillFirstName(persona.firstName);
   if (typeof formPage.fillLastName      === 'function') formPage.fillLastName(persona.lastName);
   if (typeof formPage.fillCompany       === 'function') formPage.fillCompany(persona.company);
+  if (typeof formPage.fillWebsite       === 'function') formPage.fillWebsite(persona.website);
   if (typeof formPage.fillEmail         === 'function') formPage.fillEmail(email);
   if (typeof formPage.fillPhone         === 'function') formPage.fillPhone(persona.phoneCode, persona.phoneNumber);
   if (typeof formPage.fillDetails       === 'function') formPage.fillDetails(persona.details);

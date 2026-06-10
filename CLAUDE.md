@@ -92,6 +92,7 @@ Subclasses add form-specific fields:
 - `contact-form.cy.js` — submission success, payload validation, optional file attachment; validates inquiry type options and required fields
 - `quote-form.cy.js` — submission success, payload validation; validates quantity options and required fields
 - `pro-club-form.cy.js` — submission success, non-US country support, payload validation; validates country dropdown default and required fields
+- `become-vendor-form.cy.js` — submission success, payload validation; minimal negative coverage (the only store with the form so far, ADAP at `/bvl1/`, uses a custom-built page posting to Zoho — no `zf-submitColor` button, details textarea named "Additional Details" — so client-side validation behavior is unconfirmed)
 - `product-form.cy.js` — submission success, payload validation; validates required fields including details textarea
 
 **Page/layout tests:**
@@ -140,10 +141,10 @@ When verifying that form values are actually sent, tests use `getMultipartField(
 
 Mobile specs use `cy.viewport(width, height)` per device in `beforeEach`. The `footer.tcsFooter` element and `.categories-left` sidebar are `display:none` on mobile — tests assert DOM presence rather than visibility for these. Touch target tests use `cypress-real-events` (`cy.realHover()`) and check computed sizes against thresholds (44px for phones, 24px for tablets).
 
-### Adding a New Form Test (e.g. the deferred becomeVendor / architectInquiries forms)
+### Adding a New Form Test (e.g. the deferred architectInquiries form)
 
-1. Create a page object in `cypress/support/pages/` extending `ZohoFormPage`; read its `path` from `getStore().forms.<name>.path`
-2. Fill the form's `{ path, submitUrlPattern }` in each store's `stores/<code>.json` that has the form (the `forms.becomeVendor` / `forms.architectInquiries` slots already exist as `null`); leave it `null` for stores without it
+1. Create a page object in `cypress/support/pages/` extending `ZohoFormPage`; read its `path` from `getStore().forms.<name>.path` (see `BecomeVendorFormPage.js` for an example that also overrides `submit()` for a custom-built form)
+2. Fill the form's `{ path, submitUrlPattern }` in each store's `stores/<code>.json` that has the form (the `forms.architectInquiries` slot already exists as `null`); leave it `null` for stores without it
 3. Create a spec in `cypress/e2e/` following the existing pattern: module-level `const site = getStore()`, outer `describeIfStore(site.forms && site.forms.<name>, ...)` gate, `before()` loads the personas fixture, `beforeEach()` instantiates the page, `describe('Happy path')` covers success + payload, `describe('Validation')` covers empty/malformed fields
 
 ### Adding a New Page/Layout Test
