@@ -17,9 +17,10 @@ import {
   blockThirdParty,
   makeConsoleErrorSpy,
 } from '../support/checks.js';
-import { getStore, itIfStore, homePath } from '../support/store.js';
+import { getStore, itIfStore, homePath, footerConfig } from '../support/store.js';
 
 const { branding } = getStore();
+const footer = footerConfig();
 
 // ═════════════════════════════════════════════════════════════════════════════
 // Portrait tests — all devices
@@ -47,8 +48,8 @@ ALL_DEVICES.forEach(({ name, width, height, touchTarget }) => {
 
     it('loads with key elements visible', () => {
       cy.get('header').should('be.visible');
-      // footer.tcsFooter is display:none on phone viewports — assert DOM presence only.
-      cy.get('footer.tcsFooter').should('exist');
+      // The desktop footer is display:none on phone viewports — assert DOM presence only.
+      cy.get(footer.rootSelector).should('exist');
       // Desktop-only seasonal banners are display:none on mobile — find a visible main element.
       cy.get('[class*="carousel"], [class*="hero"], [class*="banner"], main, [role="main"]')
         .filter(':visible')
@@ -60,14 +61,16 @@ ALL_DEVICES.forEach(({ name, width, height, touchTarget }) => {
     });
 
     it('footer contact info has phone and fax links in the DOM', () => {
-      cy.get('footer .Contact-info-box').should('have.length.at.least', 3);
-      cy.get('footer .Contact-info-box a[href^="tel:"]').should('have.length.at.least', 2).each(($a) => {
-        expect($a.text().trim()).to.match(/[\d\-\(\)\s\+]+/);
-      });
+      cy.get(footer.contactInfoBox).should('have.length.at.least', footer.minContactBoxes);
+      cy.get(`${footer.contactInfoBox} a[href^="tel:"]`)
+        .should('have.length.at.least', footer.minPhoneLinks)
+        .each(($a) => {
+          expect($a.text().trim()).to.match(/[\d\-\(\)\s\+]+/);
+        });
     });
 
     itIfStore(branding.footerLocationText, 'footer contact info shows the store location', () => {
-      cy.get('footer .Contact-info-box').contains(branding.footerLocationText).should('exist');
+      cy.get(footer.contactInfoBox).contains(branding.footerLocationText).should('exist');
     });
 
     itIfStore(branding.warehousesLink, 'footer warehouses link is in the DOM', () => {
@@ -77,12 +80,12 @@ ALL_DEVICES.forEach(({ name, width, height, touchTarget }) => {
     });
 
     it('footer payment icons section exists in the DOM', () => {
-      cy.get('footer .footer-payment-icons').should('exist');
+      cy.get(footer.paymentIcons).should('exist');
     });
 
     it('footer copyright year is current', () => {
-      cy.get('footer .Copyright p').should('contain.text', new Date().getFullYear().toString());
-      cy.get('footer .Copyright p').should('contain.text', branding.copyrightText);
+      cy.get(footer.copyright).should('contain.text', new Date().getFullYear().toString());
+      cy.get(footer.copyright).should('contain.text', branding.copyrightText);
     });
 
     it('footer phone number exists in the DOM', () => {
@@ -121,7 +124,7 @@ PHONES.forEach(({ name, width, height }) => {
 
     it('loads with key elements visible', () => {
       cy.get('header').should('be.visible');
-      cy.get('footer.tcsFooter').should('exist');
+      cy.get(footer.rootSelector).should('exist');
       cy.get('[class*="carousel"], [class*="hero"], [class*="banner"], main, [role="main"]')
         .filter(':visible')
         .should('have.length.at.least', 1);

@@ -43,6 +43,28 @@ export function itIfStore(condition, title, fn) {
   return block(fullTitle, fn);
 }
 
+// Footer markup for the BESTUS theme ("tcs" footer). Other stores run different
+// BigCommerce themes (e.g. BESTCA uses footer.footer with h5.footer-info-heading),
+// so any of these can be overridden per store via branding.footer in stores/<code>.json.
+const FOOTER_DEFAULTS = {
+  rootSelector: 'footer.tcsFooter',
+  sections: ['footer .footer-top', 'footer .footer-bottom', 'footer .Copyright'],
+  headingSelector: 'footer .box h3',
+  headings: ["WHAT'S IN STORE", 'SECURE SHOPPING', 'MY ACCOUNT', 'Contact Info'],
+  navLinks: 'footer .box ul li a',
+  contactInfoBox: 'footer .Contact-info-box',
+  minContactBoxes: 3,
+  minPhoneLinks: 2,
+  copyright: 'footer .Copyright p',
+  paymentIcons: 'footer .footer-payment-icons',
+};
+
+/** The store's footer selectors/expectations: BESTUS defaults merged with branding.footer. */
+export function footerConfig() {
+  const { branding } = getStore();
+  return { ...FOOTER_DEFAULTS, ...((branding && branding.footer) || {}) };
+}
+
 /**
  * Builds a visitable URL from a store-relative path, honoring the store's
  * visitQuery quirk (e.g. AAP requires ?redirect=disable on every visit).

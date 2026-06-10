@@ -1,15 +1,30 @@
 {
-  "_todo": "Scaffold. null sections make their specs show as skipped. To enable: verify branding values on the live site, then fill plp, products, forms, discovery, and pdp (see stores/bestus.json for the full shape).",
+  "_todo": "Branding/footer verified against the live site (June 2026). Still to fill: plp, products, forms, discovery, pdp (see stores/bestus.json for the full shape) — those specs skip until then.",
   "storeCode": "BESTCA",
   "baseUrl": "https://www.bestaccessdoors.ca",
   "homePath": "/",
   "visitQuery": null,
   "branding": {
-    "copyrightText": "Best Access Doors",
-    "footerLocationText": null,
-    "warehousesLink": null,
+    "copyrightText": "Best Access Doors - Canada",
+    "footerLocationText": "Ancaster",
+    "warehousesLink": { "href": "https://www.bestaccessdoors.ca/warehouses/", "text": "Warehouses" },
     "imageHosts": ["bestaccessdoors.ca", "bigcommerce.com"],
-    "partnerLinks": null
+    "partnerLinks": [
+      "https://www.bimobject.com/en/best-access-doors?location=us",
+      "https://www.rib-software.com/en/rib-speclink"
+    ],
+    "footer": {
+      "rootSelector": "footer.footer",
+      "sections": ["footer .footer-info", "footer .footer-copyright"],
+      "headingSelector": "footer .footer-info-heading",
+      "headings": ["What's In Store", "Secure Shopping", "My Account", "Contact Info"],
+      "navLinks": "footer .footer-info-col ul li a",
+      "contactInfoBox": "footer .contactbox",
+      "minContactBoxes": 1,
+      "minPhoneLinks": 1,
+      "copyright": "footer .footer-copyright p",
+      "paymentIcons": "footer .footer-payment-icons"
+    }
   },
   "plp": null,
   "products": null,

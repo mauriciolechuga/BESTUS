@@ -4,7 +4,7 @@
  * commands) so they read as plain functions with their rationale documented alongside.
  */
 
-import { homePath } from './store.js';
+import { homePath, footerConfig } from './store.js';
 
 const PRODUCT_CARD = 'ul.productGrid li.product';
 const PRODUCT_TITLE = '.card-title';
@@ -306,23 +306,23 @@ export function assertProductInfoForm() {
 }
 
 /**
- * Asserts the footer's four sections are present along with their heading text.
+ * Asserts the footer's sections are present along with their heading text.
+ * Selectors and expected headings come from the store's footer config (theme-dependent —
+ * see FOOTER_DEFAULTS in store.js and branding.footer in stores/<code>.json).
  * @param {'exist'|'be.visible'} mode — desktop footer is visible; mobile footer is display:none.
  */
 export function assertFooterHeadings(mode = 'exist') {
-  cy.get('footer.tcsFooter').should(mode);
-  cy.get('footer .footer-top').should(mode);
-  cy.get('footer .footer-bottom').should(mode);
-  cy.get('footer .Copyright').should(mode);
+  const footer = footerConfig();
+  cy.get(footer.rootSelector).should(mode);
+  footer.sections.forEach((selector) => cy.get(selector).should(mode));
 
-  const expected = ["WHAT'S IN STORE", 'SECURE SHOPPING', 'MY ACCOUNT', 'Contact Info'];
-  cy.get('footer .box h3').then(($headings) => {
+  cy.get(footer.headingSelector).then(($headings) => {
     const texts = [...$headings].map((el) => {
       const clone = el.cloneNode(true);
       clone.querySelectorAll('svg').forEach((svg) => svg.remove());
       return clone.textContent.trim();
     });
-    expected.forEach((heading) => expect(texts).to.include(heading));
+    footer.headings.forEach((heading) => expect(texts).to.include(heading));
   });
 }
 

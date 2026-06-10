@@ -46,6 +46,7 @@ npm run test:live
   - `homePath()` — the store's homepage path (FSE's homepage is `/new-home/`, not `/`)
 - **Nullable-section contract** in `stores/*.json`: `plp`, `products`, `discovery`, `pdp`, and each entry under `forms` may be `null`, which makes the specs gated on them skip. `storeCode`, `baseUrl`, `homePath`, `branding.copyrightText`, and `branding.imageHosts` are required. `branding.footerLocationText`, `branding.warehousesLink`, and `branding.partnerLinks` may be `null` (their individual homepage tests skip). See `stores/bestus.json` for the full shape; scaffolds carry a `_todo` key describing what to fill.
 - Store-specific text lives in config, not specs: brand/copyright text, footer location, PLP heading/breadcrumb labels (`plp.mainHeading`/`plp.breadcrumbLabel` — Spanish on PDA), search terms, sort label.
+- **Footer theme drift**: stores run different BigCommerce footer themes, so footer selectors/expectations are config-driven. `FOOTER_DEFAULTS` in `store.js` holds the BESTUS values (`footer.tcsFooter`, `.box h3`, `.Contact-info-box`, `.Copyright p`, 2+ tel links); any key can be overridden per store via `branding.footer` (see `stores/bestca.json`, which uses `footer.footer`, `h5.footer-info-heading`, `.contactbox`, `.footer-copyright p`, 1 tel link). `footerConfig()` returns the merged result; `assertFooterHeadings` and both homepage specs read from it.
 - Cypress cannot change `baseUrl` mid-run, so `scripts/run-all.js` spawns one `cypress run` process per store.
 
 ## Browser Baselines
