@@ -4,7 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What This Is
 
-A Cypress end-to-end test suite that verifies customer-facing forms and pages on [bestaccessdoors.com](https://www.bestaccessdoors.com) are working correctly. Tests run against the live website. No application code lives here — only test code.
+A multi-store Cypress end-to-end test suite that verifies customer-facing forms and pages on the Best Access Doors family of live BigCommerce storefronts. One shared set of specs runs against any store; each store is described by a JSON file in `stores/`. No application code lives here — only test code.
+
+Stores: BESTUS (bestaccessdoors.com — fully configured, the default), BESTCA, ADAP, ADC, AAP, FSE, BRH, CAD, PDA (scaffolds — homepage-level specs only until their config sections are filled in).
 
 ## Commands
 
@@ -12,20 +14,39 @@ A Cypress end-to-end test suite that verifies customer-facing forms and pages on
 # Install dependencies (once)
 npm install
 
-# Run all tests headlessly (stub mode — no real leads created)
-npx cypress run
+# Run all tests headlessly against the default store, BESTUS (stub mode — no real leads created)
+npx cypress run            # or: npm test
 
 # Run a single spec file
 npx cypress run --spec "cypress/e2e/contact-form.cy.js"
 
-# Open interactive Cypress app
+# Run against a specific store
+npm run test:store bestca
+npm run test:store -- aap --spec "cypress/e2e/homepage.cy.js"   # extra args forwarded to cypress run
+
+# Run every store sequentially (continues on failure, summary table at the end)
+npm run test:all
+npm run test:all -- --stores bestus,bestca
+
+# Open interactive Cypress app (default store; restart after editing a stores/*.json)
 npx cypress open
+npx cross-env STORE=bestca cypress open
 
 # Live submission mode (creates real Zoho CRM leads — use sparingly)
-LIVE_SUBMIT=true I_KNOW_THIS_IS_LIVE=true npx cypress run
+npm run test:live
 ```
 
-Note: `package.json` has no `scripts` section, so the `npm test` / `npm run open` commands in the README will not work. Use `npx cypress` directly.
+## Multi-Store Architecture
+
+- `cypress.config.js` reads `process.env.STORE` (default `bestus`), loads `stores/<STORE>.json`, sets `baseUrl` from it, and injects the whole object into `Cypress.env('site')` plus `STORE`. Screenshots/videos go to per-store subfolders (`cypress/videos/<store>/`). The loader throws with the list of available codes on an unknown store and sanity-checks `storeCode`/`baseUrl`/`homePath`.
+- `cypress/support/store.js` is the only module that reads `Cypress.env('site')`. It exports:
+  - `getStore()` — the store config object, available synchronously at spec module-evaluation time (this is why config is injected via env rather than `cy.fixture()` — `describe` vs `describe.skip` must be decided at collection time)
+  - `describeIfStore(condition, title, [options,] fn)` / `itIfStore(condition, title, fn)` — run the suite/test when the config section exists, otherwise `describe.skip`/`it.skip` with a `[skipped: not configured for <CODE>]` title suffix so missing features show as pending, never silently absent
+  - `storePath(path)` — appends the store's `visitQuery` if set (AAP needs `?redirect=disable` on every visit)
+  - `homePath()` — the store's homepage path (FSE's homepage is `/new-home/`, not `/`)
+- **Nullable-section contract** in `stores/*.json`: `plp`, `products`, `discovery`, `pdp`, and each entry under `forms` may be `null`, which makes the specs gated on them skip. `storeCode`, `baseUrl`, `homePath`, `branding.copyrightText`, and `branding.imageHosts` are required. `branding.footerLocationText`, `branding.warehousesLink`, and `branding.partnerLinks` may be `null` (their individual homepage tests skip). See `stores/bestus.json` for the full shape; scaffolds carry a `_todo` key describing what to fill.
+- Store-specific text lives in config, not specs: brand/copyright text, footer location, PLP heading/breadcrumb labels (`plp.mainHeading`/`plp.breadcrumbLabel` — Spanish on PDA), search terms, sort label.
+- Cypress cannot change `baseUrl` mid-run, so `scripts/run-all.js` spawns one `cypress run` process per store.
 
 ## Browser Baselines
 
@@ -59,7 +80,7 @@ Subclasses add form-specific fields:
 
 ### Custom Commands (`cypress/support/commands.js`)
 
-- `cy.uniqueEmail()` — generates a timestamped test email from `site.json`'s `testEmailTemplate`
+- `cy.uniqueEmail()` — generates a timestamped test email from the store config's `testEmailTemplate`
 - `cy.fillPersona(formPage, persona, email)` — duck-typed: calls fill methods on the page object only if they exist, so the same persona object works across all forms
 - `cy.interceptZoho(alias, urlPattern)` — sets up stub or passthrough intercept based on env flags
 
@@ -76,7 +97,7 @@ Subclasses add form-specific fields:
 - `homepage.mobile.cy.js` — 6 phones + 4 tablets (portrait + phone landscape); key elements, footer, contact info, payment icons, copyright, no horizontal overflow, mobile nav present, touch target sizes (≥44px phones, ≥24px tablets)
 - `plp.cy.js` — heading, breadcrumb, sidebar categories, best sellers, subcategory boxes, product grid (image/title/price/link on first 3 cards), PDP navigation, pagination controls + JSON blob validity, sidebar category link health, no console errors
 - `plp.mobile.cy.js` — same device matrix as homepage.mobile; heading, breadcrumb, product grid, product cards, subcategory boxes, sidebar DOM presence, no horizontal overflow, mobile nav, no console errors
-- `pdp.cy.js` — picks a random URL from `site.json`'s `pdp.popular` list each run; checks breadcrumbs, product title (`h1.productView-title`), price (`[data-product-price-without-tax]`), image gallery, quantity input + inc/dec buttons, Add to Cart button, PDF spec sheet links (open in `_blank`), description section, optional YouTube iframe, related products carousel (`.content-carousel .owl-carousel`), Yotpo reviews widget, SearchSpring recently-viewed script tag, product info request form fields, SKU, and lead time / stock status; no console errors
+- `pdp.cy.js` — picks a random URL from the store config's `pdp.popular` list each run; checks breadcrumbs, product title (`h1.productView-title`), price (`[data-product-price-without-tax]`), image gallery, quantity input + inc/dec buttons, Add to Cart button, PDF spec sheet links (open in `_blank`), description section, optional YouTube iframe, related products carousel (`.content-carousel .owl-carousel`), Yotpo reviews widget, SearchSpring recently-viewed script tag, product info request form fields, SKU, and lead time / stock status; no console errors
 - `pdp.mobile.cy.js` — same 6 phones + 4 tablets device matrix as other mobile specs; portrait pass per device covers header visible, breadcrumbs, title, price, image gallery, qty input, Add to Cart, description, carousel, SKU, lead time, product info form, mobile nav DOM presence, no horizontal overflow, no console errors, touch target height (44px phones / 24px tablets); landscape pass for phones only covers title and no horizontal overflow
 - `discovery.cy.js` — search (known term returns relevant products checked against `expectedTokens`; nonsense term shows a no-results message or an empty grid), category/refinement pages render, sort by price low-to-high verified by `assertSortApplied` (the URL hash becomes `#/ps:calculated_price:asc` AND the grid re-renders to a different order than the default) rather than by asserting numeric price order — the cheapest items are "Call for pricing" with no price and sort to the top, so the visible grid often shows no prices; numeric ascending order is only checked opportunistically if priced products happen to be visible. Pagination advances to page 2 (`pp=2`) with a different product set, PDP handoff from results; one console-error check on a category load. Cross-page logic lives in `checks.js` helpers (`performHeaderSearch`, `assertSearchResults`, `assertNoSearchResults`, `assertDiscoveryPage`, `applySortOption`, `assertSortApplied`, `assertPaginationAdvanced`)
 - `discovery.mobile.cy.js` — same 6 phones + 4 tablets device matrix; per device, a category page (portrait) and a search-results page render with no horizontal overflow and no console errors
@@ -86,19 +107,20 @@ Subclasses add form-specific fields:
 - `images.cy.js` — on a random PDP: asserts all product gallery images have non-empty `alt` attributes; on homepage and a random PDP: requests all same-domain images and asserts none return 4xx/5xx
 - `lighthouse.cy.js` — Chrome only (auto-skipped in Firefox); runs Lighthouse on homepage, PLP, and a random PDP and fails if Performance < 50, Accessibility < 80, or SEO < 70
 
-### Fixtures
+### Fixtures and Store Configs
 
-- `site.json` — canonical source for base URL, form paths, Zoho submit URL glob patterns, product URLs (`products.known`), PDP URLs (`pdp.popular`), discovery inputs (`discovery`: search terms/`expectedTokens`, representative `categories`, `mobileCategory`, `multiPageCategory`, and `sort` label/param/value), and `testEmailTemplate`
-- `personas.json` — fake customer data used as form input; `primary` is the only persona currently defined
+- `stores/<code>.json` (NOT a Cypress fixture — loaded by Node in `cypress.config.js`) — canonical per-store source for base URL, `homePath`/`visitQuery` quirks, branding text, PLP paths/labels, form paths, Zoho submit URL glob patterns, product URLs (`products.known`), PDP URLs (`pdp.popular`), discovery inputs (`discovery`: search terms/`expectedTokens`, representative `categories`, `mobileCategory`, `multiPageCategory`, and `sort` label/param/value), and `testEmailTemplate`
+- `personas.json` — fake customer data used as form input; `primary` is the only persona currently defined; store-agnostic and shared by all stores
 
 ### Environment Variables
 
 | Variable | Purpose |
 |---|---|
+| `STORE` | Which store to run against (a filename from `stores/`, default `bestus`) |
 | `LIVE_SUBMIT` | Set to `true` to allow real form submissions |
 | `I_KNOW_THIS_IS_LIVE` | Must also be `true` to enable live mode (second safety gate) |
 | `PRODUCT_URL` | Override which product page the product-form tests use |
-| `RANDOMIZE_PRODUCT` | Pick a random URL from `site.json`'s `products.known` list |
+| `RANDOMIZE_PRODUCT` | Pick a random URL from the store config's `products.known` list |
 
 ### Global Setup (`cypress/support/e2e.js`)
 
@@ -116,14 +138,22 @@ When verifying that form values are actually sent, tests use `getMultipartField(
 
 Mobile specs use `cy.viewport(width, height)` per device in `beforeEach`. The `footer.tcsFooter` element and `.categories-left` sidebar are `display:none` on mobile — tests assert DOM presence rather than visibility for these. Touch target tests use `cypress-real-events` (`cy.realHover()`) and check computed sizes against thresholds (44px for phones, 24px for tablets).
 
-### Adding a New Form Test
+### Adding a New Form Test (e.g. the deferred becomeVendor / architectInquiries forms)
 
-1. Create a page object in `cypress/support/pages/` extending `ZohoFormPage`
-2. Add the form path and `submitUrlPattern` to `site.json` under `forms`
-3. Create a spec in `cypress/e2e/` following the existing pattern: `before()` loads fixtures, `beforeEach()` instantiates the page, `describe('Happy path')` covers success + payload, `describe('Validation')` covers empty/malformed fields
+1. Create a page object in `cypress/support/pages/` extending `ZohoFormPage`; read its `path` from `getStore().forms.<name>.path`
+2. Fill the form's `{ path, submitUrlPattern }` in each store's `stores/<code>.json` that has the form (the `forms.becomeVendor` / `forms.architectInquiries` slots already exist as `null`); leave it `null` for stores without it
+3. Create a spec in `cypress/e2e/` following the existing pattern: module-level `const site = getStore()`, outer `describeIfStore(site.forms && site.forms.<name>, ...)` gate, `before()` loads the personas fixture, `beforeEach()` instantiates the page, `describe('Happy path')` covers success + payload, `describe('Validation')` covers empty/malformed fields
 
 ### Adding a New Page/Layout Test
 
 1. Create a spec in `cypress/e2e/` — no page object needed for read-only page checks
-2. For a matching mobile spec, reuse the same device matrix defined in the existing mobile specs
-3. Block analytics and suppress third-party exceptions via the global `e2e.js` setup (already applied automatically)
+2. Read store data via `getStore()` from `cypress/support/store.js` at module level; gate the suite with `describeIfStore` on the config section it needs, and use `storePath()`/`homePath()` for visits so per-store quirks apply
+3. For a matching mobile spec, reuse the same device matrix defined in the existing mobile specs
+4. Block analytics and suppress third-party exceptions via the global `e2e.js` setup (already applied automatically)
+
+### Onboarding a Scaffolded Store
+
+1. Open the store's `stores/<code>.json` — the `_todo` key lists what's missing
+2. Verify `branding.copyrightText` (and optionally `footerLocationText`, `warehousesLink`, `partnerLinks`) against the live footer
+3. Fill `plp`, `products`, `forms`, `discovery`, and `pdp` using `stores/bestus.json` as the reference shape — each section you fill automatically enables its specs on the next run
+4. For non-English stores (PDA), all user-visible text values in the config must be the localized strings from the live site

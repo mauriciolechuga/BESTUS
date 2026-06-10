@@ -1,6 +1,24 @@
-# BESTUS — Automated Testing for BestAccessDoors.com
+# Automated Testing for the Best Access Doors Stores
 
-This project automatically checks that the customer-facing forms and key pages on [bestaccessdoors.com](https://www.bestaccessdoors.com) are working correctly. It acts like a robot customer: it opens the website, fills out forms, clicks submit, and verifies that everything behaves as expected — all without a human having to do it by hand.
+This project automatically checks that the customer-facing forms and key pages on the Best Access Doors family of stores are working correctly. It acts like a robot customer: it opens the website, fills out forms, clicks submit, and verifies that everything behaves as expected — all without a human having to do it by hand.
+
+One shared set of tests runs against any of the stores. Each store has its own small configuration file in the `stores/` folder; the tests adapt automatically.
+
+## Supported Stores
+
+| Code | Store | Status |
+|------|-------|--------|
+| `bestus` | [bestaccessdoors.com](https://www.bestaccessdoors.com) | Fully configured (default) |
+| `bestca` | [bestaccessdoors.ca](https://www.bestaccessdoors.ca) | Scaffold — homepage checks only |
+| `adap` | [accessdoorsandpanels.com](https://www.accessdoorsandpanels.com) | Scaffold — homepage checks only |
+| `adc` | [accessdoorscanada.ca](https://accessdoorscanada.ca) | Scaffold — homepage checks only |
+| `aap` | [acudoraccesspanels.com](https://www.acudoraccesspanels.com) | Scaffold — homepage checks only |
+| `fse` | [firesafetyequipment.com](https://firesafetyequipment.com) | Scaffold — homepage checks only |
+| `brh` | [bestroofhatches.com](https://bestroofhatches.com) | Scaffold — homepage checks only |
+| `cad` | [californiaaccessdoors.com](https://californiaaccessdoors.com) | Scaffold — homepage checks only |
+| `pda` | [puertasdeacceso.com.mx](https://puertasdeacceso.com.mx) | Scaffold — homepage checks only |
+
+A "scaffold" store runs the tests that only need a homepage (layout, SEO, images, Lighthouse). All other tests show up as **skipped** ("pending") until the store's config file is filled in — filling in a section (products, forms, categories…) automatically enables its tests with no code changes.
 
 ---
 
@@ -106,7 +124,31 @@ This opens the Cypress app where you can pick which tests to run and watch them 
 npm test -- --spec "cypress/e2e/contact-form.cy.js"
 ```
 
-### Option 4 — Live Submission (weekly smoke test only)
+### Option 4 — Run a specific store
+
+```
+npm run test:store bestca
+npm run test:store -- aap --spec "cypress/e2e/homepage.cy.js"
+```
+
+The first argument is the store code from the table above. Anything after it is passed straight to Cypress. To open the interactive app for another store:
+
+```
+npx cross-env STORE=bestca cypress open
+```
+
+(Restart `cypress open` after editing a store's JSON file — the config is read once at launch.)
+
+### Option 5 — Run every store
+
+```
+npm run test:all
+npm run test:all -- --stores bestus,bestca
+```
+
+Stores run one after another (each gets its own browser session), failures don't stop the loop, and a pass/fail summary table prints at the end. Screenshots and videos are saved per store (`cypress/videos/bestca/`, etc.).
+
+### Option 6 — Live Submission (weekly smoke test only)
 
 ```
 npm run test:live
@@ -130,6 +172,7 @@ After running `npx cypress run`, you'll see a summary like this:
 
 - **passing** — tests that worked correctly
 - **failing** — tests that found a problem (the name tells you which form/page and what failed)
+- **pending** — tests skipped on purpose because the store's config doesn't include that feature yet; the test title says `[skipped: not configured for <STORE>]`
 
 If any tests fail, Cypress automatically saves a **screenshot** of the browser at the moment of failure. You can find these in the `cypress/screenshots/` folder.
 
@@ -140,11 +183,18 @@ Video recordings of each test run are saved to `cypress/videos/`.
 ## Project Structure
 
 ```
-BESTUS/
-├── cypress.config.js              Configuration (which website to test, timeouts, etc.)
+├── cypress.config.js              Configuration: loads the selected store's JSON, timeouts, etc.
+│
+├── stores/                        One JSON file per store — URLs, form paths, brand text
+│   ├── bestus.json                Fully configured (the reference example)
+│   └── bestca.json … pda.json     Scaffolds — fill in sections to enable more tests
+│
+├── scripts/
+│   ├── run-store.js               Runs the suite for one store (npm run test:store <code>)
+│   └── run-all.js                 Runs every store sequentially with a summary table
 │
 ├── cypress/
-│   ├── e2e/                       The actual tests
+│   ├── e2e/                       The actual tests (shared by all stores)
 │   │   ├── homepage.cy.js         Checks the homepage header and footer
 │   │   ├── homepage.mobile.cy.js  Checks the homepage on phones and tablets
 │   │   ├── plp.cy.js              Checks the product listing page
@@ -153,19 +203,23 @@ BESTUS/
 │   │   ├── pdp.mobile.cy.js       Checks the product detail page on phones and tablets
 │   │   ├── discovery.cy.js        Checks search, categories, sorting, and pagination
 │   │   ├── discovery.mobile.cy.js Checks discovery pages on phones and tablets
+│   │   ├── seo.cy.js              Checks titles, meta descriptions, and product JSON-LD
+│   │   ├── images.cy.js           Checks image alt text and broken images
+│   │   ├── lighthouse.cy.js       Performance/accessibility/SEO scores (Chrome only)
 │   │   ├── product-form.cy.js     Tests the Product Information form
 │   │   ├── contact-form.cy.js     Tests the Contact Us form
 │   │   ├── quote-form.cy.js       Tests the Request a Quote form
 │   │   └── pro-club-form.cy.js    Tests the Pro Club Application form
 │   │
-│   ├── fixtures/                  Test data (fake customer info, URLs, etc.)
-│   │   ├── site.json              Website URLs and form submission patterns
+│   ├── fixtures/                  Test data
 │   │   ├── personas.json          Fake customer profiles used during testing
 │   │   └── files/                 Sample files used to test file upload
 │   │
 │   └── support/                   Shared helper code (reused across tests)
 │       ├── pages/                 Page Objects — one per form, handles form interactions
 │       ├── utils/                 Utility functions (email generation, URL picking, etc.)
+│       ├── store.js               Reads the active store's config; per-store skip helpers
+│       ├── checks.js              Shared page assertions (search, grids, footers, etc.)
 │       ├── commands.js            Custom test shortcuts
 │       └── e2e.js                 Global setup (runs before every test)
 ```
