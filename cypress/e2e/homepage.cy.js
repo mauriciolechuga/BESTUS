@@ -1,4 +1,7 @@
 import { assertFooterHeadings, blockThirdParty, makeConsoleErrorSpy } from '../support/checks.js';
+import { getStore, itIfStore, homePath } from '../support/store.js';
+
+const { branding } = getStore();
 
 // All homepage checks are read-only, so the page is loaded once (testIsolation:false)
 // and every assertion runs against that single visit instead of re-loading per test.
@@ -7,7 +10,7 @@ describe('Homepage', { testIsolation: false }, () => {
 
   before(() => {
     blockThirdParty();
-    cy.visit('/', { onBeforeLoad: consoleErrors.onBeforeLoad });
+    cy.visit(homePath(), { onBeforeLoad: consoleErrors.onBeforeLoad });
   });
 
   // Runs first so it reflects load-time console errors only.
@@ -39,17 +42,23 @@ describe('Homepage', { testIsolation: false }, () => {
     });
   });
 
-  it('footer contact info shows phone, fax, address, and warehouses link', () => {
+  it('footer contact info shows phone and fax links', () => {
     cy.get('footer .Contact-info-box').should('have.length.at.least', 3);
 
     // Phone and fax: verify tel: links exist and have non-empty text (not hardcoded)
     cy.get('footer .Contact-info-box a[href^="tel:"]').should('have.length.at.least', 2).each(($a) => {
       expect($a.text().trim()).to.match(/[\d\-\(\)\s\+]+/);
     });
+  });
 
-    cy.get('footer .Contact-info-box').contains('New York').should('exist');
+  itIfStore(branding.footerLocationText, 'footer contact info shows the store location', () => {
+    cy.get('footer .Contact-info-box').contains(branding.footerLocationText).should('exist');
+  });
 
-    cy.get('footer a[href="/warehouses/"]').should('be.visible').and('contain.text', 'Warehouses');
+  itIfStore(branding.warehousesLink, 'footer shows the warehouses link', () => {
+    cy.get(`footer a[href="${branding.warehousesLink.href}"]`)
+      .should('be.visible')
+      .and('contain.text', branding.warehousesLink.text);
   });
 
   it('footer payment icons section is visible', () => {
@@ -59,15 +68,11 @@ describe('Homepage', { testIsolation: false }, () => {
   it('footer copyright year is current', () => {
     const currentYear = new Date().getFullYear().toString();
     cy.get('footer .Copyright p').should('contain.text', currentYear);
-    cy.get('footer .Copyright p').should('contain.text', 'Best Access Doors');
+    cy.get('footer .Copyright p').should('contain.text', branding.copyrightText);
   });
 
-  it('footer partner logo links resolve without error', () => {
-    const partnerLinks = [
-      'https://www.bimobject.com/en/best-access-doors?location=us',
-      'https://www.rib-software.com/en/rib-speclink',
-    ];
-    partnerLinks.forEach((url) => {
+  itIfStore(branding.partnerLinks && branding.partnerLinks.length, 'footer partner logo links resolve without error', () => {
+    branding.partnerLinks.forEach((url) => {
       cy.request({ url, failOnStatusCode: false }).its('status').should('not.eq', 404);
     });
   });

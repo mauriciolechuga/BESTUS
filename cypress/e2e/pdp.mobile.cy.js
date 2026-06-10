@@ -20,6 +20,9 @@ import {
   makeConsoleErrorSpy,
   pickRandom,
 } from '../support/checks.js';
+import { getStore, describeIfStore, storePath } from '../support/store.js';
+
+const site = getStore();
 
 // ─── Shared URL ──────────────────────────────────────────────────────────────
 // One product URL is picked once per spec run and reused across all devices so
@@ -27,19 +30,13 @@ import {
 // pickRandom(), different products could produce different overflow results —
 // masking real bugs on some products and producing false failures on others
 // (confirmed: two 412px devices can disagree when testing different products).
-let pdpUrl;
-
-before(() => {
-  cy.fixture('site').then((site) => {
-    pdpUrl = pickRandom(site.pdp.popular);
-  });
-});
+const pdpUrl = site.pdp && storePath(pickRandom(site.pdp.popular));
 
 // ═════════════════════════════════════════════════════════════════════════════
 // Portrait tests — all devices
 // ═════════════════════════════════════════════════════════════════════════════
 ALL_DEVICES.forEach(({ name, width, height, touchTarget }) => {
-  describe(`PDP – ${name} (${width}x${height})`, { testIsolation: false }, () => {
+  describeIfStore(site.pdp, `PDP – ${name} (${width}x${height})`, { testIsolation: false }, () => {
     const consoleErrors = makeConsoleErrorSpy();
 
     before(() => {
@@ -128,7 +125,7 @@ ALL_DEVICES.forEach(({ name, width, height, touchTarget }) => {
 // Landscape tests — phones only
 // ═════════════════════════════════════════════════════════════════════════════
 PHONES.forEach(({ name, width, height }) => {
-  describe(`PDP – ${name} landscape (${height}x${width})`, { testIsolation: false }, () => {
+  describeIfStore(site.pdp, `PDP – ${name} landscape (${height}x${width})`, { testIsolation: false }, () => {
     before(() => {
       blockThirdParty();
       cy.viewport(height, width); // landscape: swap width and height

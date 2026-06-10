@@ -4,6 +4,8 @@
  * commands) so they read as plain functions with their rationale documented alongside.
  */
 
+import { homePath } from './store.js';
+
 const PRODUCT_CARD = 'ul.productGrid li.product';
 const PRODUCT_TITLE = '.card-title';
 const PRODUCT_PRICE = '[class*="price"]';
@@ -114,7 +116,7 @@ export function getVisibleProductTitles(limit = 12) {
 }
 
 export function performHeaderSearch(term) {
-  cy.visit('/');
+  cy.visit(homePath());
   cy.get(SEARCH_INPUT, { timeout: 15000 }).then(($inputs) => {
     const input = $inputs.filter(':visible').first()[0] || $inputs.first()[0];
     cy.wrap(input).clear({ force: true }).type(term, { force: true });

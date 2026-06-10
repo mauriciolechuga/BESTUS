@@ -16,16 +16,12 @@ import {
   performHeaderSearch,
 } from '../support/checks.js';
 import { ALL_DEVICES, MOBILE_NAV } from '../support/devices.js';
+import { getStore, describeIfStore, storePath } from '../support/store.js';
 
-describe('Product discovery mobile', () => {
-  let discovery;
+const site = getStore();
+const discovery = site.discovery || {};
 
-  before(() => {
-    cy.fixture('site').then((site) => {
-      discovery = site.discovery;
-    });
-  });
-
+describeIfStore(site.discovery, 'Product discovery mobile', () => {
   ALL_DEVICES.forEach(({ name, width, height }) => {
     describe(`Discovery – ${name} (${width}x${height})`, { testIsolation: false }, () => {
       const consoleErrors = makeConsoleErrorSpy();
@@ -33,7 +29,7 @@ describe('Product discovery mobile', () => {
       before(() => {
         blockThirdParty();
         cy.viewport(width, height);
-        cy.visit(discovery.mobileCategory, { onBeforeLoad: consoleErrors.onBeforeLoad });
+        cy.visit(storePath(discovery.mobileCategory), { onBeforeLoad: consoleErrors.onBeforeLoad });
       });
 
       // Cypress resets the viewport to the config default before each test, even under

@@ -17,6 +17,9 @@ import {
   blockThirdParty,
   makeConsoleErrorSpy,
 } from '../support/checks.js';
+import { getStore, itIfStore, homePath } from '../support/store.js';
+
+const { branding } = getStore();
 
 // ═════════════════════════════════════════════════════════════════════════════
 // Portrait tests — all devices
@@ -28,7 +31,7 @@ ALL_DEVICES.forEach(({ name, width, height, touchTarget }) => {
     before(() => {
       blockThirdParty();
       cy.viewport(width, height);
-      cy.visit('/', { onBeforeLoad: consoleErrors.onBeforeLoad });
+      cy.visit(homePath(), { onBeforeLoad: consoleErrors.onBeforeLoad });
     });
 
     // Cypress resets the viewport to the config default (1920x1080) before each test —
@@ -56,13 +59,21 @@ ALL_DEVICES.forEach(({ name, width, height, touchTarget }) => {
       assertFooterHeadings('exist');
     });
 
-    it('footer contact info has phone, fax, address, and warehouses link in the DOM', () => {
+    it('footer contact info has phone and fax links in the DOM', () => {
       cy.get('footer .Contact-info-box').should('have.length.at.least', 3);
       cy.get('footer .Contact-info-box a[href^="tel:"]').should('have.length.at.least', 2).each(($a) => {
         expect($a.text().trim()).to.match(/[\d\-\(\)\s\+]+/);
       });
-      cy.get('footer .Contact-info-box').contains('New York').should('exist');
-      cy.get('footer a[href="/warehouses/"]').should('exist').and('contain.text', 'Warehouses');
+    });
+
+    itIfStore(branding.footerLocationText, 'footer contact info shows the store location', () => {
+      cy.get('footer .Contact-info-box').contains(branding.footerLocationText).should('exist');
+    });
+
+    itIfStore(branding.warehousesLink, 'footer warehouses link is in the DOM', () => {
+      cy.get(`footer a[href="${branding.warehousesLink.href}"]`)
+        .should('exist')
+        .and('contain.text', branding.warehousesLink.text);
     });
 
     it('footer payment icons section exists in the DOM', () => {
@@ -71,7 +82,7 @@ ALL_DEVICES.forEach(({ name, width, height, touchTarget }) => {
 
     it('footer copyright year is current', () => {
       cy.get('footer .Copyright p').should('contain.text', new Date().getFullYear().toString());
-      cy.get('footer .Copyright p').should('contain.text', 'Best Access Doors');
+      cy.get('footer .Copyright p').should('contain.text', branding.copyrightText);
     });
 
     it('footer phone number exists in the DOM', () => {
@@ -101,7 +112,7 @@ PHONES.forEach(({ name, width, height }) => {
   describe(`Homepage – ${name} landscape (${height}x${width})`, { testIsolation: false }, () => {
     before(() => {
       cy.viewport(height, width); // landscape: swap width and height
-      cy.visit('/');
+      cy.visit(homePath());
     });
 
     beforeEach(() => {

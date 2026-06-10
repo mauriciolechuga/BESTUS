@@ -1,11 +1,14 @@
 import { waitForProducts, assertProductCards, blockThirdParty, makeConsoleErrorSpy } from '../support/checks.js';
+import { getStore, describeIfStore, storePath } from '../support/store.js';
 
-const PLP = '/products/';
-const SUBCAT = '/products/popular-picks/fire-rated/';
+const site = getStore();
+const plp = site.plp || {};
+const PLP = plp.main && storePath(plp.main);
+const SUBCAT = plp.subcategory && storePath(plp.subcategory);
 
 // Read-only PLP checks share one page load (testIsolation:false). The navigation test
 // (which leaves the page) lives in its own default-isolation block at the bottom.
-describe('Product Listing Page', { testIsolation: false }, () => {
+describeIfStore(site.plp, 'Product Listing Page', { testIsolation: false }, () => {
   const consoleErrors = makeConsoleErrorSpy();
 
   before(() => {
@@ -20,10 +23,10 @@ describe('Product Listing Page', { testIsolation: false }, () => {
   // ─── Page structure ────────────────────────────────────────────────────────
 
   it('loads with correct heading and breadcrumb', () => {
-    cy.get('h1.page-heading').should('contain.text', 'Products');
+    cy.get('h1.page-heading').should('contain.text', plp.mainHeading);
     cy.get('.breadcrumbs.new_breadcrumbs').within(() => {
       cy.get('a.breadcrumb-home').should('be.visible');
-      cy.contains('a', 'Products').should('be.visible');
+      cy.contains('a', plp.breadcrumbLabel).should('be.visible');
     });
   });
 
@@ -91,7 +94,7 @@ describe('Product Listing Page', { testIsolation: false }, () => {
 });
 
 // ─── Subcategory page (separate URL, read-only) ────────────────────────────────
-describe('PLP subcategory page', { testIsolation: false }, () => {
+describeIfStore(site.plp && plp.subcategory, 'PLP subcategory page', { testIsolation: false }, () => {
   before(() => {
     cy.visit(SUBCAT);
   });
@@ -99,7 +102,7 @@ describe('PLP subcategory page', { testIsolation: false }, () => {
   it('shows correct heading and breadcrumb trail', () => {
     cy.get('h1.page-heading').invoke('text').should('not.be.empty');
     cy.get('.breadcrumbs.new_breadcrumbs').within(() => {
-      cy.contains('a', 'Products').should('be.visible');
+      cy.contains('a', plp.breadcrumbLabel).should('be.visible');
     });
   });
 
@@ -110,12 +113,12 @@ describe('PLP subcategory page', { testIsolation: false }, () => {
 });
 
 // ─── Navigation (leaves the page → needs fresh isolation) ──────────────────────
-describe('PLP navigation', () => {
+describeIfStore(site.plp, 'PLP navigation', () => {
   it('clicking a product card navigates to the PDP', () => {
     cy.visit(PLP);
     waitForProducts();
     cy.get('ul.productGrid li.product').first().find('.card-title a').click();
-    cy.url().should('not.include', '/products/');
+    cy.url().should('not.include', plp.main);
     cy.get('h1').should('be.visible');
   });
 });

@@ -1,11 +1,13 @@
 import { assertMetaTags, assertProductJsonLd, pickRandom } from '../support/checks.js';
+import { getStore, describeIfStore, storePath, homePath } from '../support/store.js';
 
-const PLP = '/products/';
+const site = getStore();
+const PLP = site.plp && storePath(site.plp.main);
 
 // ─── Homepage ──────────────────────────────────────────────────────────────────
 describe('SEO – Homepage', { testIsolation: false }, () => {
   before(() => {
-    cy.visit('/');
+    cy.visit(homePath());
   });
 
   it('has a non-empty <title>', () => {
@@ -18,7 +20,7 @@ describe('SEO – Homepage', { testIsolation: false }, () => {
 });
 
 // ─── Product Listing Page ──────────────────────────────────────────────────────
-describe('SEO – PLP', { testIsolation: false }, () => {
+describeIfStore(site.plp, 'SEO – PLP', { testIsolation: false }, () => {
   before(() => {
     cy.visit(PLP);
   });
@@ -33,11 +35,9 @@ describe('SEO – PLP', { testIsolation: false }, () => {
 });
 
 // ─── Product Detail Page ───────────────────────────────────────────────────────
-describe('SEO – PDP', { testIsolation: false }, () => {
+describeIfStore(site.pdp, 'SEO – PDP', { testIsolation: false }, () => {
   before(() => {
-    cy.fixture('site').then((site) => {
-      cy.visit(pickRandom(site.pdp.popular));
-    });
+    cy.visit(storePath(pickRandom(site.pdp.popular)));
   });
 
   it('has a non-empty <title>', () => {

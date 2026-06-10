@@ -17,14 +17,17 @@ import {
   blockThirdParty,
   makeConsoleErrorSpy,
 } from '../support/checks.js';
+import { getStore, describeIfStore, storePath } from '../support/store.js';
 
-const PLP = '/products/';
+const site = getStore();
+const plp = site.plp || {};
+const PLP = plp.main && storePath(plp.main);
 
 // ═════════════════════════════════════════════════════════════════════════════
 // Portrait tests — all devices
 // ═════════════════════════════════════════════════════════════════════════════
 ALL_DEVICES.forEach(({ name, width, height }) => {
-  describe(`PLP – ${name} (${width}x${height})`, { testIsolation: false }, () => {
+  describeIfStore(site.plp, `PLP – ${name} (${width}x${height})`, { testIsolation: false }, () => {
     const consoleErrors = makeConsoleErrorSpy();
 
     before(() => {
@@ -45,10 +48,10 @@ ALL_DEVICES.forEach(({ name, width, height }) => {
     });
 
     it('loads with correct heading and breadcrumb', () => {
-      cy.get('h1.page-heading').should('contain.text', 'Products');
+      cy.get('h1.page-heading').should('contain.text', plp.mainHeading);
       cy.get('.breadcrumbs.new_breadcrumbs').within(() => {
         cy.get('a.breadcrumb-home').should('be.visible');
-        cy.contains('a', 'Products').should('be.visible');
+        cy.contains('a', plp.breadcrumbLabel).should('be.visible');
       });
     });
 
@@ -89,7 +92,7 @@ ALL_DEVICES.forEach(({ name, width, height }) => {
 // Landscape tests — phones only
 // ═════════════════════════════════════════════════════════════════════════════
 PHONES.forEach(({ name, width, height }) => {
-  describe(`PLP – ${name} landscape (${height}x${width})`, { testIsolation: false }, () => {
+  describeIfStore(site.plp, `PLP – ${name} landscape (${height}x${width})`, { testIsolation: false }, () => {
     before(() => {
       cy.viewport(height, width); // landscape: swap width and height
       cy.visit(PLP);
@@ -100,7 +103,7 @@ PHONES.forEach(({ name, width, height }) => {
     });
 
     it('loads with correct heading', () => {
-      cy.get('h1.page-heading').should('contain.text', 'Products');
+      cy.get('h1.page-heading').should('contain.text', plp.mainHeading);
     });
 
     it('has no horizontal overflow', () => {
