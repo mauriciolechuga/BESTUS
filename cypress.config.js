@@ -25,6 +25,10 @@ module.exports = defineConfig({
   // Retry failed tests in `cypress run` to absorb transient live-site flake; never retry
   // interactively (openMode) so failures stay visible while debugging.
   retries: { runMode: 2, openMode: 0 },
+  // Cypress scrolls action targets to the viewport top by default, which lands them
+  // under sticky headers (ADAP) and fails actionability with "hidden from view".
+  // Centering keeps targets clear of sticky chrome on every store.
+  scrollBehavior: 'center',
   e2e: {
     baseUrl: site.baseUrl,
     viewportWidth: 1920,
