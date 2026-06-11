@@ -1,8 +1,9 @@
 import { assertFooterHeadings, blockThirdParty, makeConsoleErrorSpy } from '../support/checks.js';
-import { getStore, itIfStore, homePath, footerConfig } from '../support/store.js';
+import { getStore, itIfStore, homePath, footerConfig, headerSelector } from '../support/store.js';
 
 const { branding } = getStore();
 const footer = footerConfig();
+const header = headerSelector();
 
 // All homepage checks are read-only, so the page is loaded once (testIsolation:false)
 // and every assertion runs against that single visit instead of re-loading per test.
@@ -20,13 +21,13 @@ describe('Homepage', { testIsolation: false }, () => {
   });
 
   it('loads with key elements visible', () => {
-    cy.get('header').should('be.visible');
+    cy.get(header).should('be.visible');
     cy.get('footer').should('be.visible');
     cy.get('[class*="carousel"], [class*="hero"], [class*="banner"], main, [role="main"]').first().should('be.visible');
   });
 
   it('header and nav links all resolve without 404', () => {
-    cy.assertLinksResolve('header a[href]', { exclude: ['amazon', 'facebook'] });
+    cy.assertLinksResolve(`${header} a[href]`, { exclude: ['amazon', 'facebook'] });
   });
 
   it('footer is visible with all four section headings', () => {
@@ -89,7 +90,7 @@ describe('Homepage', { testIsolation: false }, () => {
     const phoneTexts = ($links) =>
       [...$links].map((a) => a.textContent.trim()).filter((t) => t.length > 0);
 
-    cy.get('header [href^="tel:"]')
+    cy.get(`${header} [href^="tel:"]`)
       .should(($h) => expect(phoneTexts($h), 'header shows a phone number').to.not.be.empty)
       .then(($h) => {
         const headerPhone = phoneTexts($h)[0];

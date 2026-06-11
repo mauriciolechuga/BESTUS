@@ -4,7 +4,7 @@
  * commands) so they read as plain functions with their rationale documented alongside.
  */
 
-import { homePath, footerConfig, pdpSelectors } from './store.js';
+import { homePath, footerConfig, pdpSelectors, mobileHeaderSelector } from './store.js';
 
 const PRODUCT_CARD = 'ul.productGrid li.product';
 const PRODUCT_TITLE = '.card-title';
@@ -283,7 +283,8 @@ export function assertNoHorizontalOverflow(maxWidth) {
  * the real question is whether there is at least one prominently-sized tappable element.
  */
 export function assertMaxTouchTarget(minHeight) {
-  cy.get('header a[href], header button')
+  const header = mobileHeaderSelector();
+  cy.get(`${header} a[href], ${header} button`)
     .filter(':visible')
     .filter((i, el) => el.getBoundingClientRect().height > 0)
     .should('have.length.at.least', 1)

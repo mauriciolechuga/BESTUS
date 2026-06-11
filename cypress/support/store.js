@@ -68,6 +68,23 @@ export function footerConfig() {
   return { ...FOOTER_DEFAULTS, ...((branding && branding.footer) || {}) };
 }
 
+/**
+ * Header container selector. The BESTUS theme uses a semantic <header> element, but
+ * ADAP's theme has none — its desktop header is div.desktop-header-section and its
+ * mobile header div.iPad_header — so stores override via branding.headerSelector
+ * and branding.mobileHeaderSelector (the latter falls back to the former).
+ */
+export function headerSelector() {
+  const { branding } = getStore();
+  return (branding && branding.headerSelector) || 'header';
+}
+
+/** Mobile header container selector (defaults to headerSelector()). */
+export function mobileHeaderSelector() {
+  const { branding } = getStore();
+  return (branding && branding.mobileHeaderSelector) || headerSelector();
+}
+
 // PLP structure selectors for the BESTUS theme. Nullable keys (breadcrumbHome, sidebar,
 // bestSellers, subcategoryBox) make their tests skip when a store sets them to null.
 // Overridden per store via plp.selectors (see stores/adap.json).

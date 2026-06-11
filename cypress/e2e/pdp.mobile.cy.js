@@ -20,10 +20,11 @@ import {
   makeConsoleErrorSpy,
   pickRandom,
 } from '../support/checks.js';
-import { getStore, describeIfStore, itIfStore, storePath, pdpSelectors } from '../support/store.js';
+import { getStore, describeIfStore, itIfStore, storePath, pdpSelectors, mobileHeaderSelector } from '../support/store.js';
 
 const site = getStore();
 const sel = pdpSelectors();
+const header = mobileHeaderSelector();
 
 // ─── Shared URL ──────────────────────────────────────────────────────────────
 // One product URL is picked once per spec run and reused across all devices so
@@ -58,7 +59,7 @@ ALL_DEVICES.forEach(({ name, width, height, touchTarget }) => {
     });
 
     it('loads with header visible', () => {
-      cy.get('header').should('be.visible');
+      cy.get(header).should('be.visible');
     });
 
     it('renders breadcrumbs with Home and at least one category link', () => {

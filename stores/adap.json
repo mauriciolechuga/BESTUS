@@ -5,6 +5,8 @@
   "homePath": "/",
   "visitQuery": null,
   "branding": {
+    "headerSelector": ".desktop-header-section",
+    "mobileHeaderSelector": ".iPad_header",
     "copyrightText": "AccessDoorsAndPanels",
     "footerLocationText": "Saint Louis",
     "warehousesLink": { "href": "/warehouses/", "text": "Warehouses" },
