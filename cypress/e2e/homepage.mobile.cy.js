@@ -17,11 +17,12 @@ import {
   blockThirdParty,
   makeConsoleErrorSpy,
 } from '../support/checks.js';
-import { getStore, itIfStore, homePath, footerConfig, mobileHeaderSelector } from '../support/store.js';
+import { getStore, itIfStore, homePath, footerConfig, anyHeaderSelector } from '../support/store.js';
 
 const { branding } = getStore();
 const footer = footerConfig();
-const header = mobileHeaderSelector();
+// Mobile OR desktop header — themes switch at their own breakpoints (see store.js).
+const header = anyHeaderSelector();
 
 // ═════════════════════════════════════════════════════════════════════════════
 // Portrait tests — all devices
@@ -48,7 +49,7 @@ ALL_DEVICES.forEach(({ name, width, height, touchTarget }) => {
     });
 
     it('loads with key elements visible', () => {
-      cy.get(header).should('be.visible');
+      cy.get(header).filter(':visible').should('have.length.at.least', 1);
       // The desktop footer is display:none on phone viewports — assert DOM presence only.
       cy.get(footer.rootSelector).should('exist');
       // Desktop-only seasonal banners are display:none on mobile — find a visible main element.
@@ -125,7 +126,7 @@ PHONES.forEach(({ name, width, height }) => {
     });
 
     it('loads with key elements visible', () => {
-      cy.get(header).should('be.visible');
+      cy.get(header).filter(':visible').should('have.length.at.least', 1);
       cy.get(footer.rootSelector).should('exist');
       cy.get('[class*="carousel"], [class*="hero"], [class*="banner"], main, [role="main"]')
         .filter(':visible')

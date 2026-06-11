@@ -86,6 +86,16 @@ export function mobileHeaderSelector() {
 }
 
 /**
+ * Selector matching the mobile AND desktop header containers (deduplicated).
+ * Mobile specs assert on this with .filter(':visible') because themes switch
+ * headers at their own breakpoints — ADAP hides .iPad_header above ~1000px
+ * (iPad Pro portrait is 1024px wide) and shows its desktop header instead.
+ */
+export function anyHeaderSelector() {
+  return [...new Set([mobileHeaderSelector(), headerSelector()])].join(', ');
+}
+
+/**
  * Mobile navigation drawer selector. BESTUS renders div.mobile-menu; ADAP's theme
  * uses a #mySidenav slide-out instead. Overridden via branding.mobileNavSelector.
  */

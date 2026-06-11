@@ -4,7 +4,7 @@
  * commands) so they read as plain functions with their rationale documented alongside.
  */
 
-import { homePath, footerConfig, pdpSelectors, mobileHeaderSelector } from './store.js';
+import { homePath, footerConfig, pdpSelectors, anyHeaderSelector } from './store.js';
 
 const PRODUCT_CARD = 'ul.productGrid li.product';
 const PRODUCT_TITLE = '.card-title';
@@ -279,6 +279,18 @@ export function assertNoHorizontalOverflow(maxWidth) {
     // Wait for content to stabilize by checking if document.body has finished laying out
     cy.get('body').should('exist');
     cy.get('html').should('exist');
+    // When the viewport's effective overflow-x is hidden/clip (body's overflow
+    // propagates to the viewport when html's is visible), the user cannot scroll
+    // horizontally no matter how wide clipped content is — ADAP clips slider tracks
+    // this way — so the scrollWidth bound only applies when scrolling is possible.
+    const doc = win.document;
+    const htmlOX = win.getComputedStyle(doc.documentElement).overflowX;
+    const bodyOX = win.getComputedStyle(doc.body).overflowX;
+    const effectiveOX = htmlOX === 'visible' ? bodyOX : htmlOX;
+    if (effectiveOX === 'hidden' || effectiveOX === 'clip') {
+      cy.log(`overflow-x:${effectiveOX} on the viewport — horizontal scroll impossible, skipping scrollWidth bound`);
+      return;
+    }
     expect(win.document.body.scrollWidth, 'body.scrollWidth').to.be.lte(maxWidth + 15);
   });
 }
@@ -289,8 +301,13 @@ export function assertNoHorizontalOverflow(maxWidth) {
  * the real question is whether there is at least one prominently-sized tappable element.
  */
 export function assertMaxTouchTarget(minHeight) {
-  const header = mobileHeaderSelector();
-  cy.get(`${header} a[href], ${header} button`)
+  // Whichever header the theme shows at this width (mobile or desktop) is the
+  // one the user taps, so measure interactive elements across both containers.
+  const selector = anyHeaderSelector()
+    .split(', ')
+    .map((h) => `${h} a[href], ${h} button`)
+    .join(', ');
+  cy.get(selector)
     .filter(':visible')
     .filter((i, el) => el.getBoundingClientRect().height > 0)
     .should('have.length.at.least', 1)
