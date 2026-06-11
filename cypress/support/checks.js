@@ -309,9 +309,11 @@ export function assertNoHorizontalOverflow(maxWidth) {
       .filter((el) => !ignore.some((s) => el.closest(s)))
       .slice(0, 5)
       .map(describe);
+    // Offender names go in the message string — chai collapses array contents
+    // ("[ Array(2) ]") in failure output, which hides exactly what we need.
     expect(
       offenders,
-      `unclipped elements extending past the ${maxWidth}px viewport (body.scrollWidth=${doc.body.scrollWidth})`
+      `unclipped elements extending past the ${maxWidth}px viewport (body.scrollWidth=${doc.body.scrollWidth}): ${offenders.join(', ') || 'none'}`
     ).to.be.empty;
   });
 }

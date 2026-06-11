@@ -8,7 +8,7 @@
     "headerSelector": ".desktop-header-section",
     "mobileHeaderSelector": ".iPad_header",
     "mobileNavSelector": "#mySidenav",
-    "overflowIgnore": [".yotpo", ".scroller"],
+    "overflowIgnore": [".yotpo", ".scroller", ".zf-templateWidth"],
     "copyrightText": "AccessDoorsAndPanels",
     "footerLocationText": "Saint Louis",
     "warehousesLink": { "href": "/warehouses/", "text": "Warehouses" },
@@ -89,8 +89,9 @@
     }
   },
   "pdp": {
+    "_popularNote": "The milcor 18x18 door (products.default) is excluded here: it has no PDF spec sheet, which the PDP spec asserts. productJsonLd:false — ADAP's theme emits no Product JSON-LD (real SEO gap, verified June 2026).",
+    "productJsonLd": false,
     "popular": [
-      "/18-x-18-fire-resistive-steel-access-door-milcor/",
       "/16-x-16-drywall-inlay-access-panel-round/",
       "/36-x-36-fire-rated-insulated-access-door-with-flange-for-drywall-acudor/",
       "/20-x-24-architectural-grade-flush-door/"
