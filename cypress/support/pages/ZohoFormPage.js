@@ -41,10 +41,13 @@ export class ZohoFormPage {
     // Country code input is only present on some Zoho forms (e.g. quote form).
     cy.get('body').then(($body) => {
       if ($body.find('input[name="PhoneNumber_countrycodeval"]').length) {
-        cy.get('input[name="PhoneNumber_countrycodeval"]').clear().type(code);
+        cy.get('input[name="PhoneNumber_countrycodeval"]').clear({ force: true }).type(code, { force: true });
       }
     });
-    cy.get('input[name="PhoneNumber_countrycode"]').clear().type(number);
+    // force: Zoho's floating label fully overlays this input (and ADAP PDPs add a
+    // sticky product bar), so Cypress actionability rejects a field real users can
+    // fill normally. Forced typing still drives the real input and zf validation.
+    cy.get('input[name="PhoneNumber_countrycode"]').scrollIntoView().clear({ force: true }).type(number, { force: true });
     return this;
   }
 
