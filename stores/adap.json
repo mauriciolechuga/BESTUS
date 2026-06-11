@@ -102,7 +102,8 @@
       "galleryImage": "section[data-image-gallery] img",
       "description": ".productView-description",
       "relatedCarousel": null,
-      "productInfoForm": "#crmWebToEntityForm",
+      "productInfoForm": "main .zf-templateWidth",
+      "reviewsContainer": "#yotpo-reviews-main-widget",
       "pdfNewTab": false
     }
   }

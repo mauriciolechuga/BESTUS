@@ -73,8 +73,8 @@ describeIfStore(site.pdp, 'Product Detail Page', { testIsolation: false }, () =>
     cy.get(sel.relatedCarousel).should('exist').children().should('have.length.at.least', 1);
   });
 
-  it('reviews section and Yotpo widget are present', () => {
-    cy.get('#productreviewbox').should('exist');
+  itIfStore(sel.reviewsContainer, 'reviews section and Yotpo widget are present', () => {
+    cy.get(sel.reviewsContainer).should('exist');
     cy.get('.yotpo-widget-instance')
       .should('exist')
       .invoke('attr', 'data-yotpo-product-id')

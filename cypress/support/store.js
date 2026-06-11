@@ -144,6 +144,9 @@ const PDP_SELECTOR_DEFAULTS = {
   description: '.productView-description1',
   relatedCarousel: '.content-carousel .owl-carousel',
   productInfoForm: '#have_a_product_question_request',
+  // Wrapper around the Yotpo reviews widget — ADAP has no #productreviewbox and
+  // renders reviews in #yotpo-reviews-main-widget instead. Nullable (skips test).
+  reviewsContainer: '#productreviewbox',
   pdfNewTab: true,
 };
 
