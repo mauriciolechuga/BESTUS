@@ -279,19 +279,34 @@ export function assertNoHorizontalOverflow(maxWidth) {
     // Wait for content to stabilize by checking if document.body has finished laying out
     cy.get('body').should('exist');
     cy.get('html').should('exist');
-    // When the viewport's effective overflow-x is hidden/clip (body's overflow
-    // propagates to the viewport when html's is visible), the user cannot scroll
-    // horizontally no matter how wide clipped content is — ADAP clips slider tracks
-    // this way — so the scrollWidth bound only applies when scrolling is possible.
     const doc = win.document;
-    const htmlOX = win.getComputedStyle(doc.documentElement).overflowX;
-    const bodyOX = win.getComputedStyle(doc.body).overflowX;
-    const effectiveOX = htmlOX === 'visible' ? bodyOX : htmlOX;
-    if (effectiveOX === 'hidden' || effectiveOX === 'clip') {
-      cy.log(`overflow-x:${effectiveOX} on the viewport — horizontal scroll impossible, skipping scrollWidth bound`);
-      return;
-    }
-    expect(win.document.body.scrollWidth, 'body.scrollWidth').to.be.lte(maxWidth + 15);
+    if (doc.body.scrollWidth <= maxWidth + 15) return;
+
+    // body.scrollWidth also counts content clipped by an overflow-x:hidden/auto
+    // ancestor — content the user can never scroll to (ADAP's slick-carousel tracks
+    // are thousands of px wide inside clipped .slick-list wrappers). Only elements
+    // whose overflow escapes every clipping ancestor produce user-visible overflow,
+    // so fail on those — and name them, so a failure pinpoints the broken element.
+    const isClipped = (el) => {
+      for (let p = el.parentElement; p && p !== doc.documentElement; p = p.parentElement) {
+        const ox = win.getComputedStyle(p).overflowX;
+        if (ox === 'hidden' || ox === 'clip' || ox === 'auto' || ox === 'scroll') return true;
+      }
+      return false;
+    };
+    const describe = (el) => {
+      const id = el.id ? `#${el.id}` : '';
+      const cls = String(el.className).trim().split(/\s+/).slice(0, 2).filter(Boolean).join('.');
+      return `${el.tagName.toLowerCase()}${id}${cls ? '.' + cls : ''}@${Math.round(el.getBoundingClientRect().right)}px`;
+    };
+    const offenders = [...doc.body.querySelectorAll('*')]
+      .filter((el) => el.getBoundingClientRect().right > maxWidth + 15 && !isClipped(el))
+      .slice(0, 5)
+      .map(describe);
+    expect(
+      offenders,
+      `unclipped elements extending past the ${maxWidth}px viewport (body.scrollWidth=${doc.body.scrollWidth})`
+    ).to.be.empty;
   });
 }
 
