@@ -54,7 +54,8 @@
     },
     "quoteRequest": {
       "path": "/new-request-a-quote/",
-      "submitUrlPattern": "**/forms.zohopublic.com/**/ADAPRequestAQuote/**/submit"
+      "submitUrlPattern": "**/forms.zohopublic.com/**/ADAPRequestAQuote/**/submit",
+      "optionalFields": ["Name_First"]
     },
     "contact": {
       "path": "/contact-us/",

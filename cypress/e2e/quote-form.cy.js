@@ -1,10 +1,14 @@
 import { QuoteFormPage } from '../support/pages/QuoteFormPage.js';
 import { getMultipartField } from '../support/utils/getMultipartField.js';
-import { getStore, describeIfStore } from '../support/store.js';
+import { getStore, describeIfStore, itIfStore } from '../support/store.js';
 
 const site = getStore();
 const quoteForm = site.forms && site.forms.quoteRequest;
 const submitPattern = quoteForm && quoteForm.submitUrlPattern;
+// Fields some stores' Zoho forms genuinely don't require (read from the form's
+// zf_MandArray) — their empty-field validation tests skip there. ADAP's quote
+// form requires Name_Last but not Name_First.
+const optionalFields = (quoteForm && quoteForm.optionalFields) || [];
 
 describeIfStore(quoteForm, 'Request a Quote form', () => {
   let page;
@@ -54,7 +58,7 @@ describeIfStore(quoteForm, 'Request a Quote form', () => {
       cy.interceptZoho('submit', submitPattern);
     });
 
-    it('shows an error when First Name is empty', () => {
+    itIfStore(!optionalFields.includes('Name_First'), 'shows an error when First Name is empty', () => {
       cy.uniqueEmail().then((email) => {
         cy.fillPersona(page, { ...persona, firstName: 'SKIP' }, email);
         cy.get('input[name="Name_First"]').clear();
