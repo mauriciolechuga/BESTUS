@@ -6,8 +6,10 @@
  *   24px → tablets (WCAG 2.2 AA 2.5.8 — the site serves desktop nav at these widths,
  *                   where mouse-optimised links of 23–30px are expected)
  *
- * The mobile nav is a div.mobile-menu drawer (not a hamburger button), confirmed from
- * page source. It is always in the DOM; opening it requires user interaction.
+ * The BESTUS mobile nav is a div.mobile-menu drawer (not a hamburger button), confirmed
+ * from page source. It is always in the DOM; opening it requires user interaction.
+ * Other themes differ (ADAP uses a #mySidenav slide-out) — MOBILE_NAV below is resolved
+ * per store via branding.mobileNavSelector (see store.js).
  *
  * Layout notes that shape the mobile specs:
  * - footer.tcsFooter is display:none on phone viewports — footer tests assert DOM
@@ -18,6 +20,7 @@
  * - Landscape is covered for phones only; tablet landscape widths (1080–1388px) approach
  *   desktop and rarely produce distinct layout breaks worth a separate pass.
  */
+import { mobileNavSelector } from './store.js';
 
 export const PHONES = [
   // Apple iPhones — compact, standard, and current flagship sizes
@@ -41,4 +44,4 @@ export const TABLETS = [
 
 export const ALL_DEVICES = [...PHONES, ...TABLETS];
 
-export const MOBILE_NAV = 'div.mobile-menu';
+export const MOBILE_NAV = mobileNavSelector();

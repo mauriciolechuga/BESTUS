@@ -85,6 +85,15 @@ export function mobileHeaderSelector() {
   return (branding && branding.mobileHeaderSelector) || headerSelector();
 }
 
+/**
+ * Mobile navigation drawer selector. BESTUS renders div.mobile-menu; ADAP's theme
+ * uses a #mySidenav slide-out instead. Overridden via branding.mobileNavSelector.
+ */
+export function mobileNavSelector() {
+  const { branding } = getStore();
+  return (branding && branding.mobileNavSelector) || 'div.mobile-menu';
+}
+
 // PLP structure selectors for the BESTUS theme. Nullable keys (breadcrumbHome, sidebar,
 // bestSellers, subcategoryBox) make their tests skip when a store sets them to null.
 // Overridden per store via plp.selectors (see stores/adap.json).
