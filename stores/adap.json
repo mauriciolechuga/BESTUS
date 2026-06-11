@@ -81,8 +81,8 @@
     "multiPageCategory": "/products/access-doors/",
     "sort": {
       "category": "/products/access-doors/",
-      "label": "Price Low to High",
-      "urlHash": "#/ps:calculated_price:asc"
+      "label": "Price: Low to High",
+      "urlHash": "#/sort:searchspring_price:asc"
     }
   },
   "pdp": {

@@ -169,8 +169,10 @@ export function assertNoSearchResults() {
 
 export function assertDiscoveryPage({ heading } = {}) {
   // filter(':visible'): some themes (ADAP) render a hidden mobile-only h1 first.
-  cy.get('h1.page-heading, h1').filter(':visible').first().should('be.visible').invoke('text').should('not.be.empty');
-  if (heading) cy.get('h1.page-heading, h1').filter(':visible').first().should('contain.text', heading);
+  // Include bare .page-heading: ADAP's desktop title is <p class="h1 page-heading
+  // page-heading--desktopOnly"> — its only real <h1> is the hidden mobile-only one.
+  cy.get('h1.page-heading, .page-heading, h1').filter(':visible').first().should('be.visible').invoke('text').should('not.be.empty');
+  if (heading) cy.get('h1.page-heading, .page-heading, h1').filter(':visible').first().should('contain.text', heading);
   cy.get('.breadcrumbs.new_breadcrumbs, .breadcrumbs').should('exist');
   cy.get('.categories-left, #searchspring-sidebar, [class*="facets"], [class*="filter"]').should('exist');
   waitForProducts();
@@ -190,15 +192,19 @@ export function applySortOption(label, urlFallback = { urlHash: '#/ps:calculated
   };
 
   return cy.get('body', { timeout: 15000 }).then(($body) => {
-    const selects = $body.find(SORT_SELECT);
-    const select = selects.filter(':visible').first()[0] || selects.first()[0];
-    if (select) {
+    // SORT_SELECT can match non-sort selects too (ADAP's per-page "20/40/60" select
+    // sits before the real sort select in the DOM), so scan every match — visible
+    // ones first — for the select that actually contains a matching option.
+    const selects = [...$body.find(SORT_SELECT)].sort(
+      (a, b) => (Cypress.$(b).is(':visible') ? 1 : 0) - (Cypress.$(a).is(':visible') ? 1 : 0)
+    );
+    for (const select of selects) {
       const option = [...select.options].find((o) => matchesPhrase(`${o.textContent} ${o.value}`));
       if (option) {
         return cy.wrap(select).select(option.value || option.textContent, { force: true }).then(() => waitForProducts());
       }
-      // The select exists but no option label matches this store's wording —
-      // fall through to the action links / URL fallback below.
+      // No option label in this select matches the store's wording — try the next
+      // matched select, then the action links / URL fallback below.
     }
 
     const actions = [...$body.find(SORT_ACTION)].filter((el) =>
@@ -252,8 +258,8 @@ export function assertSortApplied(previousTitles, { expectedHash } = {}) {
 }
 
 export function assertPaginationAdvanced(previousTitles) {
-  // BESTUS paginates with pp=2; other SearchSpring templates (ADAP) use page=2 or #...page:2.
-  cy.location('href', { timeout: 20000 }).should('match', /(?:pp|page)[=:]2/);
+  // BESTUS paginates with pp=2; other SearchSpring templates use p=2 (ADAP), page=2, or #...page:2.
+  cy.location('href', { timeout: 20000 }).should('match', /\b(?:pp|page|p)[=:]2\b/);
   cy.get('.ss__pagination, .ss-pagination-container').filter(':visible').first().within(() => {
     cy.get('.ss-page.ss-active, [aria-current="page"], .pagination-item--current')
       .should('contain.text', '2');
