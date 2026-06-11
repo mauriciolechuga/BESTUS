@@ -152,7 +152,8 @@ export function assertNoSearchResults() {
   cy.get('body', { timeout: 20000 }).should(($body) => {
     const text = normaliseText($body.text());
     expect(text, 'page body is not blank').to.not.equal('');
-    expect(text, 'not a generic error page').not.to.match(/404|page not found|server error|forbidden/i);
+    // \b404\b: product model numbers like "W4048" in mega-menu text contain "404".
+    expect(text, 'not a generic error page').not.to.match(/\b404\b|page not found|server error|forbidden/i);
 
     const hasNoResultsMessage =
       /no (products|results|matches)|0 results|did not match|could not find|couldn't find|nothing matches|try (again|a different)/i.test(
@@ -167,8 +168,9 @@ export function assertNoSearchResults() {
 }
 
 export function assertDiscoveryPage({ heading } = {}) {
-  cy.get('h1.page-heading, h1').first().should('be.visible').invoke('text').should('not.be.empty');
-  if (heading) cy.get('h1.page-heading, h1').first().should('contain.text', heading);
+  // filter(':visible'): some themes (ADAP) render a hidden mobile-only h1 first.
+  cy.get('h1.page-heading, h1').filter(':visible').first().should('be.visible').invoke('text').should('not.be.empty');
+  if (heading) cy.get('h1.page-heading, h1').filter(':visible').first().should('contain.text', heading);
   cy.get('.breadcrumbs.new_breadcrumbs, .breadcrumbs').should('exist');
   cy.get('.categories-left, #searchspring-sidebar, [class*="facets"], [class*="filter"]').should('exist');
   waitForProducts();
@@ -192,8 +194,11 @@ export function applySortOption(label, urlFallback = { urlHash: '#/ps:calculated
     const select = selects.filter(':visible').first()[0] || selects.first()[0];
     if (select) {
       const option = [...select.options].find((o) => matchesPhrase(`${o.textContent} ${o.value}`));
-      expect(option, `sort option matching "${label}"`).to.exist;
-      return cy.wrap(select).select(option.value || option.textContent, { force: true }).then(() => waitForProducts());
+      if (option) {
+        return cy.wrap(select).select(option.value || option.textContent, { force: true }).then(() => waitForProducts());
+      }
+      // The select exists but no option label matches this store's wording —
+      // fall through to the action links / URL fallback below.
     }
 
     const actions = [...$body.find(SORT_ACTION)].filter((el) =>
@@ -247,8 +252,9 @@ export function assertSortApplied(previousTitles, { expectedHash } = {}) {
 }
 
 export function assertPaginationAdvanced(previousTitles) {
-  cy.location('href', { timeout: 20000 }).should('include', 'pp=2');
-  cy.get('.ss__pagination').filter(':visible').first().within(() => {
+  // BESTUS paginates with pp=2; other SearchSpring templates (ADAP) use page=2 or #...page:2.
+  cy.location('href', { timeout: 20000 }).should('match', /(?:pp|page)[=:]2/);
+  cy.get('.ss__pagination, .ss-pagination-container').filter(':visible').first().within(() => {
     cy.get('.ss-page.ss-active, [aria-current="page"], .pagination-item--current')
       .should('contain.text', '2');
   });

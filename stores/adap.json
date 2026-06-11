@@ -35,7 +35,8 @@
       "sidebar": ".page-sidebar",
       "sidebarBlocks": ".page-sidebar .sidebarBlock",
       "sidebarLinks": ".page-sidebar .navList-item a",
-      "subcategoryBox": null
+      "subcategoryBox": null,
+      "pagination": null
     }
   },
   "products": {

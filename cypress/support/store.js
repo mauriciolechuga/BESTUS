@@ -79,6 +79,16 @@ const PLP_SELECTOR_DEFAULTS = {
   sidebarLinks: '.categories-left .navList-item a',
   bestSellers: '#treeView li a',
   subcategoryBox: '.subCategoriesBox',
+  // Detailed pagination markup (BESTUS SearchSpring template). Stores on the older
+  // template (ADAP: .ss-pagination-container/.pagination-item) set this to null —
+  // the generic pagination-presence test and the discovery page-2 test still run.
+  pagination: {
+    container: '.ss__pagination',
+    active: '.ss-page.ss-active',
+    links: 'a.ss-page-link',
+    next: '.ss-page-next a.ss-page-link',
+    pageTwoToken: 'pp=2',
+  },
 };
 
 /** The store's PLP structure selectors: BESTUS defaults merged with plp.selectors. */

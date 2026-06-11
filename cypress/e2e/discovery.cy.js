@@ -82,8 +82,10 @@ describeIfStore(site.discovery, 'Product discovery', () => {
       waitForProducts(3);
 
       getVisibleProductTitles().then((pageOneTitles) => {
-        cy.get('.ss__pagination').filter(':visible').first().within(() => {
-          cy.get('.ss-page-next a.ss-page-link, a.ss-page-link[href*="pp=2"]').first().click();
+        cy.get('.ss__pagination, .ss-pagination-container').filter(':visible').first().within(() => {
+          cy.get(
+            '.ss-page-next a.ss-page-link, a.ss-page-link[href*="pp=2"], .pagination-item--next a, a.pagination-link[href*="page=2"]'
+          ).first().click();
         });
         assertPaginationAdvanced(pageOneTitles);
       });

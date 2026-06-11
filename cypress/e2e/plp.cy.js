@@ -73,17 +73,17 @@ describeIfStore(site.plp, 'Product Listing Page', { testIsolation: false }, () =
       .should('exist');
   });
 
-  it('pagination marks page 1 active and links to further pages including page 2', () => {
+  itIfStore(sel.pagination, 'pagination marks page 1 active and links to further pages including page 2', () => {
     // Pagination is rendered more than once (top + bottom of the grid); scope to the
     // first visible copy so .within() gets a single element.
-    cy.get('.ss__pagination').filter(':visible').should('have.length.at.least', 1).first().within(() => {
+    cy.get(sel.pagination.container).filter(':visible').should('have.length.at.least', 1).first().within(() => {
       // Current page (1) is marked active and rendered as a non-clickable label.
-      cy.get('.ss-page.ss-active').should('contain.text', '1');
+      cy.get(sel.pagination.active).should('contain.text', '1');
       // Multiple pages are linked.
-      cy.get('a.ss-page-link').should('have.length.at.least', 2);
-      // The "Next" control points to page 2. SearchSpring uses the `pp` query param,
-      // not `page` — don't "correct" this to page=2.
-      cy.get('.ss-page-next a.ss-page-link').should('have.attr', 'href').and('include', 'pp=2');
+      cy.get(sel.pagination.links).should('have.length.at.least', 2);
+      // The "Next" control points to page 2. BESTUS's SearchSpring uses the `pp` query
+      // param, not `page` — don't "correct" this; it's per-store via pageTwoToken.
+      cy.get(sel.pagination.next).should('have.attr', 'href').and('include', sel.pagination.pageTwoToken);
     });
   });
 
