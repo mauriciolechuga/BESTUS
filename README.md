@@ -178,6 +178,35 @@ If any tests fail, Cypress automatically saves a **screenshot** of the browser a
 
 Video recordings of each test run are saved to `cypress/videos/`.
 
+### Skipped tests and how to enable them
+
+Skips are always deliberate and always visible — a skipped test means a config key in `stores/<code>.json` is `null`/`false`, never that coverage silently vanished. Flip the key and the test runs on the next execution, no code changes.
+
+**Skips that apply to every store:**
+
+| What's pending | Why | Enable by |
+|---|---|---|
+| All 3 Lighthouse audits | The spec self-skips outside Chrome (default `cypress run` uses Electron) | Run with `--browser chrome` |
+
+**ADAP's skips (June 2026), as a worked example:**
+
+| Skipped test(s) | Config key (`stores/adap.json`) | Why | Enable by |
+|---|---|---|---|
+| Pro Club form (all 6) | `forms.proClub: null` | ADAP has no Pro Club page | Filling `{ path, submitUrlPattern }` if the store ever adds one |
+| Homepage partner logos | `branding.partnerLinks: null` | No partner logos in ADAP's footer | Listing the partner URLs |
+| Quote form: First Name validation | `forms.quoteRequest.optionalFields: ["Name_First"]` | ADAP's Zoho form genuinely doesn't require First Name (its `zf_MandArray` omits it) | Removing the entry if the Zoho form config changes |
+| PLP subcategory boxes (desktop + 10 mobile devices) | `plp.selectors.subcategoryBox: null` | ADAP's theme has no subcategory box grid | Setting the selector if the theme gains one |
+| PLP detailed pagination markup | `plp.selectors.pagination: null` | ADAP runs the older SearchSpring template (different markup; the generic pagination tests still run) | Filling the pagination selector object (see `stores/bestus.json`) |
+| PDP related-products carousel (desktop + 10 mobile devices) | `pdp.selectors.relatedCarousel: null` | ADAP PDPs have no related-products carousel | Setting the selector if added |
+| PDP Product JSON-LD | `pdp.productJsonLd: false` | **Real SEO gap**: ADAP's theme emits no Product structured data | Fixing the theme, then flipping to `true` |
+
+**Known ADAP failures that are site bugs, not test issues (June 2026):**
+
+- `images.cy.js` — the homepage "Drywall" tile references `for-drywall-finall-des.jpg` (typo); the correctly named `for-drywall-final-des.jpg` exists. Fix the tile in the BigCommerce admin.
+- The missing Product JSON-LD above is worth raising with the theme owner alongside it.
+
+For scaffolded stores (ADC, AAP, FSE, BRH, CAD, PDA) most specs are pending because entire sections (`plp`, `products`, `forms`, `discovery`, `pdp`) are `null` — each store's `_todo` key lists what to fill. See "Onboarding a Scaffolded Store" in `CLAUDE.md`.
+
 ---
 
 ## Project Structure
