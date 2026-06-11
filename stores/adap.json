@@ -37,8 +37,8 @@
       "breadcrumbs": ".breadcrumbs",
       "breadcrumbHome": null,
       "sidebar": ".page-sidebar",
-      "sidebarBlocks": ".page-sidebar .sidebarBlock",
-      "sidebarLinks": ".page-sidebar .navList-item a",
+      "sidebarBlocks": ".page-sidebar .ss-facet-container",
+      "sidebarLinks": ".page-sidebar a.ss-list-link",
       "subcategoryBox": null,
       "pagination": null
     }
