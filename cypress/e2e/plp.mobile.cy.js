@@ -17,14 +17,18 @@ import {
   blockThirdParty,
   makeConsoleErrorSpy,
 } from '../support/checks.js';
+import { getStore, describeIfStore, itIfStore, storePath, plpSelectors } from '../support/store.js';
 
-const PLP = '/products/';
+const site = getStore();
+const plp = site.plp || {};
+const sel = plpSelectors();
+const PLP = plp.main && storePath(plp.main);
 
 // ═════════════════════════════════════════════════════════════════════════════
 // Portrait tests — all devices
 // ═════════════════════════════════════════════════════════════════════════════
 ALL_DEVICES.forEach(({ name, width, height }) => {
-  describe(`PLP – ${name} (${width}x${height})`, { testIsolation: false }, () => {
+  describeIfStore(site.plp, `PLP – ${name} (${width}x${height})`, { testIsolation: false }, () => {
     const consoleErrors = makeConsoleErrorSpy();
 
     before(() => {
@@ -45,10 +49,10 @@ ALL_DEVICES.forEach(({ name, width, height }) => {
     });
 
     it('loads with correct heading and breadcrumb', () => {
-      cy.get('h1.page-heading').should('contain.text', 'Products');
-      cy.get('.breadcrumbs.new_breadcrumbs').within(() => {
-        cy.get('a.breadcrumb-home').should('be.visible');
-        cy.contains('a', 'Products').should('be.visible');
+      cy.get('h1.page-heading').should('contain.text', plp.mainHeading);
+      cy.get(sel.breadcrumbs).within(() => {
+        if (sel.breadcrumbHome) cy.get(sel.breadcrumbHome).should('be.visible');
+        cy.contains('a', plp.breadcrumbLabel).should('be.visible');
       });
     });
 
@@ -61,8 +65,8 @@ ALL_DEVICES.forEach(({ name, width, height }) => {
       assertProductCards(3);
     });
 
-    it('subcategory boxes render with non-empty titles and valid links', () => {
-      cy.get('.subCategoriesBox').should('have.length.at.least', 1).each(($box) => {
+    itIfStore(sel.subcategoryBox, 'subcategory boxes render with non-empty titles and valid links', () => {
+      cy.get(sel.subcategoryBox).should('have.length.at.least', 1).each(($box) => {
         expect($box.find('.nameTitle').text().trim()).to.not.be.empty;
         const href = $box.find('a.navList-action').attr('href');
         expect(href).to.not.be.empty;
@@ -70,9 +74,9 @@ ALL_DEVICES.forEach(({ name, width, height }) => {
       });
     });
 
-    it('sidebar is present in the DOM', () => {
-      // .categories-left is collapsed/hidden on mobile — assert DOM presence only.
-      cy.get('.categories-left').should('exist');
+    itIfStore(sel.sidebar, 'sidebar is present in the DOM', () => {
+      // The sidebar is collapsed/hidden on mobile — assert DOM presence only.
+      cy.get(sel.sidebar).should('exist');
     });
 
     it('has no horizontal overflow', () => {
@@ -89,7 +93,7 @@ ALL_DEVICES.forEach(({ name, width, height }) => {
 // Landscape tests — phones only
 // ═════════════════════════════════════════════════════════════════════════════
 PHONES.forEach(({ name, width, height }) => {
-  describe(`PLP – ${name} landscape (${height}x${width})`, { testIsolation: false }, () => {
+  describeIfStore(site.plp, `PLP – ${name} landscape (${height}x${width})`, { testIsolation: false }, () => {
     before(() => {
       cy.viewport(height, width); // landscape: swap width and height
       cy.visit(PLP);
@@ -100,7 +104,7 @@ PHONES.forEach(({ name, width, height }) => {
     });
 
     it('loads with correct heading', () => {
-      cy.get('h1.page-heading').should('contain.text', 'Products');
+      cy.get('h1.page-heading').should('contain.text', plp.mainHeading);
     });
 
     it('has no horizontal overflow', () => {

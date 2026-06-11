@@ -1,17 +1,16 @@
 import { ProductFormPage } from '../support/pages/ProductFormPage.js';
 import { getMultipartField } from '../support/utils/getMultipartField.js';
+import { getStore, describeIfStore } from '../support/store.js';
 
-describe('Product information form', () => {
+const site = getStore();
+const productForm = site.forms && site.forms.productInfo;
+const submitPattern = productForm && productForm.submitUrlPattern;
+
+describeIfStore(productForm && site.products, 'Product information form', () => {
   let page;
   let persona;
-  let submitPattern;
-  let site;
 
   before(() => {
-    cy.fixture('site').then((s) => {
-      site = s;
-      submitPattern = s.forms.productInfo.submitUrlPattern;
-    });
     cy.fixture('personas').then((p) => { persona = p.primary; });
   });
 

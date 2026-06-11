@@ -1,0 +1,27 @@
+{
+  "_todo": "Scaffold. null sections make their specs show as skipped. To enable: verify branding values on the live site, then fill plp, products, forms, discovery, and pdp (see stores/bestus.json for the full shape). Note: this store's homepage is /new-home/, not / (homePath below).",
+  "storeCode": "FSE",
+  "baseUrl": "https://firesafetyequipment.com",
+  "homePath": "/new-home/",
+  "visitQuery": null,
+  "branding": {
+    "copyrightText": "Fire Safety Equipment",
+    "footerLocationText": null,
+    "warehousesLink": null,
+    "imageHosts": ["firesafetyequipment.com", "bigcommerce.com"],
+    "partnerLinks": null
+  },
+  "plp": null,
+  "products": null,
+  "forms": {
+    "productInfo": null,
+    "quoteRequest": null,
+    "contact": null,
+    "proClub": null,
+    "becomeVendor": null,
+    "architectInquiries": null
+  },
+  "testEmailTemplate": "mauricio+{ts}@firesafetyequipment.com",
+  "discovery": null,
+  "pdp": null
+}

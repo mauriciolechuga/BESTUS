@@ -3,6 +3,7 @@
     "firstName": "Mauricio",
     "lastName": "Testing",
     "company": "Testing LLC",
+    "website": "https://www.example.com",
     "phoneCode": "+1",
     "phoneNumber": "5551234567",
     "address1": "123 Test Lane",

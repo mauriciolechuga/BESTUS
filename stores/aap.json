@@ -1,0 +1,27 @@
+{
+  "_todo": "Scaffold. null sections make their specs show as skipped. To enable: verify branding values on the live site, then fill plp, products, forms, discovery, and pdp (see stores/bestus.json for the full shape). visitQuery is required on this store: without ?redirect=disable the site redirects.",
+  "storeCode": "AAP",
+  "baseUrl": "https://www.acudoraccesspanels.com",
+  "homePath": "/",
+  "visitQuery": "redirect=disable",
+  "branding": {
+    "copyrightText": "Acudor Access Panels",
+    "footerLocationText": null,
+    "warehousesLink": null,
+    "imageHosts": ["acudoraccesspanels.com", "bigcommerce.com"],
+    "partnerLinks": null
+  },
+  "plp": null,
+  "products": null,
+  "forms": {
+    "productInfo": null,
+    "quoteRequest": null,
+    "contact": null,
+    "proClub": null,
+    "becomeVendor": null,
+    "architectInquiries": null
+  },
+  "testEmailTemplate": "mauricio+{ts}@acudoraccesspanels.com",
+  "discovery": null,
+  "pdp": null
+}

@@ -1,0 +1,27 @@
+{
+  "_todo": "Scaffold. null sections make their specs show as skipped. To enable: verify branding values on the live site, then fill plp, products, forms, discovery, and pdp (see stores/bestus.json for the full shape).",
+  "storeCode": "BRH",
+  "baseUrl": "https://bestroofhatches.com",
+  "homePath": "/",
+  "visitQuery": null,
+  "branding": {
+    "copyrightText": "Best Roof Hatches",
+    "footerLocationText": null,
+    "warehousesLink": null,
+    "imageHosts": ["bestroofhatches.com", "bigcommerce.com"],
+    "partnerLinks": null
+  },
+  "plp": null,
+  "products": null,
+  "forms": {
+    "productInfo": null,
+    "quoteRequest": null,
+    "contact": null,
+    "proClub": null,
+    "becomeVendor": null,
+    "architectInquiries": null
+  },
+  "testEmailTemplate": "mauricio+{ts}@bestroofhatches.com",
+  "discovery": null,
+  "pdp": null
+}

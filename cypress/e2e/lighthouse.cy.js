@@ -1,4 +1,7 @@
 import { pickRandom } from '../support/checks.js';
+import { getStore, itIfStore, storePath, homePath } from '../support/store.js';
+
+const site = getStore();
 
 // Lighthouse only works in Chrome. This describe block skips itself in any other browser
 // so the spec can be included in a full run without breaking Firefox runs.
@@ -37,19 +40,17 @@ describe('Lighthouse audit', () => {
   });
 
   it('homepage meets score thresholds', () => {
-    cy.visit('/');
+    cy.visit(homePath());
     cy.lighthouse(THRESHOLDS, DESKTOP_OPTS);
   });
 
-  it('PLP meets score thresholds', () => {
-    cy.visit('/products/');
+  itIfStore(site.plp, 'PLP meets score thresholds', () => {
+    cy.visit(storePath(site.plp.main));
     cy.lighthouse(THRESHOLDS, DESKTOP_OPTS);
   });
 
-  it('a random PDP meets score thresholds', () => {
-    cy.fixture('site').then((site) => {
-      cy.visit(pickRandom(site.pdp.popular));
-      cy.lighthouse(THRESHOLDS, DESKTOP_OPTS);
-    });
+  itIfStore(site.pdp, 'a random PDP meets score thresholds', () => {
+    cy.visit(storePath(pickRandom(site.pdp.popular)));
+    cy.lighthouse(THRESHOLDS, DESKTOP_OPTS);
   });
 });

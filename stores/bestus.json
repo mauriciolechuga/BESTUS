@@ -1,5 +1,24 @@
 {
+  "storeCode": "BESTUS",
   "baseUrl": "https://www.bestaccessdoors.com",
+  "homePath": "/",
+  "visitQuery": null,
+  "branding": {
+    "copyrightText": "Best Access Doors",
+    "footerLocationText": "New York",
+    "warehousesLink": { "href": "/warehouses/", "text": "Warehouses" },
+    "imageHosts": ["bestaccessdoors.com", "bigcommerce.com"],
+    "partnerLinks": [
+      "https://www.bimobject.com/en/best-access-doors?location=us",
+      "https://www.rib-software.com/en/rib-speclink"
+    ]
+  },
+  "plp": {
+    "main": "/products/",
+    "mainHeading": "Products",
+    "breadcrumbLabel": "Products",
+    "subcategory": "/products/popular-picks/fire-rated/"
+  },
   "products": {
     "default": "/24-x-24-fire-rated-insulated-access-door-with-exposed-flange/",
     "known": ["/24-x-24-fire-rated-insulated-access-door-with-exposed-flange/"]

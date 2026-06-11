@@ -1,7 +1,8 @@
 import { ZohoFormPage } from './ZohoFormPage.js';
+import { getStore } from '../store.js';
 
 export class ContactFormPage extends ZohoFormPage {
-  get path() { return '/contact-us/'; }
+  get path() { return getStore().forms.contact.path; }
 
   selectInquiryType(v) {
     // Zoho may use name="Dropdown" or a label-relative selector.

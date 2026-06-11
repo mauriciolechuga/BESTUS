@@ -1,7 +1,8 @@
 import { pickRandom } from '../support/checks.js';
+import { getStore, describeIfStore, storePath, homePath } from '../support/store.js';
 
-const HOMEPAGE = '/';
-const BASE = 'https://www.bestaccessdoors.com';
+const site = getStore();
+const imageHosts = site.branding.imageHosts;
 
 /**
  * Collects all img[src] values from the current page that belong to the site's own
@@ -16,7 +17,7 @@ function assertNoBrokenImages() {
         .map((img) => img.getAttribute('src'))
         .filter((src) => {
           if (!src || src.startsWith('data:')) return false;
-          if (!src.startsWith('/') && !src.includes('bestaccessdoors.com') && !src.includes('bigcommerce.com')) {
+          if (!src.startsWith('/') && !imageHosts.some((host) => src.includes(host))) {
             return false;
           }
           if (src.includes('yotpo') || src.includes('staticw2')) return false;
@@ -27,7 +28,9 @@ function assertNoBrokenImages() {
     expect(srcs.length, 'number of site images found').to.be.at.least(1);
 
     srcs.forEach((src) => {
-      const url = src.startsWith('http') ? src : `${BASE}${src}`;
+      // new URL() also resolves protocol-relative srcs (//cdn11.bigcommerce.com/…,
+      // used by ADAP) — naive baseUrl prefixing turns those into broken URLs.
+      const url = new URL(src, Cypress.config('baseUrl')).href;
       cy.request({ url, failOnStatusCode: false }).then((res) => {
         expect(res.status, `image status: ${url}`).to.be.lessThan(400);
       });
@@ -36,15 +39,15 @@ function assertNoBrokenImages() {
 }
 
 // ─── Alt attributes — PDP ─────────────────────────────────────────────────────
-describe('Image alt attributes – PDP', { testIsolation: false }, () => {
+describeIfStore(site.pdp, 'Image alt attributes – PDP', { testIsolation: false }, () => {
   before(() => {
-    cy.fixture('site').then((site) => {
-      cy.visit(pickRandom(site.pdp.popular));
-    });
+    cy.visit(storePath(pickRandom(site.pdp.popular)));
   });
 
   it('all product gallery images have a non-empty alt attribute', () => {
-    cy.get('section[data-image-gallery] img').should('have.length.at.least', 1).each(($img) => {
+    // .zoomImg is a decorative duplicate injected by the jQuery zoom plugin
+    // (alt is intentionally empty on it) — only author-provided images need alts.
+    cy.get('section[data-image-gallery] img').not('.zoomImg').should('have.length.at.least', 1).each(($img) => {
       const alt = $img.attr('alt');
       expect(alt, `alt for img src="${$img.attr('src')}"`).to.not.be.undefined;
       expect(alt.trim()).to.not.be.empty;
@@ -55,7 +58,7 @@ describe('Image alt attributes – PDP', { testIsolation: false }, () => {
 // ─── Broken images — Homepage ─────────────────────────────────────────────────
 describe('Broken images – Homepage', { testIsolation: false }, () => {
   before(() => {
-    cy.visit(HOMEPAGE);
+    cy.visit(homePath());
   });
 
   it('all site images return a non-error status code', () => {
@@ -64,11 +67,9 @@ describe('Broken images – Homepage', { testIsolation: false }, () => {
 });
 
 // ─── Broken images — PDP ─────────────────────────────────────────────────────
-describe('Broken images – PDP', { testIsolation: false }, () => {
+describeIfStore(site.pdp, 'Broken images – PDP', { testIsolation: false }, () => {
   before(() => {
-    cy.fixture('site').then((site) => {
-      cy.visit(pickRandom(site.pdp.popular));
-    });
+    cy.visit(storePath(pickRandom(site.pdp.popular)));
   });
 
   it('all site images return a non-error status code', () => {

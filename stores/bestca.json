@@ -1,0 +1,43 @@
+{
+  "_todo": "Branding/footer verified against the live site (June 2026). Still to fill: plp, products, forms, discovery, pdp (see stores/bestus.json for the full shape) — those specs skip until then.",
+  "storeCode": "BESTCA",
+  "baseUrl": "https://www.bestaccessdoors.ca",
+  "homePath": "/",
+  "visitQuery": null,
+  "branding": {
+    "copyrightText": "Best Access Doors - Canada",
+    "footerLocationText": "Ancaster",
+    "warehousesLink": { "href": "https://www.bestaccessdoors.ca/warehouses/", "text": "Warehouses" },
+    "imageHosts": ["bestaccessdoors.ca", "bigcommerce.com"],
+    "partnerLinks": [
+      "https://www.bimobject.com/en/best-access-doors?location=us",
+      "https://www.rib-software.com/en/rib-speclink"
+    ],
+    "footer": {
+      "rootSelector": "footer.footer",
+      "sections": ["footer .footer-info", "footer .footer-copyright"],
+      "headingSelector": "footer .footer-info-heading",
+      "headings": ["What's In Store", "Secure Shopping", "My Account", "Contact Info"],
+      "navLinks": "footer .footer-info-col ul li a",
+      "contactInfoBox": "footer .contactbox",
+      "minContactBoxes": 1,
+      "phoneLinks": "footer a[href^=\"tel:\"]",
+      "minPhoneLinks": 1,
+      "copyright": "footer .footer-copyright p",
+      "paymentIcons": "footer .footer-payment-icons"
+    }
+  },
+  "plp": null,
+  "products": null,
+  "forms": {
+    "productInfo": null,
+    "quoteRequest": null,
+    "contact": null,
+    "proClub": null,
+    "becomeVendor": null,
+    "architectInquiries": null
+  },
+  "testEmailTemplate": "mauricio+{ts}@bestaccessdoors.ca",
+  "discovery": null,
+  "pdp": null
+}

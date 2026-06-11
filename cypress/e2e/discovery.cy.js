@@ -18,21 +18,17 @@ import {
   performHeaderSearch,
   waitForProducts,
 } from '../support/checks.js';
+import { getStore, describeIfStore, storePath } from '../support/store.js';
 
-describe('Product discovery', () => {
-  let discovery;
+const site = getStore();
+const discovery = site.discovery || {};
 
-  before(() => {
-    cy.fixture('site').then((site) => {
-      discovery = site.discovery;
-    });
-  });
-
+describeIfStore(site.discovery, 'Product discovery', () => {
   // ─── Console health ──────────────────────────────────────────────────────────
   describe('Console health', () => {
     it('renders a discovery category without console errors', () => {
       const consoleErrors = makeConsoleErrorSpy();
-      cy.visit(discovery.sort.category, { onBeforeLoad: consoleErrors.onBeforeLoad });
+      cy.visit(storePath(discovery.sort.category), { onBeforeLoad: consoleErrors.onBeforeLoad });
       waitForProducts();
       consoleErrors.assertClean();
     });
@@ -55,7 +51,7 @@ describe('Product discovery', () => {
   describe('Categories and refinement pages', () => {
     it('renders each representative discovery category', () => {
       discovery.categories.forEach((path) => {
-        cy.visit(path);
+        cy.visit(storePath(path));
         assertDiscoveryPage();
       });
     });
@@ -64,7 +60,7 @@ describe('Product discovery', () => {
   // ─── Sorting ─────────────────────────────────────────────────────────────────
   describe('Sorting', () => {
     it('sorts products by price low to high', () => {
-      cy.visit(discovery.sort.category);
+      cy.visit(storePath(discovery.sort.category));
       waitForProducts(3);
 
       // Capture the default (Bestselling) order so we can prove the sort changed it. We can't
@@ -82,12 +78,14 @@ describe('Product discovery', () => {
   // ─── Pagination ──────────────────────────────────────────────────────────────
   describe('Pagination', () => {
     it('moves to page 2 and loads a different set of products', () => {
-      cy.visit(discovery.multiPageCategory);
+      cy.visit(storePath(discovery.multiPageCategory));
       waitForProducts(3);
 
       getVisibleProductTitles().then((pageOneTitles) => {
-        cy.get('.ss__pagination').filter(':visible').first().within(() => {
-          cy.get('.ss-page-next a.ss-page-link, a.ss-page-link[href*="pp=2"]').first().click();
+        cy.get('.ss__pagination, .ss-pagination-container').filter(':visible').first().within(() => {
+          cy.get(
+            '.ss-page-next a.ss-page-link, a.ss-page-link[href*="pp=2"], .pagination-item--next a, a.pagination-link[href*="page=2"]'
+          ).first().click();
         });
         assertPaginationAdvanced(pageOneTitles);
       });

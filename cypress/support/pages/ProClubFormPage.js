@@ -1,7 +1,8 @@
 import { ZohoFormPage } from './ZohoFormPage.js';
+import { getStore } from '../store.js';
 
 export class ProClubFormPage extends ZohoFormPage {
-  get path() { return '/pro-club-application/'; }
+  get path() { return getStore().forms.proClub.path; }
 
   fillAddress1(v) {
     cy.get('input[name="Address_AddressLine1"]').clear().type(v);

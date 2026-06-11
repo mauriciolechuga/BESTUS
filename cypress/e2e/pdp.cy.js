@@ -1,15 +1,17 @@
 import { assertBreadcrumbs, assertProductInfoForm, blockThirdParty, makeConsoleErrorSpy, pickRandom } from '../support/checks.js';
+import { getStore, describeIfStore, itIfStore, storePath, pdpSelectors } from '../support/store.js';
 
-// A random product URL from site.json's pdp.popular list is chosen each run. All checks
+const site = getStore();
+const sel = pdpSelectors();
+
+// A random product URL from the store's pdp.popular list is chosen each run. All checks
 // are read-only, so the page is loaded once (testIsolation:false) and shared across tests.
-describe('Product Detail Page', { testIsolation: false }, () => {
+describeIfStore(site.pdp, 'Product Detail Page', { testIsolation: false }, () => {
   const consoleErrors = makeConsoleErrorSpy();
 
   before(() => {
     blockThirdParty();
-    cy.fixture('site').then((site) => {
-      cy.visit(pickRandom(site.pdp.popular), { onBeforeLoad: consoleErrors.onBeforeLoad });
-    });
+    cy.visit(storePath(pickRandom(site.pdp.popular)), { onBeforeLoad: consoleErrors.onBeforeLoad });
   });
 
   // ─── Page structure ────────────────────────────────────────────────────────
@@ -32,7 +34,7 @@ describe('Product Detail Page', { testIsolation: false }, () => {
 
   it('shows at least one product image with a valid src', () => {
     cy.get('section[data-image-gallery]').should('exist');
-    cy.get('section[data-image-gallery] .thumbnail_image').first().invoke('attr', 'src').should('not.be.empty');
+    cy.get(sel.galleryImage).first().invoke('attr', 'src').should('not.be.empty');
   });
 
   it('quantity input is visible and defaults to 1', () => {
@@ -50,12 +52,13 @@ describe('Product Detail Page', { testIsolation: false }, () => {
   it('spec sheet links open PDFs in a new tab', () => {
     cy.get('a[href*=".pdf"]').should('have.length.at.least', 1).each(($a) => {
       expect($a.attr('href')).to.match(/\.pdf$/i);
-      expect($a.attr('target')).to.eq('_blank');
+      // Some stores (ADAP) don't set target="_blank" on every spec-sheet link.
+      if (sel.pdfNewTab) expect($a.attr('target')).to.eq('_blank');
     });
   });
 
   it('description section is present and has content', () => {
-    cy.get('.productView-description1').invoke('text').should('not.be.empty');
+    cy.get(sel.description).invoke('text').should('not.be.empty');
   });
 
   it('YouTube video iframe is present when a video section exists', () => {
@@ -66,12 +69,12 @@ describe('Product Detail Page', { testIsolation: false }, () => {
     });
   });
 
-  it('related products carousel renders with items', () => {
-    cy.get('.content-carousel .owl-carousel').should('exist').children().should('have.length.at.least', 1);
+  itIfStore(sel.relatedCarousel, 'related products carousel renders with items', () => {
+    cy.get(sel.relatedCarousel).should('exist').children().should('have.length.at.least', 1);
   });
 
-  it('reviews section and Yotpo widget are present', () => {
-    cy.get('#productreviewbox').should('exist');
+  itIfStore(sel.reviewsContainer, 'reviews section and Yotpo widget are present', () => {
+    cy.get(sel.reviewsContainer).should('exist');
     cy.get('.yotpo-widget-instance')
       .should('exist')
       .invoke('attr', 'data-yotpo-product-id')
@@ -84,7 +87,7 @@ describe('Product Detail Page', { testIsolation: false }, () => {
 
   // ─── Product info request form ─────────────────────────────────────────────
 
-  it('product info request form is present with required fields', () => {
+  itIfStore(sel.productInfoForm, 'product info request form is present with required fields', () => {
     assertProductInfoForm();
   });
 

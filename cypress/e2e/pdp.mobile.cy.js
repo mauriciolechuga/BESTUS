@@ -20,6 +20,12 @@ import {
   makeConsoleErrorSpy,
   pickRandom,
 } from '../support/checks.js';
+import { getStore, describeIfStore, itIfStore, storePath, pdpSelectors, anyHeaderSelector } from '../support/store.js';
+
+const site = getStore();
+const sel = pdpSelectors();
+// Mobile OR desktop header — themes switch at their own breakpoints (see store.js).
+const header = anyHeaderSelector();
 
 // ─── Shared URL ──────────────────────────────────────────────────────────────
 // One product URL is picked once per spec run and reused across all devices so
@@ -27,19 +33,13 @@ import {
 // pickRandom(), different products could produce different overflow results —
 // masking real bugs on some products and producing false failures on others
 // (confirmed: two 412px devices can disagree when testing different products).
-let pdpUrl;
-
-before(() => {
-  cy.fixture('site').then((site) => {
-    pdpUrl = pickRandom(site.pdp.popular);
-  });
-});
+const pdpUrl = site.pdp && storePath(pickRandom(site.pdp.popular));
 
 // ═════════════════════════════════════════════════════════════════════════════
 // Portrait tests — all devices
 // ═════════════════════════════════════════════════════════════════════════════
 ALL_DEVICES.forEach(({ name, width, height, touchTarget }) => {
-  describe(`PDP – ${name} (${width}x${height})`, { testIsolation: false }, () => {
+  describeIfStore(site.pdp, `PDP – ${name} (${width}x${height})`, { testIsolation: false }, () => {
     const consoleErrors = makeConsoleErrorSpy();
 
     before(() => {
@@ -60,7 +60,7 @@ ALL_DEVICES.forEach(({ name, width, height, touchTarget }) => {
     });
 
     it('loads with header visible', () => {
-      cy.get('header').should('be.visible');
+      cy.get(header).filter(':visible').should('have.length.at.least', 1);
     });
 
     it('renders breadcrumbs with Home and at least one category link', () => {
@@ -77,7 +77,7 @@ ALL_DEVICES.forEach(({ name, width, height, touchTarget }) => {
 
     it('shows at least one product image with a valid src', () => {
       cy.get('section[data-image-gallery]').should('exist');
-      cy.get('section[data-image-gallery] .thumbnail_image').first().invoke('attr', 'src').should('not.be.empty');
+      cy.get(sel.galleryImage).first().invoke('attr', 'src').should('not.be.empty');
     });
 
     it('quantity input is visible and defaults to 1', () => {
@@ -91,11 +91,11 @@ ALL_DEVICES.forEach(({ name, width, height, touchTarget }) => {
     });
 
     it('description section is present and has content', () => {
-      cy.get('.productView-description1').invoke('text').should('not.be.empty');
+      cy.get(sel.description).invoke('text').should('not.be.empty');
     });
 
-    it('related products carousel renders with items', () => {
-      cy.get('.content-carousel .owl-carousel').should('exist').children().should('have.length.at.least', 1);
+    itIfStore(sel.relatedCarousel, 'related products carousel renders with items', () => {
+      cy.get(sel.relatedCarousel).should('exist').children().should('have.length.at.least', 1);
     });
 
     it('SKU is displayed', () => {
@@ -106,7 +106,7 @@ ALL_DEVICES.forEach(({ name, width, height, touchTarget }) => {
       cy.get('.leadtime_value').invoke('text').should('not.be.empty');
     });
 
-    it('product info request form is present with required fields', () => {
+    itIfStore(sel.productInfoForm, 'product info request form is present with required fields', () => {
       assertProductInfoForm();
     });
 
@@ -128,7 +128,7 @@ ALL_DEVICES.forEach(({ name, width, height, touchTarget }) => {
 // Landscape tests — phones only
 // ═════════════════════════════════════════════════════════════════════════════
 PHONES.forEach(({ name, width, height }) => {
-  describe(`PDP – ${name} landscape (${height}x${width})`, { testIsolation: false }, () => {
+  describeIfStore(site.pdp, `PDP – ${name} landscape (${height}x${width})`, { testIsolation: false }, () => {
     before(() => {
       blockThirdParty();
       cy.viewport(height, width); // landscape: swap width and height

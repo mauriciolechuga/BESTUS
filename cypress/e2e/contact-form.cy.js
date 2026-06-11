@@ -1,15 +1,16 @@
 import { ContactFormPage } from '../support/pages/ContactFormPage.js';
 import { getMultipartField } from '../support/utils/getMultipartField.js';
+import { getStore, describeIfStore } from '../support/store.js';
 
-describe('Contact Us form', () => {
+const site = getStore();
+const contactForm = site.forms && site.forms.contact;
+const submitPattern = contactForm && contactForm.submitUrlPattern;
+
+describeIfStore(contactForm, 'Contact Us form', () => {
   let page;
   let persona;
-  let submitPattern;
 
   before(() => {
-    cy.fixture('site').then((site) => {
-      submitPattern = site.forms.contact.submitUrlPattern;
-    });
     cy.fixture('personas').then((p) => { persona = p.primary; });
   });
 
