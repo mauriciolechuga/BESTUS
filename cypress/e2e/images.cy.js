@@ -28,7 +28,9 @@ function assertNoBrokenImages() {
     expect(srcs.length, 'number of site images found').to.be.at.least(1);
 
     srcs.forEach((src) => {
-      const url = src.startsWith('http') ? src : `${Cypress.config('baseUrl')}${src}`;
+      // new URL() also resolves protocol-relative srcs (//cdn11.bigcommerce.com/…,
+      // used by ADAP) — naive baseUrl prefixing turns those into broken URLs.
+      const url = new URL(src, Cypress.config('baseUrl')).href;
       cy.request({ url, failOnStatusCode: false }).then((res) => {
         expect(res.status, `image status: ${url}`).to.be.lessThan(400);
       });
@@ -43,7 +45,9 @@ describeIfStore(site.pdp, 'Image alt attributes – PDP', { testIsolation: false
   });
 
   it('all product gallery images have a non-empty alt attribute', () => {
-    cy.get('section[data-image-gallery] img').should('have.length.at.least', 1).each(($img) => {
+    // .zoomImg is a decorative duplicate injected by the jQuery zoom plugin
+    // (alt is intentionally empty on it) — only author-provided images need alts.
+    cy.get('section[data-image-gallery] img').not('.zoomImg').should('have.length.at.least', 1).each(($img) => {
       const alt = $img.attr('alt');
       expect(alt, `alt for img src="${$img.attr('src')}"`).to.not.be.undefined;
       expect(alt.trim()).to.not.be.empty;
