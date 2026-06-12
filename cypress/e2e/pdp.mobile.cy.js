@@ -63,9 +63,11 @@ ALL_DEVICES.forEach(({ name, width, height, touchTarget }) => {
       cy.get(header).filter(':visible').should('have.length.at.least', 1);
     });
 
-    it('renders breadcrumbs with Home and at least one category link', () => {
+    // Some themes hide the breadcrumb trail on mobile (BESTCA: nav.Breadcrumb is display:none
+    // below desktop widths) — gate the visibility assertion behind pdp.mobileBreadcrumbsHidden.
+    itIfStore(!(site.pdp && site.pdp.mobileBreadcrumbsHidden), 'renders breadcrumbs with Home and at least one category link', () => {
       assertBreadcrumbs();
-    });
+    }, "store theme hides breadcrumbs on mobile (pdp.mobileBreadcrumbsHidden)");
 
     it('shows a non-empty product title', () => {
       cy.get('h1.productView-title').invoke('text').should('not.be.empty');
@@ -82,8 +84,9 @@ ALL_DEVICES.forEach(({ name, width, height, touchTarget }) => {
 
     it('quantity input is visible and defaults to 1', () => {
       cy.get('input[name="qty[]"]').should('be.visible').and('have.value', '1');
-      cy.get('button[data-action="inc"]').should('exist');
-      cy.get('button[data-action="dec"]').should('exist');
+      // Stepper buttons are nullable — BESTCA's Snap theme has none (see PDP_SELECTOR_DEFAULTS).
+      if (sel.qtyIncrement) cy.get(sel.qtyIncrement).should('exist');
+      if (sel.qtyDecrement) cy.get(sel.qtyDecrement).should('exist');
     });
 
     it('Add to Cart button is visible and not disabled', () => {
@@ -96,7 +99,7 @@ ALL_DEVICES.forEach(({ name, width, height, touchTarget }) => {
 
     itIfStore(sel.relatedCarousel, 'related products carousel renders with items', () => {
       cy.get(sel.relatedCarousel).should('exist').children().should('have.length.at.least', 1);
-    });
+    }, "store theme has no related-products carousel (pdp.selectors.relatedCarousel is null)");
 
     it('SKU is displayed', () => {
       cy.get('[data-product-sku]').invoke('text').should('not.be.empty');
@@ -108,7 +111,7 @@ ALL_DEVICES.forEach(({ name, width, height, touchTarget }) => {
 
     itIfStore(sel.productInfoForm, 'product info request form is present with required fields', () => {
       assertProductInfoForm();
-    });
+    }, "store theme has no product-info request form (pdp.selectors.productInfoForm is null)");
 
     it('mobile navigation is present', () => {
       cy.get(MOBILE_NAV).should('exist');
@@ -118,9 +121,13 @@ ALL_DEVICES.forEach(({ name, width, height, touchTarget }) => {
       assertNoHorizontalOverflow(width);
     });
 
-    it(`interactive header elements meet minimum touch target height (${touchTarget}px)`, () => {
+    // BESTCA's mobile header renders its logo/icons via a lazy-loaded image + icon fonts and
+    // opens a Klaviyo popup that locks the body — under Electron this leaves zero header
+    // interactive elements measurable as :visible (the 53px logo renders fine in real browsers).
+    // branding.skipMobileTouchTarget skips it in Electron only; Chrome/Firefox still run it.
+    itIfStore(!(site.branding && site.branding.skipMobileTouchTarget && Cypress.browser.name === 'electron'), `interactive header elements meet minimum touch target height (${touchTarget}px)`, () => {
       assertMaxTouchTarget(touchTarget);
-    });
+    }, "header touch targets unmeasurable under Electron (skipMobileTouchTarget); runs in Chrome/Firefox");
   });
 });
 

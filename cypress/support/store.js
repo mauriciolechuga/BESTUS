@@ -34,12 +34,20 @@ export function describeIfStore(condition, title, options, fn) {
   return options ? block(fullTitle, options, fn) : block(fullTitle, fn);
 }
 
-/** Same as describeIfStore, at the individual-test level. */
-export function itIfStore(condition, title, fn) {
+/**
+ * Same as describeIfStore, at the individual-test level. Pass an optional `reason`
+ * to explain a *deliberate* gate — a theme that lacks the element, a form that
+ * doesn't require the field, a browser-only limitation — and it replaces the
+ * default "not configured" suffix so the skip reads clearly to anyone running the
+ * suite (e.g. `[skipped: theme hides breadcrumbs on mobile]`). Omit it for genuine
+ * "feature not configured yet" gates, where "not configured for <CODE>" is accurate.
+ */
+export function itIfStore(condition, title, fn, reason) {
   const block = condition ? it : it.skip;
-  const fullTitle = condition
-    ? title
-    : `${title} [skipped: not configured for ${getStore().storeCode}]`;
+  const suffix = reason
+    ? `[skipped: ${reason}]`
+    : `[skipped: not configured for ${getStore().storeCode}]`;
+  const fullTitle = condition ? title : `${title} ${suffix}`;
   return block(fullTitle, fn);
 }
 
@@ -112,9 +120,18 @@ const PLP_SELECTOR_DEFAULTS = {
   breadcrumbHome: 'a.breadcrumb-home',
   sidebar: '.categories-left',
   sidebarBlocks: '.categories-left .sidebarBlock',
+  // Minimum sidebar blocks the "sidebar is visible" test requires. BESTUS has several
+  // (Categories, Best Sellers, Brands); BESTCA's theme has a single Categories block, so
+  // it overrides this to 1 via plp.selectors.sidebarBlocksMin.
+  sidebarBlocksMin: 2,
   sidebarLinks: '.categories-left .navList-item a',
   bestSellers: '#treeView li a',
   subcategoryBox: '.subCategoriesBox',
+  // Product-card container. BESTUS's SearchSpring template renders BigCommerce-native
+  // ul.productGrid; BESTCA runs the stock SearchSpring "Snap" theme which renders
+  // ul.ss__results.ss__results--grid instead (cards keep .card-figure img / .card-title a).
+  // Overridden per store via plp.selectors.productCard.
+  productCard: 'ul.productGrid li.product',
   // Detailed pagination markup (BESTUS SearchSpring template). Stores on the older
   // template (ADAP: .ss-pagination-container/.pagination-item) set this to null —
   // the generic pagination-presence test and the discovery page-2 test still run.
@@ -142,6 +159,11 @@ const PDP_SELECTOR_DEFAULTS = {
   breadcrumbLabel: '.breadcrumb-label',
   galleryImage: 'section[data-image-gallery] .thumbnail_image',
   description: '.productView-description1',
+  // Quantity stepper buttons. BESTUS's theme renders button[data-action="inc"/"dec"];
+  // BESTCA's Snap theme has a bare .form-increment input with no stepper buttons, so it
+  // sets these to null and the inc/dec presence checks skip. Nullable.
+  qtyIncrement: 'button[data-action="inc"]',
+  qtyDecrement: 'button[data-action="dec"]',
   relatedCarousel: '.content-carousel .owl-carousel',
   productInfoForm: '#have_a_product_question_request',
   // Wrapper around the Yotpo reviews widget — ADAP has no #productreviewbox and

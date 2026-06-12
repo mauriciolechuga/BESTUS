@@ -30,6 +30,10 @@ export class ProClubFormPage extends ZohoFormPage {
   }
 
   selectCountry(v) {
+    // BESTCA's Canada-only Pro Club form (BestAccessDoorsProClubCanadaAp) has no country
+    // dropdown — country is implicitly Canada. Stores without the field set
+    // forms.proClub.hasCountry:false so fillPersona's call here is a no-op.
+    if (getStore().forms.proClub.hasCountry === false) return this;
     // Option text must match exactly. Verify "Canada" vs "CA" on first run.
     cy.get('select[name="Address_Country"]').select(v);
     return this;

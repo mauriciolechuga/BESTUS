@@ -22,24 +22,21 @@
  */
 import { mobileNavSelector } from './store.js';
 
+// Trimmed to representative viewport widths (Microsoft Clarity, June 2026): mobile ≈ 37% of
+// traffic / iOS ~2:1 over Android, tablet just ~4%. Because these specs are read-only LAYOUT
+// checks (layout is width-driven, no device-specific behavior), near-duplicate widths added no
+// coverage — the previous 10-device matrix had 412==412, 390≈393, and 800/810/834 in one band.
+// These four span the full phone width range (narrow Android → large Android, with a modern
+// iPhone) plus one tablet-portrait; the ~1024 tablet-landscape boundary is covered by the
+// desktop specs. Names are real devices for readable failure output.
 export const PHONES = [
-  // Apple iPhones — compact, standard, and current flagship sizes
-  { name: 'iPhone SE 2nd gen (2020)', width: 375, height: 667, touchTarget: 44 },
-  { name: 'iPhone 13 (2021)',         width: 390, height: 844, touchTarget: 44 },
-  { name: 'iPhone 15 (2023)',         width: 393, height: 852, touchTarget: 44 },
-  // Android phones — budget-era, mid-cycle, and current flagship
-  { name: 'Samsung Galaxy S10 (2019)', width: 360, height: 760, touchTarget: 44 },
-  { name: 'Samsung Galaxy A53 (2022)', width: 412, height: 892, touchTarget: 44 },
-  { name: 'Google Pixel 8 (2023)',     width: 412, height: 915, touchTarget: 44 },
+  { name: 'Samsung Galaxy S10 (2019)', width: 360, height: 760, touchTarget: 44 }, // narrow — worst-case overflow
+  { name: 'iPhone 15 (2023)',          width: 393, height: 852, touchTarget: 44 }, // modern iPhone (iOS plurality)
+  { name: 'Google Pixel 8 (2023)',     width: 412, height: 915, touchTarget: 44 }, // large Android
 ];
 
 export const TABLETS = [
-  // Apple iPads — budget and pro sizes
-  { name: 'iPad 9th gen (2021)',          width: 810,  height: 1080, touchTarget: 24 },
-  { name: 'iPad Pro 12.9" (2022)',        width: 1024, height: 1366, touchTarget: 24 },
-  // Android tablets — mainstream and flagship
-  { name: 'Samsung Galaxy Tab S7 (2020)', width: 800,  height: 1280, touchTarget: 24 },
-  { name: 'Samsung Galaxy Tab S9 (2023)', width: 834,  height: 1388, touchTarget: 24 },
+  { name: 'iPad 9th gen (2021)', width: 810, height: 1080, touchTarget: 24 }, // tablet portrait
 ];
 
 export const ALL_DEVICES = [...PHONES, ...TABLETS];

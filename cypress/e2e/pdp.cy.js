@@ -39,8 +39,9 @@ describeIfStore(site.pdp, 'Product Detail Page', { testIsolation: false }, () =>
 
   it('quantity input is visible and defaults to 1', () => {
     cy.get('input[name="qty[]"]').should('be.visible').and('have.value', '1');
-    cy.get('button[data-action="inc"]').should('be.visible');
-    cy.get('button[data-action="dec"]').should('be.visible');
+    // Stepper buttons are nullable — BESTCA's Snap theme has none (see PDP_SELECTOR_DEFAULTS).
+    if (sel.qtyIncrement) cy.get(sel.qtyIncrement).should('be.visible');
+    if (sel.qtyDecrement) cy.get(sel.qtyDecrement).should('be.visible');
   });
 
   it('Add to Cart button is visible and not disabled', () => {
@@ -71,7 +72,7 @@ describeIfStore(site.pdp, 'Product Detail Page', { testIsolation: false }, () =>
 
   itIfStore(sel.relatedCarousel, 'related products carousel renders with items', () => {
     cy.get(sel.relatedCarousel).should('exist').children().should('have.length.at.least', 1);
-  });
+  }, "store theme has no related-products carousel (pdp.selectors.relatedCarousel is null)");
 
   itIfStore(sel.reviewsContainer, 'reviews section and Yotpo widget are present', () => {
     cy.get(sel.reviewsContainer).should('exist');
@@ -79,17 +80,19 @@ describeIfStore(site.pdp, 'Product Detail Page', { testIsolation: false }, () =>
       .should('exist')
       .invoke('attr', 'data-yotpo-product-id')
       .should('not.be.empty');
-  });
+  }, "store theme has no reviews widget (pdp.selectors.reviewsContainer is null)");
 
   it('recently viewed SearchSpring script tag is present', () => {
-    cy.get('script[type="searchspring/personalized-recommendations"][profile="recently-viewed"]').should('exist');
+    // Profile is store-dependent — BESTCA's Snap theme emits "similar" rather than "recently-viewed".
+    const profile = (site.pdp && site.pdp.recentlyViewedProfile) || 'recently-viewed';
+    cy.get(`script[type="searchspring/personalized-recommendations"][profile="${profile}"]`).should('exist');
   });
 
   // ─── Product info request form ─────────────────────────────────────────────
 
   itIfStore(sel.productInfoForm, 'product info request form is present with required fields', () => {
     assertProductInfoForm();
-  });
+  }, "store theme has no product-info request form (pdp.selectors.productInfoForm is null)");
 
   // ─── SKU and meta ──────────────────────────────────────────────────────────
 

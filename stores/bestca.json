@@ -1,5 +1,5 @@
 {
-  "_todo": "Branding/footer verified against the live site (June 2026). Still to fill: plp, products, forms, discovery, pdp (see stores/bestus.json for the full shape) — those specs skip until then.",
+  "_notes": "Configured from the live site (June 2026). BESTCA runs a newer SearchSpring \"Snap\" storefront theme + CAD pricing, unlike BESTUS. Quirks: category taxonomy is /any-surface-access-doors/... (no /products/ — it 404s); product grid renders into ul.ss__results.ss__results--grid (not ul.productGrid); pagination uses .ss__pagination__* with ?page=2 query param; sort is a custom .ss__dropdown that hash-routes (#/sort:calculated_price:asc); breadcrumbs are plain .breadcrumbs (no home link); sidebar is a single-block .page-sidebar (so the >=2-block sidebar test is skipped via sidebar:null; the category tree is covered by bestSellers #treeView); PDP has no qty stepper buttons; reviews in #yotpo-reviews-main-widget; recently-viewed SearchSpring profile is \"similar\"; Product JSON-LD is present but priceCurrency is CAD.",
   "storeCode": "BESTCA",
   "baseUrl": "https://www.bestaccessdoors.ca",
   "homePath": "/",
@@ -7,6 +7,9 @@
   "branding": {
     "copyrightText": "Best Access Doors - Canada",
     "footerLocationText": "Ancaster",
+    "currency": "CAD",
+    "mobileNavSelector": "div.Mobile_menu",
+    "skipMobileTouchTarget": true,
     "warehousesLink": {
       "href": "https://www.bestaccessdoors.ca/warehouses/",
       "text": "Warehouses"
@@ -35,16 +38,42 @@
       "paymentIcons": "footer .footer-payment-icons"
     }
   },
-  "plp": null,
-  "products": null,
+  "plp": {
+    "main": "/any-surface-access-doors/fire-rated-doors/",
+    "mainHeading": "Fire-Rated",
+    "breadcrumbLabel": "Any Surface",
+    "subcategory": "/any-surface-access-doors/fire-rated-doors/drywall-flange/",
+    "selectors": {
+      "breadcrumbs": ".breadcrumbs",
+      "breadcrumbHome": null,
+      "sidebar": ".page-sidebar",
+      "sidebarBlocks": ".page-sidebar .sidebarBlock",
+      "sidebarBlocksMin": 1,
+      "sidebarLinks": ".page-sidebar #treeView > li > a",
+      "bestSellers": "#treeView > li > a",
+      "productCard": "ul.ss__results li.product",
+      "pagination": {
+        "container": ".ss__pagination",
+        "active": ".ss__pagination__current",
+        "links": ".ss__pagination__link",
+        "next": ".ss__pagination__column a.ss__pagination__link",
+        "pageTwoToken": "page=2"
+      }
+    }
+  },
+  "products": {
+    "default": "/12-x-12-fire-rated-un-insulated-access-door-with-flange/",
+    "known": ["/12-x-12-fire-rated-un-insulated-access-door-with-flange/"]
+  },
   "forms": {
     "productInfo": {
       "path": "default-product",
-      "submitUrlPattern": "**/forms.zohopublic.com/**/BESTProductForm/**/submit"
+      "submitUrlPattern": "**/forms.zohopublic.com/**/BESTCAProductForm/**/submit"
     },
     "quoteRequest": {
       "path": "/request-a-quote/",
-      "submitUrlPattern": "**/forms.zohopublic.com/**/submit"
+      "submitUrlPattern": "**/forms.zohopublic.com/**/submit",
+      "optionalFields": ["Name_First"]
     },
     "contact": {
       "path": "/contact-us/",
@@ -52,10 +81,49 @@
     },
     "proClub": {
       "path": "/pro-club-application/",
-      "submitUrlPattern": "**/forms.zohopublic.com/**/submit"
+      "submitUrlPattern": "**/forms.zohopublic.com/**/submit",
+      "hasCountry": false
     }
   },
   "testEmailTemplate": "mauricio+{ts}@bestaccessdoors.ca",
-  "discovery": null,
-  "pdp": null
+  "discovery": {
+    "search": {
+      "knownTerm": "fire-rated access door",
+      "expectedTokens": ["fire", "rated", "access", "door"],
+      "noResultsTerm": "zzzz-no-products-987654321"
+    },
+    "categories": [
+      "/any-surface-access-doors/fire-rated-doors/",
+      "/any-surface-access-doors-and-panels/",
+      "/any-surface-access-doors/insulated-access-doors/"
+    ],
+    "mobileCategory": "/any-surface-access-doors/fire-rated-doors/",
+    "multiPageCategory": "/any-surface-access-doors/fire-rated-doors/",
+    "sort": {
+      "category": "/any-surface-access-doors/fire-rated-doors/",
+      "label": "Price: Low to High",
+      "urlHash": "#/sort:calculated_price:asc"
+    }
+  },
+  "pdp": {
+    "recentlyViewedProfile": "similar",
+    "mobileBreadcrumbsHidden": true,
+    "popular": [
+      "/12-x-12-fire-rated-insulated-access-door-with-flange/",
+      "/24-x-24-fire-rated-insulated-access-door-with-flange/",
+      "/8-x-8-fire-rated-un-insulated-access-door-with-flange/",
+      "/24-x-24-general-purpose-access-door-with-flange/"
+    ],
+    "selectors": {
+      "breadcrumbs": ".breadcrumbs",
+      "breadcrumbHome": null,
+      "galleryImage": "section[data-image-gallery] img",
+      "relatedCarousel": ".ss__recommendation--carousel",
+      "reviewsContainer": "#yotpo-reviews-main-widget",
+      "productInfoForm": "#request_more_info_about_this_product",
+      "qtyIncrement": null,
+      "qtyDecrement": null,
+      "pdfNewTab": true
+    }
+  }
 }

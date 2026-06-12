@@ -1,4 +1,4 @@
-import { waitForProducts, assertProductCards, blockThirdParty, makeConsoleErrorSpy } from '../support/checks.js';
+import { waitForProducts, assertProductCards, blockThirdParty, makeConsoleErrorSpy, productCardSelector } from '../support/checks.js';
 import { getStore, describeIfStore, itIfStore, storePath, plpSelectors } from '../support/store.js';
 
 const site = getStore();
@@ -33,17 +33,17 @@ describeIfStore(site.plp, 'Product Listing Page', { testIsolation: false }, () =
 
   itIfStore(sel.sidebar, 'sidebar is visible with category navigation', () => {
     cy.get(sel.sidebar).should('be.visible');
-    cy.get(sel.sidebarBlocks).should('have.length.at.least', 2);
+    cy.get(sel.sidebarBlocks).should('have.length.at.least', sel.sidebarBlocksMin);
     cy.get(sel.sidebarLinks).each(($a) => {
       expect($a.text().trim()).to.not.be.empty;
     });
-  });
+  }, "store theme has no category sidebar (plp.selectors.sidebar is null)");
 
   itIfStore(sel.bestSellers, 'best sellers sidebar block renders with labelled links', () => {
     cy.get(sel.bestSellers).should('have.length.at.least', 1).each(($a) => {
       expect($a.text().trim()).to.not.be.empty;
     });
-  });
+  }, "store theme has no best-sellers sidebar block (plp.selectors.bestSellers is null)");
 
   itIfStore(sel.subcategoryBox, 'subcategory boxes render with non-empty titles and valid links', () => {
     cy.get(sel.subcategoryBox).should('have.length.at.least', 1).each(($box) => {
@@ -52,7 +52,7 @@ describeIfStore(site.plp, 'Product Listing Page', { testIsolation: false }, () =
       expect(href).to.not.be.empty;
       expect(href).to.include('/');
     });
-  });
+  }, "store theme has no subcategory boxes (plp.selectors.subcategoryBox is null)");
 
   // ─── Product grid ──────────────────────────────────────────────────────────
 
@@ -85,13 +85,13 @@ describeIfStore(site.plp, 'Product Listing Page', { testIsolation: false }, () =
       // param, not `page` — don't "correct" this; it's per-store via pageTwoToken.
       cy.get(sel.pagination.next).should('have.attr', 'href').and('include', sel.pagination.pageTwoToken);
     });
-  });
+  }, "store theme has no detailed pagination markup (plp.selectors.pagination is null)");
 
   // ─── Link health ───────────────────────────────────────────────────────────
 
   itIfStore(sel.sidebar, 'sidebar category links all resolve without 404', () => {
     cy.assertLinksResolve(sel.sidebarLinks);
-  });
+  }, "store theme has no category sidebar (plp.selectors.sidebar is null)");
 });
 
 // ─── Subcategory page (separate URL, read-only) ────────────────────────────────
@@ -118,7 +118,7 @@ describeIfStore(site.plp, 'PLP navigation', () => {
   it('clicking a product card navigates to the PDP', () => {
     cy.visit(PLP);
     waitForProducts();
-    cy.get('ul.productGrid li.product').first().find('.card-title a').click();
+    cy.get(productCardSelector()).first().find('.card-title a').click();
     cy.url().should('not.include', plp.main);
     cy.get('h1').should('be.visible');
   });

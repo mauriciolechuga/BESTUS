@@ -51,7 +51,9 @@ describeIfStore(site.discovery, 'Product discovery mobile', () => {
       // Runs last: navigates away from the shared category visit to the search-results page.
       it('renders search results without horizontal overflow', () => {
         performHeaderSearch(discovery.search.knownTerm);
-        cy.get('h1.page-heading, h1').first().should('exist').invoke('text').should('not.be.empty');
+        // Some themes render the results heading as a non-h1 (BESTCA: <h2 class="page-heading">),
+        // so accept a bare .page-heading too — same union assertDiscoveryPage uses.
+        cy.get('h1.page-heading, .page-heading, h1').first().should('exist').invoke('text').should('not.be.empty');
         assertSearchResults(discovery.search.expectedTokens);
         cy.get(MOBILE_NAV).should('exist');
         assertNoHorizontalOverflow(width);

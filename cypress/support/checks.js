@@ -4,9 +4,12 @@
  * commands) so they read as plain functions with their rationale documented alongside.
  */
 
-import { getStore, homePath, footerConfig, pdpSelectors, anyHeaderSelector } from './store.js';
+import { getStore, homePath, footerConfig, pdpSelectors, plpSelectors, anyHeaderSelector } from './store.js';
 
-const PRODUCT_CARD = 'ul.productGrid li.product';
+// Product-card container is theme-dependent (BESTUS ul.productGrid vs BESTCA's SearchSpring
+// "Snap" ul.ss__results) — read it from the store's PLP selectors. Exported so specs that
+// reference the grid directly (plp navigation, discovery handoff) stay in sync.
+export const productCardSelector = () => plpSelectors().productCard;
 const PRODUCT_TITLE = '.card-title';
 const PRODUCT_PRICE = '[class*="price"]';
 // Container that holds a card's price(s). We read EVERY $-amount inside it and take the minimum
@@ -41,7 +44,7 @@ const readCardPrice = (card) => {
 
 /** Waits for the product grid to populate. */
 export const waitForProducts = (min = 1) =>
-  cy.get(PRODUCT_CARD, { timeout: 20000 }).should('have.length.at.least', min);
+  cy.get(productCardSelector(), { timeout: 20000 }).should('have.length.at.least', min);
 
 /** Picks a random element from a non-empty list. */
 export const pickRandom = (list) => list[Math.floor(Math.random() * list.length)];
@@ -94,7 +97,7 @@ export function blockThirdParty() {
 
 /** Asserts the first `limit` product cards each have an image, title, price, and link. */
 export function assertProductCards(limit = 3) {
-  cy.get(PRODUCT_CARD).each(($li, i) => {
+  cy.get(productCardSelector()).each(($li, i) => {
     if (i >= limit) return false;
     cy.wrap($li).within(() => {
       cy.get('.card-figure img').should('exist').invoke('attr', 'src').should('not.be.empty');
@@ -110,7 +113,7 @@ export function assertProductCards(limit = 3) {
 }
 
 export function getVisibleProductTitles(limit = 12) {
-  return cy.get(PRODUCT_CARD).then(($cards) =>
+  return cy.get(productCardSelector()).then(($cards) =>
     [...$cards].slice(0, limit).map((card) => normaliseText(card.querySelector(PRODUCT_TITLE)?.textContent || ''))
   );
 }
@@ -138,7 +141,7 @@ export function assertSearchResults(expectedTokens = []) {
   assertProductCards(3);
   if (!expectedTokens.length) return;
 
-  cy.get(PRODUCT_CARD).then(($cards) => {
+  cy.get(productCardSelector()).then(($cards) => {
     const text = normaliseText([...$cards].map((card) => card.textContent).join(' ')).toLowerCase();
     const matched = expectedTokens.some((token) => text.includes(token.toLowerCase()));
     expect(matched, `At least one result contains one of: ${expectedTokens.join(', ')}`).to.eq(true);
@@ -159,7 +162,7 @@ export function assertNoSearchResults() {
       /no (products|results|matches)|0 results|did not match|could not find|couldn't find|nothing matches|try (again|a different)/i.test(
         text
       );
-    const hasNoProducts = $body.find(PRODUCT_CARD).length === 0;
+    const hasNoProducts = $body.find(productCardSelector()).length === 0;
     expect(
       hasNoResultsMessage || hasNoProducts,
       'shows a no-results message or an empty product grid'
@@ -243,7 +246,7 @@ export function assertSortApplied(previousTitles, { expectedHash } = {}) {
     const key = expectedHash.replace(/^#\/?/, '');
     cy.location('hash', { timeout: 20000 }).should('include', key);
   }
-  cy.get(PRODUCT_CARD, { timeout: 20000 }).should(($cards) => {
+  cy.get(productCardSelector(), { timeout: 20000 }).should(($cards) => {
     const cards = [...$cards];
     const titles = cards
       .slice(0, previousTitles.length)
@@ -261,7 +264,9 @@ export function assertPaginationAdvanced(previousTitles) {
   // BESTUS paginates with pp=2; other SearchSpring templates use p=2 (ADAP), page=2, or #...page:2.
   cy.location('href', { timeout: 20000 }).should('match', /\b(?:pp|page|p)[=:]2\b/);
   cy.get('.ss__pagination, .ss-pagination-container').filter(':visible').first().within(() => {
-    cy.get('.ss-page.ss-active, [aria-current="page"], .pagination-item--current')
+    // .ss__pagination__current: BESTCA's SearchSpring "Snap" template marks the active page
+    // with this instead of .ss-page.ss-active.
+    cy.get('.ss-page.ss-active, .ss__pagination__current, [aria-current="page"], .pagination-item--current')
       .should('contain.text', '2');
   });
   waitForProducts();
@@ -409,7 +414,9 @@ export function assertProductJsonLd() {
     expect(product.description, 'product description').to.be.a('string').and.not.be.empty;
     expect(product.image, 'product image').to.be.a('string').and.not.be.empty;
     expect(product.offers?.price, 'offers.price').to.match(/^\d+(\.\d+)?$/);
-    expect(product.offers?.priceCurrency, 'offers.priceCurrency').to.equal('USD');
+    // Currency is store-dependent — BESTCA (Canada) emits CAD. Defaults to USD.
+    const currency = (getStore().branding && getStore().branding.currency) || 'USD';
+    expect(product.offers?.priceCurrency, 'offers.priceCurrency').to.equal(currency);
     expect(product.offers?.availability, 'offers.availability').to.be.a('string').and.not.be.empty;
   });
 }
