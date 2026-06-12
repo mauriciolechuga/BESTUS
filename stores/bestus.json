@@ -39,9 +39,7 @@
     "proClub": {
       "path": "/pro-club-application/",
       "submitUrlPattern": "**/forms.zohopublic.com/**/submit"
-    },
-    "becomeVendor": null,
-    "architectInquiries": null
+    }
   },
   "testEmailTemplate": "mauricio+{ts}@bestaccessdoors.com",
   "discovery": {

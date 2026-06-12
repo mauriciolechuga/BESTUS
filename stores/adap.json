@@ -16,9 +16,18 @@
     "partnerLinks": null,
     "footer": {
       "rootSelector": "footer.footer",
-      "sections": ["footer .footer-info", "footer .footer-bottom", "footer .footer-copyright"],
+      "sections": [
+        "footer .footer-info",
+        "footer .footer-bottom",
+        "footer .footer-copyright"
+      ],
       "headingSelector": "footer .footer-info-heading",
-      "headings": ["WHAT'S IN STORE", "Secure Shopping", "My Account", "Contact Info:"],
+      "headings": [
+        "WHAT'S IN STORE",
+        "Secure Shopping",
+        "My Account",
+        "Contact Info:"
+      ],
       "navLinks": "footer .footer-info-col ul li a",
       "contactInfoBox": "footer .Info-box",
       "minContactBoxes": 3,
@@ -65,8 +74,7 @@
     "becomeVendor": {
       "path": "/bvl1/",
       "submitUrlPattern": "**/forms.zohopublic.com/**/ADAPcomApplyForVendor/**/submit"
-    },
-    "architectInquiries": null
+    }
   },
   "testEmailTemplate": "mauricio+{ts}@accessdoorsandpanels.com",
   "discovery": {

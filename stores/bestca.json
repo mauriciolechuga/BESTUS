@@ -7,7 +7,10 @@
   "branding": {
     "copyrightText": "Best Access Doors - Canada",
     "footerLocationText": "Ancaster",
-    "warehousesLink": { "href": "https://www.bestaccessdoors.ca/warehouses/", "text": "Warehouses" },
+    "warehousesLink": {
+      "href": "https://www.bestaccessdoors.ca/warehouses/",
+      "text": "Warehouses"
+    },
     "imageHosts": ["bestaccessdoors.ca", "bigcommerce.com"],
     "partnerLinks": [
       "https://www.bimobject.com/en/best-access-doors?location=us",
@@ -17,7 +20,12 @@
       "rootSelector": "footer.footer",
       "sections": ["footer .footer-info", "footer .footer-copyright"],
       "headingSelector": "footer .footer-info-heading",
-      "headings": ["What's In Store", "Secure Shopping", "My Account", "Contact Info"],
+      "headings": [
+        "What's In Store",
+        "Secure Shopping",
+        "My Account",
+        "Contact Info"
+      ],
       "navLinks": "footer .footer-info-col ul li a",
       "contactInfoBox": "footer .contactbox",
       "minContactBoxes": 1,
@@ -30,12 +38,22 @@
   "plp": null,
   "products": null,
   "forms": {
-    "productInfo": null,
-    "quoteRequest": null,
-    "contact": null,
-    "proClub": null,
-    "becomeVendor": null,
-    "architectInquiries": null
+    "productInfo": {
+      "path": "default-product",
+      "submitUrlPattern": "**/forms.zohopublic.com/**/BESTProductForm/**/submit"
+    },
+    "quoteRequest": {
+      "path": "/request-a-quote/",
+      "submitUrlPattern": "**/forms.zohopublic.com/**/submit"
+    },
+    "contact": {
+      "path": "/contact-us/",
+      "submitUrlPattern": "**/forms.zohopublic.com/**/submit"
+    },
+    "proClub": {
+      "path": "/pro-club-application/",
+      "submitUrlPattern": "**/forms.zohopublic.com/**/submit"
+    }
   },
   "testEmailTemplate": "mauricio+{ts}@bestaccessdoors.ca",
   "discovery": null,
