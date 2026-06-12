@@ -72,12 +72,12 @@ ALL_DEVICES.forEach(({ name, width, height }) => {
         expect(href).to.not.be.empty;
         expect(href).to.include('/');
       });
-    });
+    }, "store theme has no subcategory boxes (plp.selectors.subcategoryBox is null)");
 
     itIfStore(sel.sidebar, 'sidebar is present in the DOM', () => {
       // The sidebar is collapsed/hidden on mobile — assert DOM presence only.
       cy.get(sel.sidebar).should('exist');
-    });
+    }, "store theme has no category sidebar (plp.selectors.sidebar is null)");
 
     it('has no horizontal overflow', () => {
       assertNoHorizontalOverflow(width);

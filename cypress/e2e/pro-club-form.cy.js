@@ -1,10 +1,13 @@
 import { ProClubFormPage } from '../support/pages/ProClubFormPage.js';
 import { getMultipartField } from '../support/utils/getMultipartField.js';
-import { getStore, describeIfStore } from '../support/store.js';
+import { getStore, describeIfStore, itIfStore } from '../support/store.js';
 
 const site = getStore();
 const proClubForm = site.forms && site.forms.proClub;
 const submitPattern = proClubForm && proClubForm.submitUrlPattern;
+// Some Pro Club forms have no country dropdown (BESTCA's Canada-only form) — gate the
+// country-specific tests on it.
+const hasCountry = proClubForm && proClubForm.hasCountry !== false;
 
 describeIfStore(proClubForm, 'Pro Club Application form', () => {
   let page;
@@ -29,7 +32,7 @@ describeIfStore(proClubForm, 'Pro Club Application form', () => {
       });
     });
 
-    it('submits successfully with a non-US country selected', () => {
+    itIfStore(hasCountry, 'submits successfully with a non-US country selected', () => {
       cy.uniqueEmail().then((email) => {
         cy.interceptZoho('submit', submitPattern);
         page.visit().scrollToForm();
@@ -41,7 +44,7 @@ describeIfStore(proClubForm, 'Pro Club Application form', () => {
           expect(getMultipartField(body, 'Email')).to.equal(email);
         });
       });
-    });
+    }, "store's Pro Club form has no country field (forms.proClub.hasCountry is false)");
 
     it('sends user-entered values in the request payload', () => {
       cy.uniqueEmail().then((email) => {
@@ -65,7 +68,7 @@ describeIfStore(proClubForm, 'Pro Club Application form', () => {
       cy.interceptZoho('submit', submitPattern);
     });
 
-    it('defaults the country dropdown to a placeholder selection', () => {
+    itIfStore(hasCountry, 'defaults the country dropdown to a placeholder selection', () => {
       cy.get('select[name="Address_Country"]').should(($sel) => {
         const selected = $sel.val();
         expect(selected).to.satisfy(
@@ -73,7 +76,7 @@ describeIfStore(proClubForm, 'Pro Club Application form', () => {
           `Expected placeholder, got "${selected}"`
         );
       });
-    });
+    }, "store's Pro Club form has no country field (forms.proClub.hasCountry is false)");
 
     it('shows an error when Email is empty', () => {
       cy.uniqueEmail().then((email) => {

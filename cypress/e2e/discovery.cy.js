@@ -16,6 +16,7 @@ import {
   getVisibleProductTitles,
   makeConsoleErrorSpy,
   performHeaderSearch,
+  productCardSelector,
   waitForProducts,
 } from '../support/checks.js';
 import { getStore, describeIfStore, storePath } from '../support/store.js';
@@ -84,7 +85,7 @@ describeIfStore(site.discovery, 'Product discovery', () => {
       getVisibleProductTitles().then((pageOneTitles) => {
         cy.get('.ss__pagination, .ss-pagination-container').filter(':visible').first().within(() => {
           cy.get(
-            '.ss-page-next a.ss-page-link, a.ss-page-link[href*="pp=2"], .pagination-item--next a, a.pagination-link[href*="page=2"]'
+            '.ss-page-next a.ss-page-link, a.ss-page-link[href*="pp=2"], .pagination-item--next a, a.pagination-link[href*="page=2"], a.ss__pagination__link[href*="page=2"]'
           ).first().click();
         });
         assertPaginationAdvanced(pageOneTitles);
@@ -97,7 +98,7 @@ describeIfStore(site.discovery, 'Product discovery', () => {
     it('opens a PDP from discovery results', () => {
       performHeaderSearch(discovery.search.knownTerm);
       waitForProducts();
-      cy.get('ul.productGrid li.product').first().find('.card-title a').click();
+      cy.get(productCardSelector()).first().find('.card-title a').click();
       cy.get('h1.productView-title, h1').first().should('be.visible').invoke('text').should('not.be.empty');
       cy.url().should('not.include', 'search_query');
     });

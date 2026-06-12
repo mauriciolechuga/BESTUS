@@ -53,5 +53,5 @@ describeIfStore(site.pdp, 'SEO – PDP', { testIsolation: false }, () => {
   // via pdp.productJsonLd:false so the skip is visible instead of a permanent red.
   itIfStore(site.pdp && site.pdp.productJsonLd !== false, 'has a JSON-LD Product block with name, sku, price, currency, and availability', () => {
     assertProductJsonLd();
-  });
+  }, "store PDPs emit no Product JSON-LD (pdp.productJsonLd is false)");
 });

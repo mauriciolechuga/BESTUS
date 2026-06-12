@@ -66,7 +66,7 @@ describeIfStore(quoteForm, 'Request a Quote form', () => {
         cy.get('@submit.all').should('have.length', 0);
         cy.expectFieldError('input[name="Name_First"]');
       });
-    });
+    }, "store's quote form does not require First Name (forms.quoteRequest.optionalFields includes Name_First)");
 
     it('shows an error when Last Name is empty', () => {
       cy.uniqueEmail().then((email) => {

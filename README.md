@@ -9,7 +9,7 @@ One shared set of tests runs against any of the stores. Each store has its own s
 | Code | Store | Status |
 |------|-------|--------|
 | `bestus` | [bestaccessdoors.com](https://www.bestaccessdoors.com) | Fully configured (default) |
-| `bestca` | [bestaccessdoors.ca](https://www.bestaccessdoors.ca) | Scaffold — homepage checks only |
+| `bestca` | [bestaccessdoors.ca](https://www.bestaccessdoors.ca) | Fully configured |
 | `adap` | [accessdoorsandpanels.com](https://www.accessdoorsandpanels.com) | Scaffold — homepage checks only |
 | `adc` | [accessdoorscanada.ca](https://accessdoorscanada.ca) | Scaffold — homepage checks only |
 | `aap` | [acudoraccesspanels.com](https://www.acudoraccesspanels.com) | Scaffold — homepage checks only |
@@ -52,13 +52,13 @@ For each form, the tests verify:
 | Page | What's checked |
 |------|---------------|
 | **Homepage** | Header/footer links work (no broken links), phone number is consistent, no browser errors |
-| **Homepage (mobile)** | Layout looks correct on 6 phone sizes and 4 tablet sizes, nothing overflows, touch targets are large enough to tap |
+| **Homepage (mobile)** | Layout looks correct on 3 phone sizes and 1 tablet size, nothing overflows, touch targets are large enough to tap |
 | **Product Listing Page (PLP)** | Product grid loads, cards have images/titles/prices/links, pagination works, sidebar categories link correctly |
 | **PLP (mobile)** | Same device range as homepage mobile — grid, cards, and sidebar all present |
 | **Product Detail Page (PDP)** | Breadcrumbs, title, price, images, qty input, Add to Cart, PDF spec links, description, video, related products carousel, Yotpo reviews widget, product info form, SKU, lead time |
-| **PDP (mobile)** | Same 6 phones + 4 tablets device matrix; title, price, images, qty, Add to Cart, description, carousel, form, SKU, lead time, mobile nav, no horizontal overflow, touch targets, no console errors; landscape pass for phones |
+| **PDP (mobile)** | Same 3 phones + 1 tablet device matrix; title, price, images, qty, Add to Cart, description, carousel, form, SKU, lead time, mobile nav, no horizontal overflow, touch targets, no console errors; landscape pass for phones |
 | **Product Discovery** | Site search returns relevant products and shows a no-results message for nonsense terms, category/refinement pages render, sort by price low-to-high actually orders products, pagination moves to page 2, and a result opens its product page |
-| **Discovery (mobile)** | Same 6 phones + 4 tablets device matrix — category and search-results pages render with no horizontal overflow and no console errors |
+| **Discovery (mobile)** | Same 3 phones + 1 tablet device matrix — category and search-results pages render with no horizontal overflow and no console errors |
 
 ---
 
@@ -195,10 +195,22 @@ Skips are always deliberate and always visible — a skipped test means a config
 | Pro Club form (all 6) | `forms.proClub: null` | ADAP has no Pro Club page | Filling `{ path, submitUrlPattern }` if the store ever adds one |
 | Homepage partner logos | `branding.partnerLinks: null` | No partner logos in ADAP's footer | Listing the partner URLs |
 | Quote form: First Name validation | `forms.quoteRequest.optionalFields: ["Name_First"]` | ADAP's Zoho form genuinely doesn't require First Name (its `zf_MandArray` omits it) | Removing the entry if the Zoho form config changes |
-| PLP subcategory boxes (desktop + 10 mobile devices) | `plp.selectors.subcategoryBox: null` | ADAP's theme has no subcategory box grid | Setting the selector if the theme gains one |
+| PLP subcategory boxes (desktop + 4 mobile devices) | `plp.selectors.subcategoryBox: null` | ADAP's theme has no subcategory box grid | Setting the selector if the theme gains one |
 | PLP detailed pagination markup | `plp.selectors.pagination: null` | ADAP runs the older SearchSpring template (different markup; the generic pagination tests still run) | Filling the pagination selector object (see `stores/bestus.json`) |
-| PDP related-products carousel (desktop + 10 mobile devices) | `pdp.selectors.relatedCarousel: null` | ADAP PDPs have no related-products carousel | Setting the selector if added |
+| PDP related-products carousel (desktop + 4 mobile devices) | `pdp.selectors.relatedCarousel: null` | ADAP PDPs have no related-products carousel | Setting the selector if added |
 | PDP Product JSON-LD | `pdp.productJsonLd: false` | **Real SEO gap**: ADAP's theme emits no Product structured data | Fixing the theme, then flipping to `true` |
+
+**BESTCA's skips (June 2026):** BESTCA runs a newer SearchSpring "Snap" theme + CAD pricing, so a few BESTUS-specific selectors/values are now config-driven (defaults unchanged). Its only intentional skips:
+
+| Skipped test(s) | Config key (`stores/bestca.json`) | Why | Enable by |
+|---|---|---|---|
+| PDP mobile breadcrumb trail (4 devices) | `pdp.mobileBreadcrumbsHidden: true` | BESTCA's theme hides the PDP breadcrumb (`nav.Breadcrumb { display:none }`) below desktop widths; the desktop PDP breadcrumb test still runs | Removing the flag if the theme shows breadcrumbs on mobile |
+| Quote form: First Name validation | `forms.quoteRequest.optionalFields: ["Name_First"]` | BESTCA's Zoho quote form doesn't require First Name client-side (submits with it empty) | Removing the entry if the Zoho form config changes |
+| Pro Club country dropdown (2 tests) | `forms.proClub.hasCountry: false` | BESTCA's Pro Club form is the Canada-only Zoho form (`BestAccessDoorsProClubCanadaAp`) with no country field — country is implicitly Canada | Removing the flag if the form gains a country dropdown |
+| Mobile header touch-target — **Electron only** (homepage + pdp, all devices) | `branding.skipMobileTouchTarget: true` | BESTCA's mobile header renders its logo via a lazy-loaded image + icon fonts; under **Electron** these don't size, so zero header elements are measurable as `:visible`. The flag is gated to Electron only (`Cypress.browser.name === 'electron'`) — **Chrome and Firefox run it and it passes** (the 53px logo renders). So this is only pending on the default `cypress run` (Electron) | Already runs in Chrome/Firefox; remove the flag if Electron ever renders the header |
+| PDP quantity stepper buttons (desktop + 4 mobile devices) | `pdp.selectors.qtyIncrement` / `qtyDecrement: null` | BESTCA's theme has a bare quantity input with no +/− buttons | Setting the selectors if the theme gains them |
+
+(BESTCA's Product JSON-LD, sidebar + category-link health (single-block `.page-sidebar`, `sidebarBlocksMin:1`), subcategory boxes, best-sellers tree, pagination, price-sort, and the SearchSpring "Customers Also Viewed" related carousel (`pdp.selectors.relatedCarousel: ".ss__recommendation--carousel"`) all run — its grid uses `plp.selectors.productCard: "ul.ss__results li.product"`, its pagination the `.ss__pagination__*` selectors, and its JSON-LD currency check `branding.currency: "CAD"`.)
 
 **Known ADAP failures that are site bugs, not test issues (June 2026):**
 
