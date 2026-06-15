@@ -11,7 +11,8 @@
     "partnerLinks": [
       "https://www.bimobject.com/en/best-access-doors?location=us",
       "https://www.rib-software.com/en/rib-speclink"
-    ]
+    ],
+    "overflowIgnore": ["[class*=\"yotpo\"]"]
   },
   "plp": {
     "main": "/products/",

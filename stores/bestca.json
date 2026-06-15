@@ -10,6 +10,7 @@
     "currency": "CAD",
     "mobileNavSelector": "div.Mobile_menu",
     "skipMobileTouchTarget": true,
+    "overflowIgnore": ["[class*=\"yotpo\"]"],
     "warehousesLink": {
       "href": "https://www.bestaccessdoors.ca/warehouses/",
       "text": "Warehouses"
