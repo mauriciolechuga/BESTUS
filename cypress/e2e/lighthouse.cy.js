@@ -31,8 +31,12 @@ const DESKTOP_OPTS = {
 
 // Thresholds reflect actual throttled-desktop scores with headroom for variance.
 // Unthrottled runs score higher; PageSpeed mobile runs score lower.
-// Adjust here if the site's baseline shifts.
-const THRESHOLDS = { performance: 50, accessibility: 80, seo: 70 };
+// These BESTUS-baseline defaults are overridable per store via the top-level `lighthouse.thresholds`
+// in stores/<code>.json — different store themes have different baselines (e.g. ADC's "footer-new"
+// theme has real accessibility deficiencies that floor it in the high 60s/low 70s). Adjust the
+// per-store override (not these defaults) when a store's live-site baseline differs.
+const THRESHOLD_DEFAULTS = { performance: 50, accessibility: 80, seo: 70 };
+const THRESHOLDS = { ...THRESHOLD_DEFAULTS, ...((site.lighthouse && site.lighthouse.thresholds) || {}) };
 
 describe('Lighthouse audit', () => {
   before(function () {

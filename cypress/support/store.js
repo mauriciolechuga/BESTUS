@@ -116,6 +116,10 @@ export function mobileNavSelector() {
 // bestSellers, subcategoryBox) make their tests skip when a store sets them to null.
 // Overridden per store via plp.selectors (see stores/adap.json).
 const PLP_SELECTOR_DEFAULTS = {
+  // Category/heading <h1>. BESTUS's theme uses h1.page-heading; ADC's "footer-new"
+  // SearchSpring theme titles categories with h1.container-header instead — overridden
+  // per store via plp.selectors.heading.
+  heading: 'h1.page-heading',
   breadcrumbs: '.breadcrumbs.new_breadcrumbs',
   breadcrumbHome: 'a.breadcrumb-home',
   sidebar: '.categories-left',
@@ -127,11 +131,21 @@ const PLP_SELECTOR_DEFAULTS = {
   sidebarLinks: '.categories-left .navList-item a',
   bestSellers: '#treeView li a',
   subcategoryBox: '.subCategoriesBox',
+  // Inner elements of a subcategory box: its title text node and the category link. BESTUS uses
+  // .nameTitle + a.navList-action; ADC's SearchSpring "Snap" theme renders .subcategory-item tiles
+  // whose title and href both live on a.subcategory-link. Overridden per store via plp.selectors.
+  subcategoryTitle: '.nameTitle',
+  subcategoryLink: 'a.navList-action',
   // Product-card container. BESTUS's SearchSpring template renders BigCommerce-native
   // ul.productGrid; BESTCA runs the stock SearchSpring "Snap" theme which renders
   // ul.ss__results.ss__results--grid instead (cards keep .card-figure img / .card-title a).
   // Overridden per store via plp.selectors.productCard.
   productCard: 'ul.productGrid li.product',
+  // Per-card price element, asserted to show a $-amount on the first few cards. ADC's catalog
+  // is MIXED — priced "Best Access Doors" products and quote-only products (no price element)
+  // are interleaved in the same grid — so it sets this to null to skip the per-card price check
+  // (PDP/JSON-LD price coverage still applies on priced products). Nullable.
+  cardPrice: '[class*="price"]',
   // Detailed pagination markup (BESTUS SearchSpring template). Stores on the older
   // template (ADAP: .ss-pagination-container/.pagination-item) set this to null —
   // the generic pagination-presence test and the discovery page-2 test still run.

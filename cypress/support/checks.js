@@ -11,7 +11,6 @@ import { getStore, homePath, footerConfig, pdpSelectors, plpSelectors, anyHeader
 // reference the grid directly (plp navigation, discovery handoff) stay in sync.
 export const productCardSelector = () => plpSelectors().productCard;
 const PRODUCT_TITLE = '.card-title';
-const PRODUCT_PRICE = '[class*="price"]';
 // Container that holds a card's price(s). We read EVERY $-amount inside it and take the minimum
 // (see readCardPrice) rather than targeting one element, because the live store's price markup
 // varies by product: a sale card glues RRP+sale ("$75.96$54.25"), a multi-variant/range card shows
@@ -95,14 +94,19 @@ export function blockThirdParty() {
   cy.intercept(/salesiq\.zohopublic\.com/, stub);     // Zoho SalesIQ live-chat widget
 }
 
-/** Asserts the first `limit` product cards each have an image, title, price, and link. */
+/**
+ * Asserts the first `limit` product cards each have an image, title, link — and a $-price
+ * when the store shows per-card prices. ADC's catalog interleaves priced and quote-only
+ * (price-less) cards, so it sets plp.selectors.cardPrice to null to skip the price check.
+ */
 export function assertProductCards(limit = 3) {
+  const cardPrice = plpSelectors().cardPrice;
   cy.get(productCardSelector()).each(($li, i) => {
     if (i >= limit) return false;
     cy.wrap($li).within(() => {
       cy.get('.card-figure img').should('exist').invoke('attr', 'src').should('not.be.empty');
       cy.get(PRODUCT_TITLE).invoke('text').should('not.be.empty');
-      cy.get(PRODUCT_PRICE).invoke('text').should('match', /\$[\d,]+(\.\d{2})?/);
+      if (cardPrice) cy.get(cardPrice).invoke('text').should('match', /\$[\d,]+(\.\d{2})?/);
       cy.get('.card-figure a, .card-title a')
         .first()
         .invoke('attr', 'href')
