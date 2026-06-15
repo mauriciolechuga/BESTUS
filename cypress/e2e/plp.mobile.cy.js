@@ -49,7 +49,7 @@ ALL_DEVICES.forEach(({ name, width, height }) => {
     });
 
     it('loads with correct heading and breadcrumb', () => {
-      cy.get('h1.page-heading').should('contain.text', plp.mainHeading);
+      cy.get(sel.heading).should('contain.text', plp.mainHeading);
       cy.get(sel.breadcrumbs).within(() => {
         if (sel.breadcrumbHome) cy.get(sel.breadcrumbHome).should('be.visible');
         cy.contains('a', plp.breadcrumbLabel).should('be.visible');
@@ -67,8 +67,8 @@ ALL_DEVICES.forEach(({ name, width, height }) => {
 
     itIfStore(sel.subcategoryBox, 'subcategory boxes render with non-empty titles and valid links', () => {
       cy.get(sel.subcategoryBox).should('have.length.at.least', 1).each(($box) => {
-        expect($box.find('.nameTitle').text().trim()).to.not.be.empty;
-        const href = $box.find('a.navList-action').attr('href');
+        expect($box.find(sel.subcategoryTitle).text().trim()).to.not.be.empty;
+        const href = $box.find(sel.subcategoryLink).attr('href');
         expect(href).to.not.be.empty;
         expect(href).to.include('/');
       });
@@ -104,7 +104,7 @@ PHONES.forEach(({ name, width, height }) => {
     });
 
     it('loads with correct heading', () => {
-      cy.get('h1.page-heading').should('contain.text', plp.mainHeading);
+      cy.get(sel.heading).should('contain.text', plp.mainHeading);
     });
 
     it('has no horizontal overflow', () => {

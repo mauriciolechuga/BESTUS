@@ -82,11 +82,13 @@ describeIfStore(site.pdp, 'Product Detail Page', { testIsolation: false }, () =>
       .should('not.be.empty');
   }, "store theme has no reviews widget (pdp.selectors.reviewsContainer is null)");
 
-  it('recently viewed SearchSpring script tag is present', () => {
-    // Profile is store-dependent — BESTCA's Snap theme emits "similar" rather than "recently-viewed".
+  // Profile is store-dependent — BESTCA's Snap theme emits "similar" rather than "recently-viewed".
+  // ADC's theme ships no SearchSpring recommendations script at all, so it sets
+  // pdp.recentlyViewedProfile:null to skip this check.
+  itIfStore(!(site.pdp && site.pdp.recentlyViewedProfile === null), 'recently viewed SearchSpring script tag is present', () => {
     const profile = (site.pdp && site.pdp.recentlyViewedProfile) || 'recently-viewed';
     cy.get(`script[type="searchspring/personalized-recommendations"][profile="${profile}"]`).should('exist');
-  });
+  }, "store theme ships no SearchSpring recommendations script (pdp.recentlyViewedProfile is null)");
 
   // ─── Product info request form ─────────────────────────────────────────────
 

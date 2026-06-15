@@ -84,18 +84,23 @@ describe('Homepage', { testIsolation: false }, () => {
   });
 
   it('phone number in header matches footer', () => {
-    // First tel link can be a text-less icon, call-tracking scripts rewrite numbers at
-    // runtime, and themes pad the text — so compare the first non-empty trimmed header
-    // number against all footer numbers, retrying while the rewrites settle.
-    const phoneTexts = ($links) =>
-      [...$links].map((a) => a.textContent.trim()).filter((t) => t.length > 0);
+    // Compare on the LAST 4 DIGITS only. The first tel link can be a text-less icon,
+    // call-tracking scripts rewrite numbers at runtime, themes pad the text, and some
+    // stores format the same number differently in the header vs footer (ADC shows
+    // "1-800-679-3405" in the header but "800-679-3405" in the footer tel: link). The
+    // trailing 4 digits are the stable, comparable part. Retries while rewrites settle.
+    const last4s = ($links) =>
+      [...$links]
+        .map((a) => (a.textContent.match(/\d/g) || []).join(''))
+        .filter((digits) => digits.length >= 4)
+        .map((digits) => digits.slice(-4));
 
     cy.get(`${header} [href^="tel:"]`)
-      .should(($h) => expect(phoneTexts($h), 'header shows a phone number').to.not.be.empty)
+      .should(($h) => expect(last4s($h), 'header shows a phone number').to.not.be.empty)
       .then(($h) => {
-        const headerPhone = phoneTexts($h)[0];
+        const headerLast4 = last4s($h)[0];
         cy.get('footer [href^="tel:"]').should(($f) => {
-          expect(phoneTexts($f), 'footer phone numbers').to.include(headerPhone);
+          expect(last4s($f), 'footer phone numbers (last 4 digits)').to.include(headerLast4);
         });
       });
   });

@@ -99,7 +99,9 @@ describeIfStore(site.discovery, 'Product discovery', () => {
       performHeaderSearch(discovery.search.knownTerm);
       waitForProducts();
       cy.get(productCardSelector()).first().find('.card-title a').click();
-      cy.get('h1.productView-title, h1').first().should('be.visible').invoke('text').should('not.be.empty');
+      // filter(':visible'): ADC's PDP renders a hidden mobile-only h1.productView-title.Mobile_title
+      // first in the DOM, so .first() alone would grab the display:none element.
+      cy.get('h1.productView-title, h1').filter(':visible').first().should('be.visible').invoke('text').should('not.be.empty');
       cy.url().should('not.include', 'search_query');
     });
   });

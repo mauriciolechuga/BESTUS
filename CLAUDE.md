@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 A multi-store Cypress end-to-end test suite that verifies customer-facing forms and pages on the Best Access Doors family of live BigCommerce storefronts. One shared set of specs runs against any store; each store is described by a JSON file in `stores/`. No application code lives here — only test code.
 
-Stores: BESTUS (bestaccessdoors.com — fully configured, the default), BESTCA, ADAP, ADC, AAP, FSE, BRH, CAD, PDA (scaffolds — homepage-level specs only until their config sections are filled in).
+Stores: BESTUS (bestaccessdoors.com — the default), BESTCA, ADAP, ADC (all four fully configured); AAP, FSE, BRH, CAD, PDA (scaffolds — homepage-level specs only until their config sections are filled in).
 
 ## Commands
 
@@ -41,16 +41,18 @@ npm run test:live
 - `cypress.config.js` reads `process.env.STORE` (default `bestus`), loads `stores/<STORE>.json`, sets `baseUrl` from it, and injects the whole object into `Cypress.env('site')` plus `STORE`. Screenshots/videos go to per-store subfolders (`cypress/videos/<store>/`). The loader throws with the list of available codes on an unknown store and sanity-checks `storeCode`/`baseUrl`/`homePath`.
 - `cypress/support/store.js` is the only module that reads `Cypress.env('site')`. It exports:
   - `getStore()` — the store config object, available synchronously at spec module-evaluation time (this is why config is injected via env rather than `cy.fixture()` — `describe` vs `describe.skip` must be decided at collection time)
-  - `describeIfStore(condition, title, [options,] fn)` / `itIfStore(condition, title, fn, [reason])` — run the suite/test when the config section exists, otherwise `describe.skip`/`it.skip` with a `[skipped: not configured for <CODE>]` title suffix so missing features show as pending, never silently absent. `itIfStore`'s optional `reason` replaces that suffix with `[skipped: <reason>]` for *deliberate* gates (theme lacks the element, form doesn't require the field, Electron-only limitation) so the skip self-documents to anyone running the suite — e.g. `[skipped: store theme hides breadcrumbs on mobile (pdp.mobileBreadcrumbsHidden)]`. Omit `reason` only for genuine "not configured yet" gates on scaffold stores.
+  - `describeIfStore(condition, title, [options,] fn)` / `itIfStore(condition, title, fn, [reason])` — run the suite/test when the config section exists, otherwise `describe.skip`/`it.skip` with a `[skipped: not configured for <CODE>]` title suffix so missing features show as pending, never silently absent. `itIfStore`'s optional `reason` replaces that suffix with `[skipped: <reason>]` for _deliberate_ gates (theme lacks the element, form doesn't require the field, Electron-only limitation) so the skip self-documents to anyone running the suite — e.g. `[skipped: store theme hides breadcrumbs on mobile (pdp.mobileBreadcrumbsHidden)]`. Omit `reason` only for genuine "not configured yet" gates on scaffold stores.
   - `storePath(path)` — appends the store's `visitQuery` if set (AAP needs `?redirect=disable` on every visit)
   - `homePath()` — the store's homepage path (FSE's homepage is `/new-home/`, not `/`)
 - **Nullable-section contract** in `stores/*.json`: `plp`, `products`, `discovery`, `pdp`, and each entry under `forms` may be `null`, which makes the specs gated on them skip. `storeCode`, `baseUrl`, `homePath`, `branding.copyrightText`, and `branding.imageHosts` are required. `branding.footerLocationText`, `branding.warehousesLink`, and `branding.partnerLinks` may be `null` (their individual homepage tests skip). See `stores/bestus.json` for the full shape; scaffolds carry a `_todo` key describing what to fill.
 - Store-specific text lives in config, not specs: brand/copyright text, footer location, PLP heading/breadcrumb labels (`plp.mainHeading`/`plp.breadcrumbLabel` — Spanish on PDA), search terms, sort label.
 - **Footer theme drift**: stores run different BigCommerce footer themes, so footer selectors/expectations are config-driven. `FOOTER_DEFAULTS` in `store.js` holds the BESTUS values (`footer.tcsFooter`, `.box h3`, `.Contact-info-box`, `.Copyright p`, 2+ tel links); any key can be overridden per store via `branding.footer` (see `stores/bestca.json`, which uses `footer.footer`, `h5.footer-info-heading`, `.contactbox`, `.footer-copyright p`, 1 tel link). `footerConfig()` returns the merged result; `assertFooterHeadings` and both homepage specs read from it.
 - **Header theme drift**: some themes have no semantic `<header>` element (ADAP's desktop header is `div.desktop-header-section`, its mobile header `div.iPad_header`). `headerSelector()` / `mobileHeaderSelector()` in `store.js` default to `header` and are overridden per store via `branding.headerSelector` / `branding.mobileHeaderSelector` (mobile falls back to desktop). Consumed by both homepage specs, `pdp.mobile.cy.js`, and `assertMaxTouchTarget`. Likewise the mobile nav drawer: `MOBILE_NAV` in `devices.js` resolves via `mobileNavSelector()` (default `div.mobile-menu`; ADAP overrides to `#mySidenav` via `branding.mobileNavSelector`).
-- **PLP/PDP theme drift**: same pattern — `PLP_SELECTOR_DEFAULTS` / `PDP_SELECTOR_DEFAULTS` in `store.js` hold BESTUS selectors (breadcrumbs, sidebar, subcategory boxes, `productCard` grid container, gallery image, description, related carousel, product-info-form container, qty stepper buttons, `pdfNewTab`), overridable per store via `plp.selectors` / `pdp.selectors` (see `stores/adap.json`, `stores/bestca.json`). Nullable selector keys (`breadcrumbHome`, `sidebar`, `bestSellers`, `subcategoryBox`, `relatedCarousel`, `productInfoForm`, `qtyIncrement`, `qtyDecrement`) skip their tests when set to null — use for stores whose theme lacks the element. `assertBreadcrumbs`/`assertProductInfoForm` read from `pdpSelectors()`; `productCardSelector()` (exported from `checks.js`) reads `plp.selectors.productCard`.
+- **PLP/PDP theme drift**: same pattern — `PLP_SELECTOR_DEFAULTS` / `PDP_SELECTOR_DEFAULTS` in `store.js` hold BESTUS selectors (PLP `heading`, breadcrumbs, sidebar, subcategory boxes + their `subcategoryTitle`/`subcategoryLink` internals, `productCard` grid container, `cardPrice`, gallery image, description, related carousel, product-info-form container, qty stepper buttons, `pdfNewTab`), overridable per store via `plp.selectors` / `pdp.selectors` (see `stores/adap.json`, `stores/bestca.json`, `stores/adc.json`). Nullable selector keys (`breadcrumbHome`, `sidebar`, `bestSellers`, `subcategoryBox`, `cardPrice`, `relatedCarousel`, `productInfoForm`, `qtyIncrement`, `qtyDecrement`) skip their check when set to null — use for stores whose theme lacks the element (ADC sets `cardPrice: null` because its mixed catalog interleaves priced and quote-only cards). `assertBreadcrumbs`/`assertProductInfoForm` read from `pdpSelectors()`; `productCardSelector()` (exported from `checks.js`) reads `plp.selectors.productCard`; `assertProductCards` reads `plp.selectors.cardPrice` and `plp.cy.js`/`plp.mobile.cy.js` read `plp.selectors.heading`.
 - **SearchSpring "Snap" theme drift (BESTCA)**: BESTCA runs a newer SearchSpring storefront theme than BESTUS/ADAP. Its product grid renders into `ul.ss__results.ss__results--grid` (not `ul.productGrid`), so `plp.selectors.productCard` is set to `ul.ss__results li.product` and is read everywhere via `productCardSelector()` (used by `waitForProducts`, `assertProductCards`, `getVisibleProductTitles`, the search/no-results checks, and the PLP/discovery grid-click tests). Pagination uses `.ss__pagination__*` markup with a `?page=2` query param (set via `plp.selectors.pagination`; `assertPaginationAdvanced`'s active-page selector union includes `.ss__pagination__current`; the discovery page-2 click union includes `a.ss__pagination__link[href*="page=2"]`). Sort hash-routes like ADAP (`#/sort:calculated_price:asc`). BESTCA also has no qty stepper buttons (`qtyIncrement`/`qtyDecrement: null`) and a `searchspring/personalized-recommendations` script with `profile="similar"` rather than `"recently-viewed"` (`pdp.recentlyViewedProfile`).
-- **Currency drift**: `assertProductJsonLd` checks `offers.priceCurrency` against `branding.currency` (default `USD`); BESTCA (Canada) sets `branding.currency: "CAD"`.
+- **SearchSpring "Snap" theme drift (ADC)**: ADC also runs the Snap theme + CAD, but with its own deltas on top of the BESTCA pattern. Its grid `<ul>` carries BOTH `ss__results` and `productGrid` classes; pagination uses `?p=2` (not `?page=2`) and marks the active page with `.pagination-item--current` (both already in the `assertPaginationAdvanced` unions / `pageTwoToken`). PLP/category headings are `h1.container-header` (`plp.selectors.heading`). **Mixed catalog**: priced "Best Access Doors" brand products and quote-only (price-less, no-cart, empty-JSON-LD-price) products are interleaved in the same grid, so config points `plp`/`products`/`pdp`/`discovery` at `/best-access-doors/` priced products AND sets `plp.selectors.cardPrice: null` to skip per-card price assertions. The search-results page has no `<h1>` at all → `discovery.search.resultsHaveHeading: false` gates the mobile search-heading check. PDPs render a hidden mobile-only `h1.productView-title.Mobile_title` before the visible title, so the discovery PDP-handoff uses `.filter(':visible')`. Subcategory tiles are `.subcategory-item` with title+href both on `a.subcategory-link` (`subcategoryBox`/`subcategoryTitle`/`subcategoryLink`). ADC HAS qty steppers (unlike BESTCA), no related carousel (`relatedCarousel: null`), and ships no recommendations script (`pdp.recentlyViewedProfile: null`). Footer is a distinct "footer-new" theme (see Footer theme drift). Lighthouse a11y floors in the high-60s/low-70s, so `lighthouse.thresholds.accessibility: 65`.
+- **Lighthouse threshold drift**: `lighthouse.cy.js` merges the BESTUS-baseline `THRESHOLD_DEFAULTS` (`performance:50, accessibility:80, seo:70`) with a per-store top-level `lighthouse.thresholds` override; ADC lowers `accessibility` to 65 for its footer-new theme's real a11y deficiencies.
+- **Currency drift**: `assertProductJsonLd` checks `offers.priceCurrency` against `branding.currency` (default `USD`); BESTCA and ADC (Canada) set `branding.currency: "CAD"`.
 - Cypress cannot change `baseUrl` mid-run, so `scripts/run-all.js` spawns one `cypress run` process per store.
 
 ## Browser Baselines
@@ -78,6 +80,7 @@ The `cy.interceptZoho(alias, urlPattern)` custom command handles this via `setup
 All form page objects extend `ZohoFormPage` (the base class in `cypress/support/pages/ZohoFormPage.js`), which provides common Zoho field selectors (`input[name="Name_First"]`, `input[name="Email"]`, etc.) and a `submit()` / `expectSuccess()` method.
 
 Subclasses add form-specific fields:
+
 - `ContactFormPage` — adds address fields, inquiry type dropdown, message textarea, and file attachment
 - `QuoteFormPage` — adds model (`SingleLine1`), size (`SingleLine2`), quantity dropdown, address (`SingleLine3`)
 - `ProClubFormPage` — adds address fields and country dropdown
@@ -92,13 +95,16 @@ Subclasses add form-specific fields:
 ### Spec Files (`cypress/e2e/`)
 
 **Form tests** (all follow: `before()` loads fixtures → `beforeEach()` instantiates page → `describe('Happy path')` → `describe('Validation')`):
+
 - `contact-form.cy.js` — submission success, payload validation, optional file attachment; validates inquiry type options and required fields
 - `quote-form.cy.js` — submission success, payload validation; validates quantity options and required fields
 - `pro-club-form.cy.js` — submission success, non-US country support, payload validation; validates country dropdown default and required fields
 - `become-vendor-form.cy.js` — submission success, payload validation; minimal negative coverage (the only store with the form so far, ADAP at `/bvl1/`, uses a custom-built page posting to Zoho — no `zf-submitColor` button, details textarea named "Additional Details" — so client-side validation behavior is unconfirmed)
+- `architect-form.cy.js` — submission success, payload validation, negative paths (empty/malformed required fields). (`/architects/`, standard Zoho form `ADCcaArchitects`); BESTUS, BESTCA, ADAP and the rest have no architects form, so their `forms.architectInquiries` stays `null` and the spec shows as skipped there.
 - `product-form.cy.js` — submission success, payload validation; validates required fields including details textarea
 
 **Page/layout tests:**
+
 - `homepage.cy.js` — header/footer visibility, nav link health (no 404s), footer sections/contact info/payment icons/copyright/partner logos, phone number consistency, no console errors
 - `homepage.mobile.cy.js` — 3 phones + 1 tablet (portrait + phone landscape); key elements, footer, contact info, payment icons, copyright, no horizontal overflow, mobile nav present, touch target sizes (≥44px phones, ≥24px tablets)
 - `plp.cy.js` — heading, breadcrumb, sidebar categories, best sellers, subcategory boxes, product grid (image/title/price/link on first 3 cards), PDP navigation, pagination controls + JSON blob validity, sidebar category link health, no console errors
@@ -109,9 +115,10 @@ Subclasses add form-specific fields:
 - `discovery.mobile.cy.js` — same 3 phones + 1 tablet device matrix; per device, a category page (portrait) and a search-results page render with no horizontal overflow and no console errors
 
 **SEO, accessibility & performance tests:**
+
 - `seo.cy.js` — on homepage, PLP, and a random PDP: asserts `<title>` and `<meta name="description">` are present and non-empty; on PDP also validates the `Product` JSON-LD block (name, sku, description, image, price, currency, availability)
 - `images.cy.js` — on a random PDP: asserts all product gallery images have non-empty `alt` attributes; on homepage and a random PDP: requests all same-domain images and asserts none return 4xx/5xx
-- `lighthouse.cy.js` — Chrome only (auto-skipped in Firefox); runs Lighthouse on homepage, PLP, and a random PDP and fails if Performance < 50, Accessibility < 80, or SEO < 70
+- `lighthouse.cy.js` — Chrome only (auto-skipped in Firefox); runs Lighthouse on homepage, PLP, and a random PDP and fails if Performance < 50, Accessibility < 80, or SEO < 70. These BESTUS-baseline thresholds are overridable per store via the top-level `lighthouse.thresholds` in `stores/<code>.json` — ADC's "footer-new" theme has real accessibility deficiencies (live scores high-60s/low-70s) so it sets `accessibility: 65`
 
 ### Fixtures and Store Configs
 
@@ -120,13 +127,13 @@ Subclasses add form-specific fields:
 
 ### Environment Variables
 
-| Variable | Purpose |
-|---|---|
-| `STORE` | Which store to run against (a filename from `stores/`, default `bestus`) |
-| `LIVE_SUBMIT` | Set to `true` to allow real form submissions |
-| `I_KNOW_THIS_IS_LIVE` | Must also be `true` to enable live mode (second safety gate) |
-| `PRODUCT_URL` | Override which product page the product-form tests use |
-| `RANDOMIZE_PRODUCT` | Pick a random URL from the store config's `products.known` list |
+| Variable              | Purpose                                                                  |
+| --------------------- | ------------------------------------------------------------------------ |
+| `STORE`               | Which store to run against (a filename from `stores/`, default `bestus`) |
+| `LIVE_SUBMIT`         | Set to `true` to allow real form submissions                             |
+| `I_KNOW_THIS_IS_LIVE` | Must also be `true` to enable live mode (second safety gate)             |
+| `PRODUCT_URL`         | Override which product page the product-form tests use                   |
+| `RANDOMIZE_PRODUCT`   | Pick a random URL from the store config's `products.known` list          |
 
 ### Global Setup (`cypress/support/e2e.js`)
 
@@ -144,9 +151,9 @@ When verifying that form values are actually sent, tests use `getMultipartField(
 
 Mobile specs use `cy.viewport(width, height)` per device in `beforeEach`. The `footer.tcsFooter` element and `.categories-left` sidebar are `display:none` on mobile — tests assert DOM presence rather than visibility for these. Touch target tests use `cypress-real-events` (`cy.realHover()`) and check computed sizes against thresholds (44px for phones, 24px for tablets).
 
-### Adding a New Form Test (e.g. the deferred architectInquiries form)
+### Adding a New Form Test (see `architect-form.cy.js` / `ArchitectFormPage.js` for a recent example)
 
-1. Create a page object in `cypress/support/pages/` extending `ZohoFormPage`; read its `path` from `getStore().forms.<name>.path` (see `BecomeVendorFormPage.js` for an example that also overrides `submit()` for a custom-built form)
+1. Create a page object in `cypress/support/pages/` extending `ZohoFormPage`; read its `path` from `getStore().forms.<name>.path` (`ArchitectFormPage.js` is the minimal case — just a few extra field methods; `BecomeVendorFormPage.js` overrides `submit()` for a custom-built form)
 2. Fill the form's `{ path, submitUrlPattern }` in each store's `stores/<code>.json` that has the form (the `forms.architectInquiries` slot already exists as `null`); leave it `null` for stores without it
 3. Create a spec in `cypress/e2e/` following the existing pattern: module-level `const site = getStore()`, outer `describeIfStore(site.forms && site.forms.<name>, ...)` gate, `before()` loads the personas fixture, `beforeEach()` instantiates the page, `describe('Happy path')` covers success + payload, `describe('Validation')` covers empty/malformed fields
 

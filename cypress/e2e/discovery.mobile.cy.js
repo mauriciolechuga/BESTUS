@@ -52,8 +52,13 @@ describeIfStore(site.discovery, 'Product discovery mobile', () => {
       it('renders search results without horizontal overflow', () => {
         performHeaderSearch(discovery.search.knownTerm);
         // Some themes render the results heading as a non-h1 (BESTCA: <h2 class="page-heading">),
-        // so accept a bare .page-heading too — same union assertDiscoveryPage uses.
-        cy.get('h1.page-heading, .page-heading, h1').first().should('exist').invoke('text').should('not.be.empty');
+        // so accept a bare .page-heading too — same union assertDiscoveryPage uses. Other stores'
+        // results page has no title heading at all (ADC renders only sidebar <h2> labels, no
+        // results <h1>) — gate via discovery.search.resultsHaveHeading:false. The products check
+        // below still proves the search rendered.
+        if (discovery.search.resultsHaveHeading !== false) {
+          cy.get('h1.page-heading, .page-heading, h1').first().should('exist').invoke('text').should('not.be.empty');
+        }
         assertSearchResults(discovery.search.expectedTokens);
         cy.get(MOBILE_NAV).should('exist');
         assertNoHorizontalOverflow(width);

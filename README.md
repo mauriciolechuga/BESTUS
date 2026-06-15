@@ -10,8 +10,8 @@ One shared set of tests runs against any of the stores. Each store has its own s
 |------|-------|--------|
 | `bestus` | [bestaccessdoors.com](https://www.bestaccessdoors.com) | Fully configured (default) |
 | `bestca` | [bestaccessdoors.ca](https://www.bestaccessdoors.ca) | Fully configured |
-| `adap` | [accessdoorsandpanels.com](https://www.accessdoorsandpanels.com) | Scaffold — homepage checks only |
-| `adc` | [accessdoorscanada.ca](https://accessdoorscanada.ca) | Scaffold — homepage checks only |
+| `adap` | [accessdoorsandpanels.com](https://www.accessdoorsandpanels.com) | Fully configured |
+| `adc` | [accessdoorscanada.ca](https://accessdoorscanada.ca) | Fully configured |
 | `aap` | [acudoraccesspanels.com](https://www.acudoraccesspanels.com) | Scaffold — homepage checks only |
 | `fse` | [firesafetyequipment.com](https://firesafetyequipment.com) | Scaffold — homepage checks only |
 | `brh` | [bestroofhatches.com](https://bestroofhatches.com) | Scaffold — homepage checks only |
@@ -40,6 +40,7 @@ Running the tests takes a few minutes instead of an hour of manual clicking. And
 | **Contact Us** | `/contact-us/` | General inquiries, supports optional file attachment |
 | **Request a Quote** | `/request-a-quote/` | Customers request pricing for a product |
 | **Pro Club Application** | `/pro-club-application/` | Contractors and resellers apply for trade pricing |
+| **Architects & Spec Writers** | `/architects/` | Architects and spec writers request product info (ADC only) |
 
 For each form, the tests verify:
 - The form submits successfully when filled out correctly
@@ -212,12 +213,26 @@ Skips are always deliberate and always visible — a skipped test means a config
 
 (BESTCA's Product JSON-LD, sidebar + category-link health (single-block `.page-sidebar`, `sidebarBlocksMin:1`), subcategory boxes, best-sellers tree, pagination, price-sort, and the SearchSpring "Customers Also Viewed" related carousel (`pdp.selectors.relatedCarousel: ".ss__recommendation--carousel"`) all run — its grid uses `plp.selectors.productCard: "ul.ss__results li.product"`, its pagination the `.ss__pagination__*` selectors, and its JSON-LD currency check `branding.currency: "CAD"`.)
 
+**ADC's skips (June 2026):** ADC runs the SearchSpring "Snap" theme + CAD like BESTCA, but a distinct "footer-new" theme and a **mixed catalog** — priced "Best Access Doors" brand products and quote-only (price-less, no-cart) products are interleaved in the same grid — so config points `plp`/`products`/`pdp`/`discovery` at `/best-access-doors/` priced products. Onboarding it needed several BESTUS-specific assumptions to become config-driven (defaults unchanged for other stores). Its intentional skips:
+
+| Skipped test(s) | Config key (`stores/adc.json`) | Why | Enable by |
+|---|---|---|---|
+| Pro Club form (all 6) | `forms.proClub: null` | `/pro-club-application/` is a 404 on ADC | Filling `{ path, submitUrlPattern }` if added |
+| Homepage partner logos | `branding.partnerLinks: null` | ADC's footer has no partner/affiliate logos | Listing the partner URLs if added |
+| Quote form: First Name validation | `forms.quoteRequest.optionalFields: ["Name_First"]` | ADC's quote form uses a single Full Name field | Removing the entry if the Zoho form config changes |
+| PLP category sidebar + link health (desktop + 4 mobile devices) | `plp.selectors.sidebar: null` | ADC has no `.categories-left` multi-block sidebar; its category tree (`#treeView`) is covered by the best-sellers test instead | Setting the selector if the theme gains one |
+| PDP mobile breadcrumb trail (4 devices) | `pdp.mobileBreadcrumbsHidden: true` | ADC hides the PDP breadcrumb (`display:none`) below desktop widths; the desktop breadcrumb test still runs | Removing the flag if shown on mobile |
+| PDP related-products carousel (desktop + 4 mobile devices) | `pdp.selectors.relatedCarousel: null` | ADC PDPs have no related-products carousel | Setting the selector if added |
+| PDP recently-viewed SearchSpring script | `pdp.recentlyViewedProfile: null` | ADC ships no SearchSpring recommendations script | Setting the profile string if added |
+
+ADC-specific config that lets the rest run: `plp.selectors.heading: "h1.container-header"` (its PLP h1 differs), `plp.selectors.cardPrice: null` (skips the per-card price check because priced and quote-only cards interleave — PDP/JSON-LD price checks still cover priced products), `discovery.search.resultsHaveHeading: false` (its search-results page has no `<h1>`), `plp.selectors.subcategoryBox/subcategoryTitle/subcategoryLink` (its `.subcategory-item` tiles), `plp.selectors.pagination` (`?p=2`), `branding.footer` (the "footer-new" theme), `branding.currency: "CAD"`, and `lighthouse.thresholds.accessibility: 65` (the footer-new theme has real accessibility deficiencies, so the live a11y score floors in the high-60s/low-70s). The **Architects & Spec Writers** form (`forms.architectInquiries`, `/architects/`) runs only for ADC — every other store has no architects form, so it shows as skipped there.
+
 **Known ADAP failures that are site bugs, not test issues (June 2026):**
 
 - `images.cy.js` — the homepage "Drywall" tile references `for-drywall-finall-des.jpg` (typo); the correctly named `for-drywall-final-des.jpg` exists. Fix the tile in the BigCommerce admin.
 - The missing Product JSON-LD above is worth raising with the theme owner alongside it.
 
-For scaffolded stores (ADC, AAP, FSE, BRH, CAD, PDA) most specs are pending because entire sections (`plp`, `products`, `forms`, `discovery`, `pdp`) are `null` — each store's `_todo` key lists what to fill. See "Onboarding a Scaffolded Store" in `CLAUDE.md`.
+For scaffolded stores (AAP, FSE, BRH, CAD, PDA) most specs are pending because entire sections (`plp`, `products`, `forms`, `discovery`, `pdp`) are `null` — each store's `_todo` key lists what to fill. See "Onboarding a Scaffolded Store" in `CLAUDE.md`.
 
 ---
 
@@ -228,7 +243,8 @@ For scaffolded stores (ADC, AAP, FSE, BRH, CAD, PDA) most specs are pending beca
 │
 ├── stores/                        One JSON file per store — URLs, form paths, brand text
 │   ├── bestus.json                Fully configured (the reference example)
-│   └── bestca.json … pda.json     Scaffolds — fill in sections to enable more tests
+│   ├── bestca.json, adap.json, adc.json   Fully configured stores
+│   └── aap.json … pda.json        Scaffolds — fill in sections to enable more tests
 │
 ├── scripts/
 │   ├── run-store.js               Runs the suite for one store (npm run test:store <code>)
@@ -250,7 +266,9 @@ For scaffolded stores (ADC, AAP, FSE, BRH, CAD, PDA) most specs are pending beca
 │   │   ├── product-form.cy.js     Tests the Product Information form
 │   │   ├── contact-form.cy.js     Tests the Contact Us form
 │   │   ├── quote-form.cy.js       Tests the Request a Quote form
-│   │   └── pro-club-form.cy.js    Tests the Pro Club Application form
+│   │   ├── pro-club-form.cy.js    Tests the Pro Club Application form
+│   │   ├── become-vendor-form.cy.js  Tests the Become a Vendor form (ADAP only)
+│   │   └── architect-form.cy.js   Tests the Architects & Spec Writers form (ADC only)
 │   │
 │   ├── fixtures/                  Test data
 │   │   ├── personas.json          Fake customer profiles used during testing
