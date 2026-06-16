@@ -18,22 +18,25 @@ export class ZohoFormPage {
   }
 
   fillFirstName(v) {
-    cy.get('input[name="Name_First"]').clear().type(v);
+    // force: some store themes (AAP) use a Zoho floating-label template that covers
+    // all text inputs, same pattern as fillPhone. Forced typing still drives the real
+    // input and zf client-side validation.
+    cy.get('input[name="Name_First"]').scrollIntoView().clear({ force: true }).type(v, { force: true });
     return this;
   }
 
   fillLastName(v) {
-    cy.get('input[name="Name_Last"]').clear().type(v);
+    cy.get('input[name="Name_Last"]').scrollIntoView().clear({ force: true }).type(v, { force: true });
     return this;
   }
 
   fillCompany(v) {
-    cy.get('input[name="SingleLine"]').first().clear().type(v);
+    cy.get('input[name="SingleLine"]').first().scrollIntoView().clear({ force: true }).type(v, { force: true });
     return this;
   }
 
   fillEmail(v) {
-    cy.get('input[name="Email"]').clear().type(v);
+    cy.get('input[name="Email"]').scrollIntoView().clear({ force: true }).type(v, { force: true });
     return this;
   }
 

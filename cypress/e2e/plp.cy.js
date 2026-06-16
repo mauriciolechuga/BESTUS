@@ -118,7 +118,8 @@ describeIfStore(site.plp, 'PLP navigation', () => {
   it('clicking a product card navigates to the PDP', () => {
     cy.visit(PLP);
     waitForProducts();
-    cy.get(productCardSelector()).first().find('.card-title a').click();
+    // force: marketing popups (e.g. Klaviyo) can cover the card link.
+    cy.get(productCardSelector()).first().find('.card-title a').click({ force: true });
     cy.url().should('not.include', plp.main);
     cy.get('h1').should('be.visible');
   });

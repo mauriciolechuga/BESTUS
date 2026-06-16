@@ -1,5 +1,5 @@
 {
-  "_todo": "Scaffold. null sections make their specs show as skipped. To enable: verify branding values on the live site, then fill plp, products, forms, discovery, and pdp (see stores/bestus.json for the full shape). visitQuery is required on this store: without ?redirect=disable the site redirects.",
+  "_notes": "Configured June 2026. AAP runs the SearchSpring Snap theme (ul.ss__results, .ss__pagination__*). Category taxonomy: /fire-rated/, /flush/, /recessed/, etc. (no /products/ umbrella). No pro-club form (/pro-club-application/ 404s). No subcategory boxes on any category page (subcategoryBox: null). Qty stepper buttons absent (no data-action inc/dec; bare .form-increment input). Related carousel is SS recommendation (.ss__recommendation--carousel). Footer: bare <footer> with .box h3 headings, div.copyright for copyright text; phone in footer-bottom-col (1 tel: link). Mobile nav is #mySidenav.",
   "storeCode": "AAP",
   "baseUrl": "https://www.acudoraccesspanels.com",
   "homePath": "/",
@@ -7,21 +7,112 @@
   "branding": {
     "copyrightText": "Acudor Access Panels",
     "footerLocationText": null,
-    "warehousesLink": null,
+    "warehousesLink": { "href": "/warehouses/", "text": "Warehouses" },
     "imageHosts": ["acudoraccesspanels.com", "bigcommerce.com"],
-    "partnerLinks": null
+    "partnerLinks": null,
+    "mobileNavSelector": "#mySidenav",
+    "overflowIgnore": ["[class*=\"yotpo\"]"],
+    "footer": {
+      "rootSelector": "footer",
+      "sections": ["footer .footer-top", "footer .copyright"],
+      "headingSelector": "footer .box h3",
+      "headings": ["what’s in store", "SECURE SHOPPING", "MY ACCOUNT", "Contact us"],
+      "navLinks": "footer .box ul li a",
+      "contactInfoBox": "footer .box",
+      "minContactBoxes": 4,
+      "phoneLinks": "footer a[href^=\"tel:\"]",
+      "minPhoneLinks": 1,
+      "copyright": "footer .copyright",
+      "paymentIcons": "footer .footer-payment-icons"
+    }
   },
-  "plp": null,
-  "products": null,
+  "plp": {
+    "main": "/fire-rated/",
+    "mainHeading": "Fire-Rated",
+    "breadcrumbLabel": "Fire-Rated",
+    "subcategory": null,
+    "selectors": {
+      "breadcrumbs": ".breadcrumbs",
+      "breadcrumbHome": null,
+      "sidebar": ".sidebarBlock",
+      "sidebarBlocks": ".sidebarBlock",
+      "sidebarBlocksMin": 1,
+      "sidebarLinks": "#treeView li a",
+      "bestSellers": "#treeView li a",
+      "subcategoryBox": null,
+      "productCard": "ul.ss__results li.product",
+      "pagination": {
+        "container": ".ss__pagination",
+        "active": ".ss__pagination__current",
+        "links": ".ss__pagination__link",
+        "next": ".ss__pagination__column a.ss__pagination__link",
+        "pageTwoToken": "p=2"
+      }
+    }
+  },
+  "products": {
+    "default": "/24-x-36-fire-rated-insulated-access-door-upward-opening-acudor/",
+    "known": [
+      "/24-x-36-fire-rated-insulated-access-door-upward-opening-acudor/",
+      "/22-x-36-fire-rated-insulated-access-door-upward-opening-acudor/"
+    ]
+  },
   "forms": {
-    "productInfo": null,
-    "quoteRequest": null,
-    "contact": null,
+    "productInfo": {
+      "path": "default-product",
+      "submitUrlPattern": "**/forms.zohopublic.com/**/AAPProductForm/**/submit"
+    },
+    "quoteRequest": {
+      "path": "/request-a-quote/",
+      "submitUrlPattern": "**/forms.zohopublic.com/**/AAPRequestAQuote/**/submit"
+    },
+    "contact": {
+      "path": "/contact-us/",
+      "submitUrlPattern": "**/forms.zohopublic.com/**/AAPContactUsNew/**/submit"
+    },
     "proClub": null,
     "becomeVendor": null,
     "architectInquiries": null
   },
   "testEmailTemplate": "mauricio+{ts}@acudoraccesspanels.com",
-  "discovery": null,
-  "pdp": null
+  "discovery": {
+    "search": {
+      "knownTerm": "fire rated access door",
+      "expectedTokens": ["fire", "rated", "access", "door"],
+      "noResultsTerm": "zzzz-no-products-987654321"
+    },
+    "categories": [
+      "/fire-rated/",
+      "/flush/",
+      "/recessed/"
+    ],
+    "mobileCategory": "/fire-rated/",
+    "multiPageCategory": "/fire-rated/",
+    "sort": {
+      "category": "/fire-rated/",
+      "label": "Price: Low to High",
+      "urlHash": "#/sort:calculated_price:asc"
+    }
+  },
+  "pdp": {
+    "recentlyViewedProfile": "recently-viewed",
+    "mobileBreadcrumbsHidden": true,
+    "popular": [
+      "/24-x-36-fire-rated-insulated-access-door-upward-opening-acudor/",
+      "/22-x-30-fire-rated-insulated-access-door-upward-opening-acudor/",
+      "/22-x-36-fire-rated-insulated-access-door-upward-opening-acudor/"
+    ],
+    "selectors": {
+      "breadcrumbs": ".breadcrumbs",
+      "breadcrumbHome": null,
+      "galleryImage": "section[data-image-gallery] img",
+      "description": "#tab-description",
+      "relatedCarousel": ".ss__recommendation--carousel",
+      "reviewsContainer": "#yotpo-reviews-main-widget",
+      "productInfoForm": ".product_form_wrap",
+      "qtyIncrement": null,
+      "qtyDecrement": null,
+      "pdfNewTab": true
+    }
+  }
 }
