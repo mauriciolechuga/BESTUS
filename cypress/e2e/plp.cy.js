@@ -107,10 +107,13 @@ describeIfStore(site.plp && plp.subcategory, 'PLP subcategory page', { testIsola
     });
   });
 
-  it('loads products and SearchSpring sidebar', () => {
+  it('loads products on the subcategory page', () => {
     waitForProducts();
-    cy.get('#searchspring-sidebar').should('exist');
   });
+
+  itIfStore(sel.sidebar, 'subcategory page has a sidebar', () => {
+    cy.get(sel.sidebar).should('exist');
+  }, 'store theme has no category sidebar (plp.selectors.sidebar is null)');
 });
 
 // ─── Navigation (leaves the page → needs fresh isolation) ──────────────────────

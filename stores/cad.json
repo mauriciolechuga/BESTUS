@@ -1,7 +1,7 @@
 {
   "_notes": "Configured June 2026. Standard BigCommerce theme (ul.productGrid, h1.page-heading, .breadcrumbs). No SearchSpring — native BC sort (?sort=priceasc) and search (search.php). Native BC search always returns results — no zero-result state. Products have prices (not quote-only). Footer: plain <footer> (no .tcsFooter), three sibling sections (footer-top / footer-bottom / footer-copyright), h3 headings in .box divs. Mobile nav is #menu (native BC toggle container). No sidebar on category pages. Subcategory boxes use li.subcategory_box / a.nameTitle / a.subcategory_image. PDP: #zoho_product_form for product info form, section[data-image-gallery] img for gallery, .productView-description for description. No related carousel, no Yotpo reviews, no SS recently-viewed.",
   "storeCode": "CAD",
-  "baseUrl": "https://californiaaccessdoors.com",
+  "baseUrl": "https://www.californiaaccessdoors.com",
   "homePath": "/",
   "visitQuery": null,
   "branding": {
@@ -62,7 +62,8 @@
     },
     "quoteRequest": {
       "path": "/quote-request/",
-      "submitUrlPattern": "**/forms.zohopublic.com/**/CADRequestAQuote/**/submit"
+      "submitUrlPattern": "**/forms.zohopublic.com/**/CADRequestAQuote/**/submit",
+      "optionalFields": ["Name_First"]
     },
     "contact": {
       "path": "/contact-us/",
