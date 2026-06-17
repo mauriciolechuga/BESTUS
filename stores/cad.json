@@ -1,27 +1,116 @@
 {
-  "_todo": "Scaffold. null sections make their specs show as skipped. To enable: verify branding values on the live site, then fill plp, products, forms, discovery, and pdp (see stores/bestus.json for the full shape).",
+  "_notes": "Configured June 2026. Standard BigCommerce theme (ul.productGrid, h1.page-heading, .breadcrumbs). No SearchSpring — native BC sort (?sort=priceasc) and search (search.php). Native BC search always returns results — no zero-result state. Products have prices (not quote-only). Footer: plain <footer> (no .tcsFooter), three sibling sections (footer-top / footer-bottom / footer-copyright), h3 headings in .box divs. Mobile nav is #menu (native BC toggle container). No sidebar on category pages. Subcategory boxes use li.subcategory_box / a.nameTitle / a.subcategory_image. PDP: #zoho_product_form for product info form, section[data-image-gallery] img for gallery, .productView-description for description. No related carousel, no Yotpo reviews, no SS recently-viewed.",
   "storeCode": "CAD",
   "baseUrl": "https://californiaaccessdoors.com",
   "homePath": "/",
   "visitQuery": null,
   "branding": {
     "copyrightText": "California Access Doors",
-    "footerLocationText": null,
-    "warehousesLink": null,
+    "footerLocationText": "San Francisco",
+    "warehousesLink": { "href": "/warehouses/", "text": "WAREHOUSES" },
     "imageHosts": ["californiaaccessdoors.com", "bigcommerce.com"],
-    "partnerLinks": null
+    "partnerLinks": null,
+    "mobileNavSelector": "#menu",
+    "footer": {
+      "rootSelector": "footer",
+      "sections": ["footer .footer-top", "footer .footer-bottom", "footer .footer-copyright"],
+      "headingSelector": "footer .box h3",
+      "headings": ["WHAT'S IN STORE", "SECURE SHOPPING", "MY ACCOUNT", "CONTACT INFO"],
+      "navLinks": "footer .box ul li a",
+      "contactInfoBox": "footer .box:last-child",
+      "minContactBoxes": 1,
+      "phoneLinks": "footer a[href^=\"tel:\"]",
+      "minPhoneLinks": 2,
+      "copyright": "footer .footer-copyright p",
+      "paymentIcons": "footer .footer-payment-icons"
+    }
   },
-  "plp": null,
-  "products": null,
+  "plp": {
+    "main": "/fire-rated-access-doors/",
+    "mainHeading": "Fire-Rated",
+    "breadcrumbLabel": "Fire-Rated",
+    "subcategory": "/for-drywall-installation/",
+    "selectors": {
+      "breadcrumbs": ".breadcrumbs",
+      "breadcrumbHome": null,
+      "sidebar": null,
+      "bestSellers": null,
+      "subcategoryBox": "li.subcategory_box",
+      "subcategoryLink": "a.subcategory_image",
+      "cardPrice": ".price--withoutTax",
+      "pagination": {
+        "container": ".pagination-list",
+        "active": ".pagination-item--current",
+        "links": "li.pagination-item a",
+        "next": ".pagination-item--next a",
+        "pageTwoToken": "page=2"
+      }
+    }
+  },
+  "products": {
+    "default": "/36-x-48-fire-rated-insulated-access-door-with-flange-for-drywall/",
+    "known": [
+      "/36-x-48-fire-rated-insulated-access-door-with-flange-for-drywall/",
+      "/36-x-36-fire-rated-insulated-access-door-with-flange-for-drywall/",
+      "/30-x-30-fire-rated-insulated-access-door-with-flange-for-drywall/"
+    ]
+  },
   "forms": {
-    "productInfo": null,
-    "quoteRequest": null,
-    "contact": null,
+    "productInfo": {
+      "path": "default-product",
+      "submitUrlPattern": "**/forms.zohopublic.com/**/CADProductForm/**/submit"
+    },
+    "quoteRequest": {
+      "path": "/quote-request/",
+      "submitUrlPattern": "**/forms.zohopublic.com/**/CADRequestAQuote/**/submit"
+    },
+    "contact": {
+      "path": "/contact-us/",
+      "submitUrlPattern": "**/forms.zohopublic.com/**/CADContactUsNew/**/submit"
+    },
     "proClub": null,
     "becomeVendor": null,
-    "architectInquiries": null
+    "architectInquiries": {
+      "path": "/architects/",
+      "submitUrlPattern": "**/forms.zohopublic.com/**/CADArchitects/**/submit"
+    }
   },
   "testEmailTemplate": "mauricio+{ts}@californiaaccessdoors.com",
-  "discovery": null,
-  "pdp": null
+  "discovery": {
+    "search": {
+      "knownTerm": "fire rated access door",
+      "expectedTokens": ["fire", "rated", "access", "door"],
+      "noResultsTerm": null,
+      "pdpUrlClean": false
+    },
+    "categories": [
+      "/fire-rated-access-doors/",
+      "/ceiling-attic-access-doors/",
+      "/drywall-access-doors/"
+    ],
+    "mobileCategory": "/fire-rated-access-doors/",
+    "multiPageCategory": "/fire-rated-access-doors/",
+    "sort": {
+      "category": "/fire-rated-access-doors/",
+      "label": "Price: Ascending",
+      "urlHash": null
+    }
+  },
+  "pdp": {
+    "recentlyViewedProfile": null,
+    "popular": [
+      "/36-x-48-fire-rated-insulated-access-door-with-flange-for-drywall/",
+      "/36-x-36-fire-rated-insulated-access-door-with-flange-for-drywall/",
+      "/30-x-30-fire-rated-insulated-access-door-with-flange-for-drywall/"
+    ],
+    "selectors": {
+      "breadcrumbs": ".breadcrumbs",
+      "breadcrumbHome": null,
+      "galleryImage": "section[data-image-gallery] img",
+      "description": ".productView-description",
+      "productInfoForm": "#zoho_product_form",
+      "relatedCarousel": null,
+      "reviewsContainer": null
+    }
+  }
 }
