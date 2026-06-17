@@ -1,5 +1,5 @@
 {
-  "_todo": "Scaffold. null sections make their specs show as skipped. To enable: verify branding values on the live site, then fill plp, products, forms, discovery, and pdp (see stores/bestus.json for the full shape). Note: this store's homepage is /new-home/, not / (homePath below).",
+  "_notes": "Configured June 2026. FSE runs the SearchSpring Snap theme (ul.ss__results dual-classed with productGrid, .ss__pagination, select-based sort — no hash routing). Header is .site-header (not semantic <header>). PLP heading is h1.simple-heading. Sidebar uses aside.page-sidebar/.sidebarBlock (no #treeView). Subcategory boxes (.subCategoriesBox) use BESTUS-default .nameTitle / a.navList-action inner selectors. PDP description tab is #tab-description; product info form is #have_a_product_question (without _request suffix). No related carousel. No SS recently-viewed script. Footer is .site-footer: nav links are direct <a> children of .box (no ul/li), copyright is in .Copyright p (sibling of .footer-bottom, not inside it). Mobile breadcrumbs hidden (display:none) — mobileBreadcrumbsHidden:true. No pro-club, become-vendor, or architects form. KNOWN SITE DEFICIENCIES (tests intentionally failing — devs notified June 17 2026): (1) /new-home/ has no <meta name='description'> — SEO test 'has a non-empty meta description' fails; add meta description to the page in BigCommerce admin. (2) grid-box-icon-1.jpg in section[data-image-gallery] has no alt attribute — images.cy.js 'all product gallery images have a non-empty alt attribute' fails; add alt text to the image in BigCommerce Media Manager.",
   "storeCode": "FSE",
   "baseUrl": "https://firesafetyequipment.com",
   "homePath": "/new-home/",
@@ -9,19 +9,113 @@
     "footerLocationText": null,
     "warehousesLink": null,
     "imageHosts": ["firesafetyequipment.com", "bigcommerce.com"],
-    "partnerLinks": null
+    "partnerLinks": null,
+    "headerSelector": ".site-header",
+    "footer": {
+      "rootSelector": ".site-footer",
+      "sections": [".site-footer .footer-top", ".site-footer .footer-bottom"],
+      "headingSelector": ".site-footer .footer-top h3",
+      "headings": ["WHAT’s In store", "Secure shopping", "my account", "contact info"],
+      "navLinks": ".site-footer .box a",
+      "contactInfoBox": ".site-footer .Contact-info-box",
+      "minContactBoxes": 1,
+      "phoneLinks": ".site-footer a[href^=\"tel:\"]",
+      "minPhoneLinks": 2,
+      "copyright": ".site-footer .Copyright p",
+      "paymentIcons": ".site-footer .footer-bottom .payment-icon"
+    }
   },
-  "plp": null,
-  "products": null,
+  "plp": {
+    "main": "/fire-extinguishers/",
+    "mainHeading": "Fire Extinguishers",
+    "breadcrumbLabel": "Fire Extinguishers",
+    "subcategory": null,
+    "selectors": {
+      "heading": "h1.simple-heading",
+      "breadcrumbs": "ol.breadcrumbs",
+      "breadcrumbHome": "a.breadcrumb-label",
+      "sidebar": "aside.page-sidebar",
+      "sidebarBlocks": ".sidebarBlock",
+      "sidebarBlocksMin": 1,
+      "sidebarLinks": "aside a.navList-action",
+      "bestSellers": "aside a.navList-action",
+      "subcategoryBox": ".subCategoriesBox",
+      "productCard": "ul.ss__results li.product",
+      "pagination": {
+        "container": ".ss__pagination",
+        "active": ".pagination-item--current",
+        "links": "a.ss__pagination__link",
+        "next": ".ss__pagination__next a",
+        "pageTwoToken": "page=2"
+      }
+    }
+  },
+  "products": {
+    "default": "/10-lb-cosmic-extinguisher-multi-purpose-dry-chemical-jl-industries/",
+    "known": [
+      "/10-lb-cosmic-extinguisher-multi-purpose-dry-chemical-jl-industries/",
+      "/20-lb-cosmic-extinguisher-multi-purpose-dry-chemical-jl-industries/",
+      "/2-5-lb-cosmic-extinguisher-multi-purpose-dry-chemical-with-mark-bracket-jl-industries/"
+    ]
+  },
   "forms": {
-    "productInfo": null,
-    "quoteRequest": null,
-    "contact": null,
+    "productInfo": {
+      "path": "default-product",
+      "submitUrlPattern": "**/forms.zohopublic.com/**/FSEProductForm/**/submit"
+    },
+    "quoteRequest": {
+      "path": "/request-a-quote/",
+      "submitUrlPattern": "**/forms.zohopublic.com/**/FSERequestAQuote/**/submit",
+      "optionalFields": ["Name_First"]
+    },
+    "contact": {
+      "path": "/contact-us/",
+      "submitUrlPattern": "**/forms.zohopublic.com/**/FSEContactUsNew/**/submit"
+    },
     "proClub": null,
     "becomeVendor": null,
     "architectInquiries": null
   },
   "testEmailTemplate": "mauricio+{ts}@firesafetyequipment.com",
-  "discovery": null,
-  "pdp": null
+  "discovery": {
+    "search": {
+      "knownTerm": "fire extinguisher",
+      "expectedTokens": ["fire", "extinguisher"],
+      "noResultsTerm": "zzzz-no-products-987654321",
+      "resultsHaveHeading": true
+    },
+    "categories": [
+      "/fire-extinguishers/",
+      "/fire-extinguisher-cabinets/",
+      "/fire-rated-access-doors/"
+    ],
+    "mobileCategory": "/fire-extinguishers/",
+    "multiPageCategory": "/fire-extinguishers/",
+    "sort": {
+      "category": "/fire-extinguishers/",
+      "label": "Price: Ascending",
+      "urlHash": null
+    }
+  },
+  "pdp": {
+    "recentlyViewedProfile": null,
+    "mobileBreadcrumbsHidden": true,
+    "popular": [
+      "/10-lb-cosmic-extinguisher-multi-purpose-dry-chemical-jl-industries/",
+      "/20-lb-cosmic-extinguisher-multi-purpose-dry-chemical-jl-industries/",
+      "/2-5-lb-cosmic-extinguisher-multi-purpose-dry-chemical-with-mark-bracket-jl-industries/"
+    ],
+    "selectors": {
+      "breadcrumbs": "ol.breadcrumbs",
+      "breadcrumbHome": "a.breadcrumb-label",
+      "galleryImage": "section[data-image-gallery] img",
+      "description": "#tab-description",
+      "relatedCarousel": null,
+      "reviewsContainer": "#yotpo-reviews-main-widget",
+      "productInfoForm": "#have_a_product_question",
+      "qtyIncrement": "button[data-action=\"inc\"]",
+      "qtyDecrement": "button[data-action=\"dec\"]",
+      "pdfNewTab": true
+    }
+  }
 }
