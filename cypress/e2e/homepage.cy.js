@@ -67,9 +67,9 @@ describe('Homepage', { testIsolation: false }, () => {
       .and('contain.text', branding.warehousesLink.text);
   });
 
-  it('footer payment icons section is visible', () => {
+  itIfStore(footer.paymentIcons, 'footer payment icons section is visible', () => {
     cy.get(footer.paymentIcons).should('be.visible');
-  });
+  }, 'store theme has no payment icons in footer');
 
   it('footer copyright year is current', () => {
     const currentYear = new Date().getFullYear().toString();

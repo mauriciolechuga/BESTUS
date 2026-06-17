@@ -28,25 +28,25 @@ describeIfStore(site.pdp, 'Product Detail Page', { testIsolation: false }, () =>
     cy.get('h1.productView-title').invoke('text').should('not.be.empty');
   });
 
-  it('displays a sale price', () => {
+  itIfStore(!(site.pdp && site.pdp.quoteOnly), 'displays a sale price', () => {
     cy.get('[data-product-price-without-tax]').invoke('text').should('match', /\$[\d,]+(\.\d{2})?/);
-  });
+  }, 'store is quote-only — no price, no cart, no lead-time widget (pdp.quoteOnly)');
 
   it('shows at least one product image with a valid src', () => {
     cy.get('section[data-image-gallery]').should('exist');
     cy.get(sel.galleryImage).first().invoke('attr', 'src').should('not.be.empty');
   });
 
-  it('quantity input is visible and defaults to 1', () => {
+  itIfStore(!(site.pdp && site.pdp.quoteOnly), 'quantity input is visible and defaults to 1', () => {
     cy.get('input[name="qty[]"]').should('be.visible').and('have.value', '1');
     // Stepper buttons are nullable — BESTCA's Snap theme has none (see PDP_SELECTOR_DEFAULTS).
     if (sel.qtyIncrement) cy.get(sel.qtyIncrement).should('be.visible');
     if (sel.qtyDecrement) cy.get(sel.qtyDecrement).should('be.visible');
-  });
+  }, 'store is quote-only — no price, no cart, no lead-time widget (pdp.quoteOnly)');
 
-  it('Add to Cart button is visible and not disabled', () => {
+  itIfStore(!(site.pdp && site.pdp.quoteOnly), 'Add to Cart button is visible and not disabled', () => {
     cy.get('#form-action-addToCart').should('be.visible').and('not.be.disabled');
-  });
+  }, 'store is quote-only — no price, no cart, no lead-time widget (pdp.quoteOnly)');
 
   // ─── Content sections ──────────────────────────────────────────────────────
 
@@ -102,7 +102,7 @@ describeIfStore(site.pdp, 'Product Detail Page', { testIsolation: false }, () =>
     cy.get('[data-product-sku]').invoke('text').should('not.be.empty');
   });
 
-  it('lead time / stock status is displayed', () => {
+  itIfStore(!(site.pdp && site.pdp.quoteOnly), 'lead time / stock status is displayed', () => {
     cy.get('.leadtime_value').invoke('text').should('not.be.empty');
-  });
+  }, 'store is quote-only — no price, no cart, no lead-time widget (pdp.quoteOnly)');
 });

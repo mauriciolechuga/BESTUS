@@ -267,7 +267,7 @@ export function assertSortApplied(previousTitles, { expectedHash } = {}) {
 export function assertPaginationAdvanced(previousTitles) {
   // BESTUS paginates with pp=2; other SearchSpring templates use p=2 (ADAP), page=2, or #...page:2.
   cy.location('href', { timeout: 20000 }).should('match', /\b(?:pp|page|p)[=:]2\b/);
-  cy.get('.ss__pagination, .ss-pagination-container').filter(':visible').first().within(() => {
+  cy.get('.ss__pagination, .ss-pagination-container, .pagination-list').filter(':visible').first().within(() => {
     // .ss__pagination__current: BESTCA's SearchSpring "Snap" template marks the active page
     // with this instead of .ss-page.ss-active.
     cy.get('.ss-page.ss-active, .ss__pagination__current, [aria-current="page"], .pagination-item--current')

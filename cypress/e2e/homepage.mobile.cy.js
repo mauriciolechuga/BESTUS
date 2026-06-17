@@ -82,9 +82,9 @@ ALL_DEVICES.forEach(({ name, width, height, touchTarget }) => {
         .and('contain.text', branding.warehousesLink.text);
     });
 
-    it('footer payment icons section exists in the DOM', () => {
+    itIfStore(footer.paymentIcons, 'footer payment icons section exists in the DOM', () => {
       cy.get(footer.paymentIcons).should('exist');
-    });
+    }, 'store theme has no payment icons in footer');
 
     it('footer copyright year is current', () => {
       cy.get(footer.copyright).should('contain.text', new Date().getFullYear().toString());

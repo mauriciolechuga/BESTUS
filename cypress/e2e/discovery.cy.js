@@ -19,7 +19,7 @@ import {
   productCardSelector,
   waitForProducts,
 } from '../support/checks.js';
-import { getStore, describeIfStore, storePath } from '../support/store.js';
+import { getStore, describeIfStore, itIfStore, storePath } from '../support/store.js';
 
 const site = getStore();
 const discovery = site.discovery || {};
@@ -42,10 +42,10 @@ describeIfStore(site.discovery, 'Product discovery', () => {
       assertSearchResults(discovery.search.expectedTokens);
     });
 
-    it('shows a no-results message for a nonsense search term', () => {
+    itIfStore(discovery.search.noResultsTerm, 'shows a no-results message for a nonsense search term', () => {
       performHeaderSearch(discovery.search.noResultsTerm);
       assertNoSearchResults();
-    });
+    }, 'store uses native BC search which always returns results — no zero-result state (discovery.search.noResultsTerm is null)');
   });
 
   // ─── Categories and refinement pages ─────────────────────────────────────────
@@ -83,7 +83,7 @@ describeIfStore(site.discovery, 'Product discovery', () => {
       waitForProducts(3);
 
       getVisibleProductTitles().then((pageOneTitles) => {
-        cy.get('.ss__pagination, .ss-pagination-container').filter(':visible').first().within(() => {
+        cy.get('.ss__pagination, .ss-pagination-container, .pagination-list').filter(':visible').first().within(() => {
           cy.get(
             '.ss-page-next a.ss-page-link, a.ss-page-link[href*="pp=2"], .pagination-item--next a, a.pagination-link[href*="page=2"], a.ss__pagination__link[href*="page=2"], a.ss__pagination__link[href*="p=2"]'
             // force: marketing popups (e.g. Klaviyo) can cover the link; navigation still succeeds.
@@ -99,11 +99,14 @@ describeIfStore(site.discovery, 'Product discovery', () => {
     it('opens a PDP from discovery results', () => {
       performHeaderSearch(discovery.search.knownTerm);
       waitForProducts();
-      cy.get(productCardSelector()).first().find('.card-title a').click();
+      cy.get(productCardSelector()).first().find('.card-title a').click({ force: true });
       // filter(':visible'): ADC's PDP renders a hidden mobile-only h1.productView-title.Mobile_title
       // first in the DOM, so .first() alone would grab the display:none element.
       cy.get('h1.productView-title, h1').filter(':visible').first().should('be.visible').invoke('text').should('not.be.empty');
-      cy.url().should('not.include', 'search_query');
+      // Native BC search appends search_query to the destination PDP URL — skip for those stores.
+      if (discovery.search.pdpUrlClean !== false) {
+        cy.url().should('not.include', 'search_query');
+      }
     });
   });
 });

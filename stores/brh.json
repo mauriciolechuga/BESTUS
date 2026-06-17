@@ -1,27 +1,119 @@
 {
-  "_todo": "Scaffold. null sections make their specs show as skipped. To enable: verify branding values on the live site, then fill plp, products, forms, discovery, and pdp (see stores/bestus.json for the full shape).",
+  "_notes": "Configured June 2026. Standard BigCommerce theme (ul.productGrid, h1.page-heading). No SearchSpring — native BC sort/search. Native BC search always returns results (full catalog for any term) — no zero-result state. Quote-only catalog (no prices, no cart, no qty input, no lead-time). Mobile nav is #mySidenav. Mobile breadcrumbs hidden. Footer root is plain <footer> (no .tcsFooter). No .Contact-info-box — contact info in footer .box:last-child. No payment icons. PLP at /aluminum/. Sidebar is .sidebarBlock. No subcategory tiles. PDP: no qty steppers, no carousel, no Yotpo, no SS recently-viewed. KNOWN SITE DEFICIENCY (test intentionally failing): products have no SKU set in BigCommerce admin — seo.cy.js JSON-LD Product block test fails. BRH admin must add SKUs (model numbers) to products.",
   "storeCode": "BRH",
   "baseUrl": "https://bestroofhatches.com",
   "homePath": "/",
   "visitQuery": null,
   "branding": {
     "copyrightText": "Best Roof Hatches",
-    "footerLocationText": null,
-    "warehousesLink": null,
+    "footerLocationText": "San Francisco",
+    "warehousesLink": { "href": "/warehouses/", "text": "Warehouses" },
     "imageHosts": ["bestroofhatches.com", "bigcommerce.com"],
-    "partnerLinks": null
+    "partnerLinks": null,
+    "mobileNavSelector": "#mySidenav",
+    "footer": {
+      "rootSelector": "footer",
+      "sections": ["footer .footer-top", "footer .footer-bottom", "footer .Copyright"],
+      "headingSelector": "footer .box h3",
+      "headings": ["What's In Store", "SECURE SHOPPING", "My Account", "Contact Info"],
+      "navLinks": "footer .box ul li a",
+      "contactInfoBox": "footer .box:last-child",
+      "minContactBoxes": 1,
+      "phoneLinks": "footer a[href^=\"tel:\"]",
+      "minPhoneLinks": 2,
+      "copyright": "footer .Copyright p",
+      "paymentIcons": null
+    }
   },
-  "plp": null,
-  "products": null,
+  "plp": {
+    "main": "/aluminum/",
+    "mainHeading": "Aluminum",
+    "breadcrumbLabel": "Aluminum",
+    "subcategory": null,
+    "selectors": {
+      "breadcrumbs": ".breadcrumbs",
+      "breadcrumbHome": null,
+      "sidebar": ".sidebarBlock",
+      "sidebarBlocks": ".sidebarBlock",
+      "sidebarBlocksMin": 1,
+      "sidebarLinks": ".sidebarBlock a",
+      "bestSellers": ".sidebarBlock a[href*=\"best-sellers\"]",
+      "subcategoryBox": null,
+      "cardPrice": null,
+      "pagination": {
+        "container": ".pagination-list",
+        "active": ".pagination-item--current",
+        "links": "li.pagination-item a",
+        "next": ".pagination-item--next a",
+        "pageTwoToken": "page=2"
+      }
+    }
+  },
+  "products": {
+    "default": "/66-x-144-aluminum-quad-door-lightmax-smoke-vent-polycarb-dome-rooftop-close/",
+    "known": [
+      "/66-x-144-aluminum-quad-door-lightmax-smoke-vent-polycarb-dome-rooftop-close/",
+      "/66-x-144-galvanized-steel-quad-door-acousticmax-50-smoke-vent-manual-winch/",
+      "/66-x-144-galvanized-steel-quad-door-acousticmax-50-smoke-vent-rooftop-close-with-electrical-opening-mechanism/"
+    ]
+  },
   "forms": {
-    "productInfo": null,
-    "quoteRequest": null,
-    "contact": null,
+    "productInfo": {
+      "path": "default-product",
+      "submitUrlPattern": "**/forms.zohopublic.com/**/BRHProductForm/**/submit"
+    },
+    "quoteRequest": {
+      "path": "/request-a-quote/",
+      "submitUrlPattern": "**/forms.zohopublic.com/**/BRHRequestAQuote/**/submit",
+      "optionalFields": ["Name_First"]
+    },
+    "contact": {
+      "path": "/contact-us/",
+      "submitUrlPattern": "**/forms.zohopublic.com/**/BRHContactUsNew/**/submit"
+    },
     "proClub": null,
     "becomeVendor": null,
     "architectInquiries": null
   },
   "testEmailTemplate": "mauricio+{ts}@bestroofhatches.com",
-  "discovery": null,
-  "pdp": null
+  "discovery": {
+    "search": {
+      "knownTerm": "roof hatch",
+      "expectedTokens": ["roof", "hatch"],
+      "noResultsTerm": null,
+      "pdpUrlClean": false
+    },
+    "categories": [
+      "/aluminum/",
+      "/galvanized-steel/",
+      "/ladder-access/"
+    ],
+    "mobileCategory": "/aluminum/",
+    "multiPageCategory": "/aluminum/",
+    "sort": {
+      "category": "/aluminum/",
+      "label": "Price: Ascending",
+      "urlHash": null
+    }
+  },
+  "pdp": {
+    "recentlyViewedProfile": null,
+    "quoteOnly": true,
+    "mobileBreadcrumbsHidden": true,
+    "popular": [
+      "/66-x-144-aluminum-quad-door-lightmax-smoke-vent-polycarb-dome-rooftop-close/",
+      "/66-x-144-galvanized-steel-quad-door-acousticmax-50-smoke-vent-manual-winch/",
+      "/66-x-144-galvanized-steel-quad-door-acousticmax-50-smoke-vent-rooftop-close-with-electrical-opening-mechanism/"
+    ],
+    "selectors": {
+      "breadcrumbs": ".breadcrumbs",
+      "breadcrumbHome": null,
+      "galleryImage": "section[data-image-gallery] img",
+      "description": ".productView-description",
+      "relatedCarousel": null,
+      "reviewsContainer": null,
+      "qtyIncrement": null,
+      "qtyDecrement": null
+    }
+  }
 }
