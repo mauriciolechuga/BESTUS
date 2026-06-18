@@ -178,6 +178,7 @@ const PDP_SELECTOR_DEFAULTS = {
   // sets these to null and the inc/dec presence checks skip. Nullable.
   qtyIncrement: 'button[data-action="inc"]',
   qtyDecrement: 'button[data-action="dec"]',
+  leadTime: '.leadtime_value',
   relatedCarousel: '.content-carousel .owl-carousel',
   productInfoForm: '#have_a_product_question_request',
   // Wrapper around the Yotpo reviews widget — ADAP has no #productreviewbox and

@@ -106,7 +106,7 @@ ALL_DEVICES.forEach(({ name, width, height, touchTarget }) => {
     });
 
     itIfStore(!(site.pdp && site.pdp.quoteOnly), 'lead time / stock status is displayed', () => {
-      cy.get('.leadtime_value').invoke('text').should('not.be.empty');
+      cy.get(sel.leadTime).invoke('text').should('not.be.empty');
     }, 'store is quote-only — no price, no cart, no lead-time widget (pdp.quoteOnly)');
 
     itIfStore(sel.productInfoForm, 'product info request form is present with required fields', () => {

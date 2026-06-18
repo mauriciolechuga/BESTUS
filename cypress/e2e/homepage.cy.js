@@ -83,7 +83,7 @@ describe('Homepage', { testIsolation: false }, () => {
     });
   });
 
-  it('phone number in header matches footer', () => {
+  itIfStore(footer.minPhoneLinks > 0, 'phone number in header matches footer', () => {
     // Compare on the LAST 4 DIGITS only. The first tel link can be a text-less icon,
     // call-tracking scripts rewrite numbers at runtime, themes pad the text, and some
     // stores format the same number differently in the header vs footer (ADC shows
@@ -103,5 +103,5 @@ describe('Homepage', { testIsolation: false }, () => {
           expect(last4s($f), 'footer phone numbers (last 4 digits)').to.include(headerLast4);
         });
       });
-  });
+  }, 'store has no phone link in footer (branding.footer.minPhoneLinks: 0)');
 });

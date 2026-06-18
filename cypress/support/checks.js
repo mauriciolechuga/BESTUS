@@ -19,7 +19,7 @@ const PRODUCT_TITLE = '.card-title';
 // markup-agnostic — and it naturally skips the higher RRP without needing the effective-price node.
 const CARD_PRICE_CONTAINER = '.product-item-price, .price-section, [data-product-price-without-tax], [class*="price"]';
 const SEARCH_INPUT =
-  'input[name="search_query"], input[name*="search"], input[type="search"], input[placeholder*="Search"], input[aria-label*="Search"]';
+  'input[name="search_query"], input[name*="search"], input[type="search"], input[placeholder*="Search"], input[placeholder*="Buscar"], input[aria-label*="Search"]';
 // The live store sorts via a native SearchSpring select (name/id "ss__sort--select"). The generic
 // fallbacks are kept for other BAD stores that may render BigCommerce-native sort controls.
 const SORT_SELECT =
@@ -92,6 +92,8 @@ export function blockThirdParty() {
   cy.intercept(/analytics\.searchspring\.net/, stub); // SearchSpring analytics (search API kept)
   cy.intercept(/beacon\.searchspring\.io/, stub);     // SearchSpring beacon (search API kept)
   cy.intercept(/salesiq\.zohopublic\.com/, stub);     // Zoho SalesIQ live-chat widget
+  cy.intercept(/clarity\.ms/, stub);                  // Microsoft Clarity session recording
+  cy.intercept(/ipapi\.co/, stub);                    // ipapi.co geo-IP (PDA locale detection)
 }
 
 /**
@@ -182,7 +184,8 @@ export function assertDiscoveryPage({ heading } = {}) {
   if (heading) cy.get('h1.page-heading, .page-heading, h1').filter(':visible').first().should('contain.text', heading);
   cy.get('.breadcrumbs.new_breadcrumbs, .breadcrumbs').should('exist');
   // Skip sidebar check for stores with no sidebar (plp.selectors.sidebar: null — e.g. CAD native BC).
-  if (plpSelectors().sidebar) cy.get('.categories-left, #searchspring-sidebar, [class*="facets"], [class*="filter"]').should('exist');
+  // Include the configured sidebar selector first so non-BESTUS selectors (.sidebarBlock, etc.) match.
+  if (plpSelectors().sidebar) cy.get(`${plpSelectors().sidebar}, .categories-left, #searchspring-sidebar, [class*="facets"], [class*="filter"]`).should('exist');
   waitForProducts();
   assertProductCards(3);
 }

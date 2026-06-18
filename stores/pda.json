@@ -1,5 +1,4 @@
 {
-  "_todo": "Scaffold. null sections make their specs show as skipped. To enable: verify branding values on the live site, then fill plp, products, forms, discovery, and pdp (see stores/bestus.json for the full shape). Spanish-language store: text values (copyright, plp headings, discovery sort label and search terms) must be the Spanish strings shown on the live site.",
   "storeCode": "PDA",
   "baseUrl": "https://puertasdeacceso.com.mx",
   "homePath": "/",
@@ -7,21 +6,114 @@
   "branding": {
     "copyrightText": "Puertas de Acceso",
     "footerLocationText": null,
-    "warehousesLink": null,
+    "warehousesLink": { "href": "/centros-de-distribucion/", "text": "Mapa de Almacenes" },
     "imageHosts": ["puertasdeacceso.com.mx", "bigcommerce.com"],
-    "partnerLinks": null
+    "partnerLinks": null,
+    "currency": "MXN",
+    "footer": {
+      "rootSelector": "footer",
+      "sections": ["footer .Informacion-direccion", "footer .Copyright"],
+      "headingSelector": "footer h2",
+      "headings": ["Información:", "Dirección:"],
+      "navLinks": "footer .box ul li a",
+      "contactInfoBox": "footer .box:last-child",
+      "minContactBoxes": 1,
+      "phoneLinks": "footer a[href^=\"tel:\"]",
+      "minPhoneLinks": 0,
+      "copyright": "footer .Copyright p",
+      "paymentIcons": "footer .Payment-icons"
+    }
   },
-  "plp": null,
-  "products": null,
+  "plp": {
+    "main": "/mas-vendidos/",
+    "mainHeading": "Más vendidos",
+    "breadcrumbLabel": "Más vendidos",
+    "subcategory": "/mas-vendidos/resistentes-al-fuego/",
+    "selectors": {
+      "breadcrumbs": ".breadcrumbs",
+      "breadcrumbHome": "a.breadcrumb-label",
+      "sidebar": ".sidebarBlock",
+      "sidebarBlocks": ".sidebarBlock",
+      "sidebarBlocksMin": 1,
+      "sidebarLinks": ".sidebarBlock a",
+      "bestSellers": ".sidebarBlock a[href*=\"mas-vendidos\"]",
+      "subcategoryBox": null,
+      "pagination": {
+        "container": ".pagination-list",
+        "active": ".pagination-item--current",
+        "links": "li.pagination-item a",
+        "next": ".pagination-item--next a",
+        "pageTwoToken": "page=2"
+      }
+    }
+  },
+  "products": {
+    "default": "/test-proposito/",
+    "known": [
+      "/test-proposito/",
+      "/test-mex-product-with-option-and-modifier/",
+      "/test-modifier-one-13-50/",
+      "/test-modifier-two-5-50/"
+    ]
+  },
   "forms": {
     "productInfo": null,
-    "quoteRequest": null,
-    "contact": null,
+    "quoteRequest": {
+      "path": "/cotiza/",
+      "noQuantityDropdown": true,
+      "addressField": "SingleLine4",
+      "optionalFields": ["Name_Last"],
+      "submitUrlPattern": "**/forms.zohopublic.com/**/PuertasdeAccesoSolicituddeCotizacin/**/submit"
+    },
+    "contact": {
+      "path": "/contactenos/",
+      "inquiryType": "Ventas y Productos",
+      "inquiryTypes": ["Ventas y Productos", "Servicio al Cliente y Pedidos Existentes"],
+      "submitUrlPattern": "**/forms.zohopublic.com/**/ContctanosPuertasdeAccesoNew/**/submit"
+    },
     "proClub": null,
     "becomeVendor": null,
     "architectInquiries": null
   },
   "testEmailTemplate": "mauricio+{ts}@puertasdeacceso.com.mx",
-  "discovery": null,
-  "pdp": null
+  "discovery": {
+    "search": {
+      "knownTerm": "test",
+      "expectedTokens": ["test"],
+      "noResultsTerm": "zzzz-no-products-987654321",
+      "pdpUrlClean": false,
+      "resultsHaveHeading": false
+    },
+    "categories": [
+      "/mas-vendidos/",
+      "/productos/entrega-rapida-en-mexico/"
+    ],
+    "mobileCategory": "/mas-vendidos/",
+    "multiPageCategory": "/productos/entrega-rapida-en-mexico/",
+    "sort": {
+      "category": "/productos/entrega-rapida-en-mexico/",
+      "label": "Precio: ascendente",
+      "urlHash": null
+    }
+  },
+  "pdp": {
+    "recentlyViewedProfile": null,
+    "popular": [
+      "/test-proposito/",
+      "/test-mex-product-with-option-and-modifier/",
+      "/test-modifier-one-13-50/",
+      "/test-modifier-two-5-50/"
+    ],
+    "selectors": {
+      "breadcrumbs": ".breadcrumbs",
+      "breadcrumbHome": "a.breadcrumb-label",
+      "leadTime": "dd.productView-info-value",
+      "galleryImage": "section[data-image-gallery] img",
+      "description": ".productView-description",
+      "relatedCarousel": null,
+      "reviewsContainer": null,
+      "productInfoForm": null
+    }
+  },
+  "_notes": "Spanish-language MX storefront. PLP main is /mas-vendidos/ (4 test products); /productos/entrega-rapida-en-mexico/ has enough products for pagination and sort. Categories are being implemented — revisit PLP main, subcategory, discovery categories, and sort/pagination paths once full category tree is live. Known intentional failures: (1) PLP subcategory /mas-vendidos/resistentes-al-fuego/ has 0 products; (2) seo.cy.js Product JSON-LD test fails — Product schema has no offers/priceCurrency/availability — BC admin must configure structured data. Klaviyo email popup present (force:true already in ZohoFormPage). No Pro Club / architects / product-info forms."
 }

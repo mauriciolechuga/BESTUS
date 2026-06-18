@@ -5,35 +5,34 @@ export class ContactFormPage extends ZohoFormPage {
   get path() { return getStore().forms.contact.path; }
 
   selectInquiryType(v) {
-    // Zoho may use name="Dropdown" or a label-relative selector.
-    // If this is ambiguous on first run, scope with .first() or switch to:
-    //   cy.contains('label', /inquiry/i).next('select').select(v)
-    cy.get('select[name="Dropdown"]').first().select(v);
+    const store = getStore();
+    const storeType = store.forms && store.forms.contact && store.forms.contact.inquiryType;
+    cy.get('select[name="Dropdown"]').first().select(storeType || v);
     return this;
   }
 
   fillAddress1(v) {
-    cy.get('input[name="Address_AddressLine1"]').clear().type(v);
+    cy.get('input[name="Address_AddressLine1"]').scrollIntoView().clear({ force: true }).type(v, { force: true });
     return this;
   }
 
   fillAddress2(v) {
-    cy.get('input[name="Address_AddressLine2"]').clear().type(v);
+    cy.get('input[name="Address_AddressLine2"]').scrollIntoView().clear({ force: true }).type(v, { force: true });
     return this;
   }
 
   fillCity(v) {
-    cy.get('input[name="Address_City"]').clear().type(v);
+    cy.get('input[name="Address_City"]').scrollIntoView().clear({ force: true }).type(v, { force: true });
     return this;
   }
 
   fillRegion(v) {
-    cy.get('input[name="Address_Region"]').clear().type(v);
+    cy.get('input[name="Address_Region"]').scrollIntoView().clear({ force: true }).type(v, { force: true });
     return this;
   }
 
   fillZip(v) {
-    cy.get('input[name="Address_ZipCode"]').clear().type(v);
+    cy.get('input[name="Address_ZipCode"]').scrollIntoView().clear({ force: true }).type(v, { force: true });
     return this;
   }
 

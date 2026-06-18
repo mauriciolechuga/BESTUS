@@ -91,11 +91,11 @@ ALL_DEVICES.forEach(({ name, width, height, touchTarget }) => {
       cy.get(footer.copyright).should('contain.text', branding.copyrightText);
     });
 
-    it('footer phone number exists in the DOM', () => {
+    itIfStore(footer.minPhoneLinks > 0, 'footer phone number exists in the DOM', () => {
       cy.get('footer a[href^="tel:"]').first().invoke('text').then((text) => {
         expect(text.trim()).to.match(/[\d\-\(\)\s\+]+/);
       });
-    });
+    }, 'store has no phone link in footer (branding.footer.minPhoneLinks: 0)');
 
     it('has no horizontal overflow', () => {
       assertNoHorizontalOverflow(width);

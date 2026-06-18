@@ -64,10 +64,11 @@ describeIfStore(contactForm, 'Contact Us form', () => {
     });
 
     it('lists both inquiry types in the dropdown', () => {
+      const inquiryTypes = (contactForm && contactForm.inquiryTypes) ||
+        ['Sales & Products', 'Customer Service & Existing Orders'];
       cy.get('select[name="Dropdown"]').first().find('option').then(($options) => {
         const values = [...$options].map((o) => o.text.trim());
-        expect(values).to.include('Sales & Products');
-        expect(values).to.include('Customer Service & Existing Orders');
+        inquiryTypes.forEach((type) => expect(values).to.include(type));
       });
     });
 

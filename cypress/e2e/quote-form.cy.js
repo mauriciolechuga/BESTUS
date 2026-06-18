@@ -61,27 +61,27 @@ describeIfStore(quoteForm, 'Request a Quote form', () => {
     itIfStore(!optionalFields.includes('Name_First'), 'shows an error when First Name is empty', () => {
       cy.uniqueEmail().then((email) => {
         cy.fillPersona(page, { ...persona, firstName: 'SKIP' }, email);
-        cy.get('input[name="Name_First"]').clear();
+        cy.get('input[name="Name_First"]').clear({ force: true });
         page.submit();
         cy.get('@submit.all').should('have.length', 0);
         cy.expectFieldError('input[name="Name_First"]');
       });
     }, "store's quote form does not require First Name (forms.quoteRequest.optionalFields includes Name_First)");
 
-    it('shows an error when Last Name is empty', () => {
+    itIfStore(!optionalFields.includes('Name_Last'), 'shows an error when Last Name is empty', () => {
       cy.uniqueEmail().then((email) => {
         cy.fillPersona(page, { ...persona, lastName: 'SKIP' }, email);
-        cy.get('input[name="Name_Last"]').clear();
+        cy.get('input[name="Name_Last"]').clear({ force: true });
         page.submit();
         cy.get('@submit.all').should('have.length', 0);
         cy.expectFieldError('input[name="Name_Last"]');
       });
-    });
+    }, "store's quote form does not require Last Name (forms.quoteRequest.optionalFields includes Name_Last)");
 
     it('shows an error when Email is empty', () => {
       cy.uniqueEmail().then((email) => {
         cy.fillPersona(page, { ...persona }, email);
-        cy.get('input[name="Email"]').clear();
+        cy.get('input[name="Email"]').clear({ force: true });
         page.submit();
         cy.get('@submit.all').should('have.length', 0);
         cy.expectFieldError('input[name="Email"]');
@@ -95,12 +95,14 @@ describeIfStore(quoteForm, 'Request a Quote form', () => {
       cy.expectFieldError('input[name="Email"]');
     });
 
-    it('lists the expected quantity options', () => {
+    itIfStore(!(quoteForm && quoteForm.noQuantityDropdown), 'lists the expected quantity options', () => {
+      const expected = (quoteForm && quoteForm.quantityOptions) ||
+        ["I don't know", '1', '2', '3', '4', '5+'];
       cy.get('select[name="Dropdown"]').find('option').then(($options) => {
         const values = [...$options].map((o) => o.text.trim());
-        expect(values).to.include.members(["I don't know", '1', '2', '3', '4', '5+']);
+        expect(values).to.include.members(expected);
       });
-    });
+    }, "store's quote form has no quantity dropdown (forms.quoteRequest.noQuantityDropdown)");
 
     it('does not submit the form when required fields are missing', () => {
       page.submit();

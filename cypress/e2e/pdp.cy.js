@@ -103,6 +103,6 @@ describeIfStore(site.pdp, 'Product Detail Page', { testIsolation: false }, () =>
   });
 
   itIfStore(!(site.pdp && site.pdp.quoteOnly), 'lead time / stock status is displayed', () => {
-    cy.get('.leadtime_value').invoke('text').should('not.be.empty');
+    cy.get(sel.leadTime).invoke('text').should('not.be.empty');
   }, 'store is quote-only — no price, no cart, no lead-time widget (pdp.quoteOnly)');
 });
