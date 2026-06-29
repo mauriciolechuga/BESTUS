@@ -15,6 +15,9 @@ const path = require('path');
 
 const LOG_DIR = path.join(__dirname, '..', 'results');
 const LOG_FILE = path.join(LOG_DIR, 'test-results.log');
+// Per-store machine-readable sidecars consumed by run-all.js to build its
+// end-of-run aggregate summary. One file per store, overwritten each run.
+const SUMMARY_DIR = path.join(LOG_DIR, '.run-summary');
 const RULE = '═'.repeat(60);
 const SUBRULE = '─'.repeat(60);
 
@@ -93,6 +96,24 @@ function appendRunLog(results, store) {
     fs.appendFileSync(LOG_FILE, lines.join('\n') + '\n', 'utf8');
     // eslint-disable-next-line no-console
     console.log(`\n📝 Run logged to results/test-results.log (${outcome})`);
+
+    // Drop a sidecar so run-all.js can aggregate failures across stores.
+    writeSummarySidecar(store, {
+      store,
+      outcome,
+      durationMs: results.totalDuration ?? 0,
+      duration: formatDuration(results.totalDuration),
+      totals: { totalTests, totalPassed, totalFailed, totalPending, totalSkipped },
+      failedSpecs: runs
+        .filter((run) => (run.stats && run.stats.failures) > 0)
+        .map((run) => ({
+          spec: (run.spec && run.spec.relative) || '(unknown spec)',
+          failures: run.stats.failures,
+          tests: (run.tests || [])
+            .filter((t) => t.state === 'failed')
+            .map((t) => (Array.isArray(t.title) ? t.title.join(' › ') : String(t.title))),
+        })),
+    });
   } catch (err) {
     // Never let logging break the run.
     // eslint-disable-next-line no-console
@@ -100,4 +121,19 @@ function appendRunLog(results, store) {
   }
 }
 
-module.exports = { appendRunLog };
+// Best-effort sidecar write; never breaks the run if it fails.
+function writeSummarySidecar(store, payload) {
+  try {
+    fs.mkdirSync(SUMMARY_DIR, { recursive: true });
+    fs.writeFileSync(
+      path.join(SUMMARY_DIR, `${store}.json`),
+      JSON.stringify(payload, null, 2),
+      'utf8'
+    );
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.error(`writeRunLog: failed to write summary sidecar — ${err.message}`);
+  }
+}
+
+module.exports = { appendRunLog, SUMMARY_DIR };

@@ -51,12 +51,14 @@ describe("Lighthouse audit", () => {
     cy.lighthouse(THRESHOLDS, DESKTOP_OPTS);
   });
 
-  itIfStore.skip(site.plp, "PLP meets score thresholds", () => {
+  itIfStore(false, "PLP meets score thresholds", () => {
+    // site.plp instead of false to avoid skipping the test if the store has no PLPs
     cy.visit(storePath(site.plp.main));
     cy.lighthouse(THRESHOLDS, DESKTOP_OPTS);
   });
 
-  itIfStore.skip(site.pdp, "a random PDP meets score thresholds", () => {
+  itIfStore(false, "a random PDP meets score thresholds", () => {
+    //site.pdp instead of false to avoid skipping the test if the store has no PDPs
     cy.visit(storePath(pickRandom(site.pdp.popular)));
     cy.lighthouse(THRESHOLDS, DESKTOP_OPTS);
   });
