@@ -41,6 +41,9 @@ if (unknown.length) {
   process.exit(1);
 }
 
+// Default to Chrome unless the caller already passed --browser.
+if (!cypressArgs.includes('--browser')) cypressArgs.push('--browser', 'chrome');
+
 const results = [];
 
 for (const store of stores) {

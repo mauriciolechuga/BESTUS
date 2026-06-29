@@ -33,6 +33,9 @@ if (!code || !stores.includes(code.toLowerCase())) {
 const store = code.toLowerCase();
 console.log(`\n▶ Running Cypress for store "${store}"\n`);
 
+// Default to Chrome unless the caller already passed --browser.
+if (!cypressArgs.includes('--browser')) cypressArgs.push('--browser', 'chrome');
+
 const result = spawnSync('npx', ['cypress', 'run', ...cypressArgs], {
   stdio: 'inherit',
   shell: true, // required on Windows for npx

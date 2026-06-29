@@ -12,13 +12,13 @@ One shared set of tests runs against any of the stores. Each store has its own s
 | `bestca` | [bestaccessdoors.ca](https://www.bestaccessdoors.ca) | Fully configured |
 | `adap` | [accessdoorsandpanels.com](https://www.accessdoorsandpanels.com) | Fully configured |
 | `adc` | [accessdoorscanada.ca](https://accessdoorscanada.ca) | Fully configured |
-| `aap` | [acudoraccesspanels.com](https://www.acudoraccesspanels.com) | Scaffold — homepage checks only |
-| `fse` | [firesafetyequipment.com](https://firesafetyequipment.com) | Scaffold — homepage checks only |
-| `brh` | [bestroofhatches.com](https://bestroofhatches.com) | Scaffold — homepage checks only |
-| `cad` | [californiaaccessdoors.com](https://californiaaccessdoors.com) | Scaffold — homepage checks only |
-| `pda` | [puertasdeacceso.com.mx](https://puertasdeacceso.com.mx) | Scaffold — homepage checks only |
+| `aap` | [acudoraccesspanels.com](https://www.acudoraccesspanels.com) | Fully configured |
+| `fse` | [firesafetyequipment.com](https://firesafetyequipment.com) | Fully configured |
+| `brh` | [bestroofhatches.com](https://bestroofhatches.com) | Fully configured |
+| `cad` | [californiaaccessdoors.com](https://californiaaccessdoors.com) | Fully configured |
+| `pda` | [puertasdeacceso.com.mx](https://puertasdeacceso.com.mx) | Fully configured (Spanish, MX) |
 
-A "scaffold" store runs the tests that only need a homepage (layout, SEO, images, Lighthouse). All other tests show up as **skipped** ("pending") until the store's config file is filled in — filling in a section (products, forms, categories…) automatically enables its tests with no code changes.
+All nine stores are fully configured and run the complete suite. Tests still show up as **skipped** ("pending") on a store wherever its config marks a feature absent (a `null` section or selector) — for example a store whose theme has no Pro Club form or no related-products carousel. Skips are always deliberate and self-documenting; see "Skipped tests and how to enable them" below.
 
 ---
 
@@ -40,7 +40,8 @@ Running the tests takes a few minutes instead of an hour of manual clicking. And
 | **Contact Us** | `/contact-us/` | General inquiries, supports optional file attachment |
 | **Request a Quote** | `/request-a-quote/` | Customers request pricing for a product |
 | **Pro Club Application** | `/pro-club-application/` | Contractors and resellers apply for trade pricing |
-| **Architects & Spec Writers** | `/architects/` | Architects and spec writers request product info (ADC only) |
+| **Architects & Spec Writers** | `/architects/` | Architects and spec writers request product info (ADC and CAD) |
+| **Become a Vendor** | `/bvl1/` | Suppliers apply to become a vendor (ADAP only) |
 
 For each form, the tests verify:
 - The form submits successfully when filled out correctly
@@ -77,6 +78,8 @@ node --version
 
 If you see a version number like `v20.11.0`, you're good. If you get an error, download and install Node.js from [nodejs.org](https://nodejs.org) — choose the "LTS" (recommended) version.
 
+You also need **Google Chrome** installed, since the tests run in Chrome by default. Most computers already have it; if not, get it at [google.com/chrome](https://www.google.com/chrome).
+
 ---
 
 ## Setup
@@ -98,6 +101,22 @@ If you see a version number like `v20.11.0`, you're good. If you get an error, d
 ---
 
 ## Running the Tests
+
+> **All tests run in Google Chrome by default.** Every command and launcher below uses Chrome automatically — you don't have to pass `--browser`. (Advanced users can still override with `--browser firefox`; `lighthouse.cy.js` skips itself outside Chrome.)
+
+### Easiest way — double-click launchers (no typing)
+
+If you're not comfortable with a terminal, you don't need one. Three Windows launcher files sit in the project folder. **Double-click them** — see **`READ ME FIRST.txt`** for the picture version.
+
+| Double-click this file | What it does |
+|---|---|
+| **`First Time Setup.bat`** | Run **once**. Checks for Node.js and installs everything the tests need. |
+| **`Run All Tests.bat`** | Tests **every store** in Chrome, then shows a PASS/FAIL summary. |
+| **`Run One Store.bat`** | Shows a numbered menu — pick one store to test in Chrome. |
+
+Each launcher checks that setup ran, keeps its window open at the end so you can read the results, and points you to `results\test-results.log`. You still need Node.js and Google Chrome installed (the setup launcher tells you if Node.js is missing).
+
+The `npm` commands below do the exact same things and are for anyone who prefers a terminal.
 
 > **Note:** The `npm` shortcuts below are configured in `package.json`. You can also call `npx cypress` directly if you prefer.
 
@@ -187,7 +206,7 @@ Skips are always deliberate and always visible — a skipped test means a config
 
 | What's pending | Why | Enable by |
 |---|---|---|
-| All 3 Lighthouse audits | The spec self-skips outside Chrome (default `cypress run` uses Electron) | Run with `--browser chrome` |
+| All 3 Lighthouse audits | The spec self-skips outside Chrome | Already runs — every command and launcher defaults to Chrome. Only pending if you override with `--browser firefox`. |
 
 **ADAP's skips (June 2026), as a worked example:**
 
@@ -208,7 +227,7 @@ Skips are always deliberate and always visible — a skipped test means a config
 | PDP mobile breadcrumb trail (4 devices) | `pdp.mobileBreadcrumbsHidden: true` | BESTCA's theme hides the PDP breadcrumb (`nav.Breadcrumb { display:none }`) below desktop widths; the desktop PDP breadcrumb test still runs | Removing the flag if the theme shows breadcrumbs on mobile |
 | Quote form: First Name validation | `forms.quoteRequest.optionalFields: ["Name_First"]` | BESTCA's Zoho quote form doesn't require First Name client-side (submits with it empty) | Removing the entry if the Zoho form config changes |
 | Pro Club country dropdown (2 tests) | `forms.proClub.hasCountry: false` | BESTCA's Pro Club form is the Canada-only Zoho form (`BestAccessDoorsProClubCanadaAp`) with no country field — country is implicitly Canada | Removing the flag if the form gains a country dropdown |
-| Mobile header touch-target — **Electron only** (homepage + pdp, all devices) | `branding.skipMobileTouchTarget: true` | BESTCA's mobile header renders its logo via a lazy-loaded image + icon fonts; under **Electron** these don't size, so zero header elements are measurable as `:visible`. The flag is gated to Electron only (`Cypress.browser.name === 'electron'`) — **Chrome and Firefox run it and it passes** (the 53px logo renders). So this is only pending on the default `cypress run` (Electron) | Already runs in Chrome/Firefox; remove the flag if Electron ever renders the header |
+| Mobile header touch-target — **Electron only** (homepage + pdp, all devices) | `branding.skipMobileTouchTarget: true` | BESTCA's mobile header renders its logo via a lazy-loaded image + icon fonts; under **Electron** these don't size, so zero header elements are measurable as `:visible`. The flag is gated to Electron only (`Cypress.browser.name === 'electron'`) — **Chrome and Firefox run it and it passes** (the 53px logo renders). Since the suite now defaults to Chrome, this test runs by default; it's only pending if you force Electron | Already runs in Chrome/Firefox (the default); remove the flag if Electron ever renders the header |
 | PDP quantity stepper buttons (desktop + 4 mobile devices) | `pdp.selectors.qtyIncrement` / `qtyDecrement: null` | BESTCA's theme has a bare quantity input with no +/− buttons | Setting the selectors if the theme gains them |
 
 (BESTCA's Product JSON-LD, sidebar + category-link health (single-block `.page-sidebar`, `sidebarBlocksMin:1`), subcategory boxes, best-sellers tree, pagination, price-sort, and the SearchSpring "Customers Also Viewed" related carousel (`pdp.selectors.relatedCarousel: ".ss__recommendation--carousel"`) all run — its grid uses `plp.selectors.productCard: "ul.ss__results li.product"`, its pagination the `.ss__pagination__*` selectors, and its JSON-LD currency check `branding.currency: "CAD"`.)
@@ -232,19 +251,31 @@ ADC-specific config that lets the rest run: `plp.selectors.heading: "h1.containe
 - `images.cy.js` — the homepage "Drywall" tile references `for-drywall-finall-des.jpg` (typo); the correctly named `for-drywall-final-des.jpg` exists. Fix the tile in the BigCommerce admin.
 - The missing Product JSON-LD above is worth raising with the theme owner alongside it.
 
-For scaffolded stores (AAP, FSE, BRH, CAD, PDA) most specs are pending because entire sections (`plp`, `products`, `forms`, `discovery`, `pdp`) are `null` — each store's `_todo` key lists what to fill. See "Onboarding a Scaffolded Store" in `CLAUDE.md`.
+**The other stores (AAP, FSE, BRH, CAD, PDA) — now fully onboarded (June 2026):** each runs the complete suite; their remaining skips are deliberate theme/catalog gates, and a few tests are intentionally **left failing** to flag real site bugs (see "Site deficiency policy" in `CLAUDE.md`). Per store:
+
+- **AAP** (`acudoraccesspanels.com`) — SearchSpring "Snap" theme. Skips: subcategory suite (flat taxonomy, `plp.subcategory: null`), mobile breadcrumbs (`pdp.mobileBreadcrumbsHidden`), qty steppers (none in theme). **Intentionally failing:** mobile header hamburger (23px) and logo (12px) are below the 44px touch-target standard — devs notified with a CSS fix, left failing until it ships.
+- **FSE** (`firesafetyequipment.com`) — Snap theme, homepage at `/new-home/`. Skips: mobile breadcrumbs, related carousel, recently-viewed. **Intentionally failing (devs notified):** `/new-home/` has no meta description (`seo.cy.js`), and `grid-box-icon-1.jpg` has no `alt` attribute (`images.cy.js`).
+- **BRH** (`bestroofhatches.com`) — standard BC theme, native search/sort, entirely quote-only catalog. Skips: no-results search (native search always returns results), prices/Add-to-Cart/qty/lead-time (`pdp.quoteOnly`), subcategory tiles, footer payment icons (theme has none), Pro Club / Become Vendor / Architects forms. **Intentionally failing:** products have no SKU in BigCommerce → Product JSON-LD test (`seo.cy.js`); admin must add model-number SKUs.
+- **CAD** (`californiaaccessdoors.com`) — standard BC theme, native search/sort, priced catalog. Skips: no-results search, category sidebar (`sidebar: null`), Pro Club, Become Vendor. Runs the Architects form. No known failing site bugs.
+- **PDA** (`puertasdeacceso.com.mx`) — Spanish/MX storefront, standard BC theme, currency MXN. Skips: subcategory boxes, product-info form (none on PDPs), footer phone links (none), Pro Club / Architects forms. **Intentionally failing:** catalog has only 4 placeholder products → pagination/subcategory tests fail (admin must add inventory), and Product JSON-LD has no `offers` block → `seo.cy.js` (admin must configure structured data).
+
+Every store's `stores/<code>.json` documents its specifics in a `_notes` key; the per-store theme drift is detailed in `CLAUDE.md`.
 
 ---
 
 ## Project Structure
 
 ```
+├── First Time Setup.bat           Double-click once: installs everything (non-technical users)
+├── Run All Tests.bat              Double-click: tests every store in Chrome
+├── Run One Store.bat              Double-click: pick one store from a menu
+├── READ ME FIRST.txt              Plain-language quick start for the launchers above
+│
 ├── cypress.config.js              Configuration: loads the selected store's JSON, timeouts, etc.
 │
 ├── stores/                        One JSON file per store — URLs, form paths, brand text
 │   ├── bestus.json                Fully configured (the reference example)
-│   ├── bestca.json, adap.json, adc.json   Fully configured stores
-│   └── aap.json … pda.json        Scaffolds — fill in sections to enable more tests
+│   └── bestca.json … pda.json     All nine stores fully configured
 │
 ├── scripts/
 │   ├── run-store.js               Runs the suite for one store (npm run test:store <code>)
@@ -268,7 +299,7 @@ For scaffolded stores (AAP, FSE, BRH, CAD, PDA) most specs are pending because e
 │   │   ├── quote-form.cy.js       Tests the Request a Quote form
 │   │   ├── pro-club-form.cy.js    Tests the Pro Club Application form
 │   │   ├── become-vendor-form.cy.js  Tests the Become a Vendor form (ADAP only)
-│   │   └── architect-form.cy.js   Tests the Architects & Spec Writers form (ADC only)
+│   │   └── architect-form.cy.js   Tests the Architects & Spec Writers form (ADC and CAD)
 │   │
 │   ├── fixtures/                  Test data
 │   │   ├── personas.json          Fake customer profiles used during testing

@@ -10,27 +10,31 @@ Stores: BESTUS (bestaccessdoors.com — the default), BESTCA, ADAP, ADC, AAP, FS
 
 ## Commands
 
+**Browser default is Chrome.** The `npm` scripts and both runner scripts force `--browser chrome` (see "Browser Baselines"); pass an explicit `--browser firefox` to override. Bare `npx cypress run` still defaults to Electron — prefer the `npm`/launcher paths.
+
+**Non-technical launchers (Windows, double-click — see `READ ME FIRST.txt`):** `First Time Setup.bat` (runs `npm install`), `Run All Tests.bat` (→ `npm run test:all`), `Run One Store.bat` (menu → `npm run test:store <code>`). All Chrome, all keep their window open with results.
+
 ```bash
 # Install dependencies (once)
 npm install
 
-# Run all tests headlessly against the default store, BESTUS (stub mode — no real leads created)
-npx cypress run            # or: npm test
+# Run all tests headlessly against the default store, BESTUS in Chrome (stub mode — no real leads created)
+npm test                   # = cypress run --browser chrome
 
 # Run a single spec file
-npx cypress run --spec "cypress/e2e/contact-form.cy.js"
+npm test -- --spec "cypress/e2e/contact-form.cy.js"
 
-# Run against a specific store
+# Run against a specific store (run-store.js injects --browser chrome unless you pass --browser)
 npm run test:store bestca
 npm run test:store -- aap --spec "cypress/e2e/homepage.cy.js"   # extra args forwarded to cypress run
 
-# Run every store sequentially (continues on failure, summary table at the end)
+# Run every store sequentially (continues on failure, summary table at the end; run-all.js injects --browser chrome)
 npm run test:all
 npm run test:all -- --stores bestus,bestca
 
-# Open interactive Cypress app (default store; restart after editing a stores/*.json)
-npx cypress open
-npx cross-env STORE=bestca cypress open
+# Open interactive Cypress app in Chrome (default store; restart after editing a stores/*.json)
+npm run test:open
+npx cross-env STORE=bestca cypress open --browser chrome
 
 # Live submission mode (creates real Zoho CRM leads — use sparingly)
 npm run test:live
@@ -44,7 +48,7 @@ npm run test:live
   - `describeIfStore(condition, title, [options,] fn)` / `itIfStore(condition, title, fn, [reason])` — run the suite/test when the config section exists, otherwise `describe.skip`/`it.skip` with a `[skipped: not configured for <CODE>]` title suffix so missing features show as pending, never silently absent. `itIfStore`'s optional `reason` replaces that suffix with `[skipped: <reason>]` for _deliberate_ gates (theme lacks the element, form doesn't require the field, Electron-only limitation) so the skip self-documents to anyone running the suite — e.g. `[skipped: store theme hides breadcrumbs on mobile (pdp.mobileBreadcrumbsHidden)]`. Omit `reason` only for genuine "not configured yet" gates on scaffold stores.
   - `storePath(path)` — appends the store's `visitQuery` if set (AAP needs `?redirect=disable` on every visit)
   - `homePath()` — the store's homepage path (FSE's homepage is `/new-home/`, not `/`)
-- **Nullable-section contract** in `stores/*.json`: `plp`, `products`, `discovery`, `pdp`, and each entry under `forms` may be `null`, which makes the specs gated on them skip. `storeCode`, `baseUrl`, `homePath`, `branding.copyrightText`, and `branding.imageHosts` are required. `branding.footerLocationText`, `branding.warehousesLink`, and `branding.partnerLinks` may be `null` (their individual homepage tests skip). See `stores/bestus.json` for the full shape; scaffolds carry a `_todo` key describing what to fill.
+- **Nullable-section contract** in `stores/*.json`: `plp`, `products`, `discovery`, `pdp`, and each entry under `forms` may be `null`, which makes the specs gated on them skip. `storeCode`, `baseUrl`, `homePath`, `branding.copyrightText`, and `branding.imageHosts` are required. `branding.footerLocationText`, `branding.warehousesLink`, and `branding.partnerLinks` may be `null` (their individual homepage tests skip). See `stores/bestus.json` for the full shape; a scaffold (not-yet-onboarded) store carries a `_todo` key describing what to fill. **All nine current stores are fully onboarded** — no scaffolds remain; the `_todo`/`describeIfStore` machinery stays for the next store added.
 - Store-specific text lives in config, not specs: brand/copyright text, footer location, PLP heading/breadcrumb labels (`plp.mainHeading`/`plp.breadcrumbLabel` — Spanish on PDA), search terms, sort label.
 - **Footer theme drift**: stores run different BigCommerce footer themes, so footer selectors/expectations are config-driven. `FOOTER_DEFAULTS` in `store.js` holds the BESTUS values (`footer.tcsFooter`, `.box h3`, `.Contact-info-box`, `.Copyright p`, 2+ tel links); any key can be overridden per store via `branding.footer` (see `stores/bestca.json`, which uses `footer.footer`, `h5.footer-info-heading`, `.contactbox`, `.footer-copyright p`, 1 tel link). `footerConfig()` returns the merged result; `assertFooterHeadings` and both homepage specs read from it.
 - **Header theme drift**: some themes have no semantic `<header>` element (ADAP's desktop header is `div.desktop-header-section`, its mobile header `div.iPad_header`). `headerSelector()` / `mobileHeaderSelector()` in `store.js` default to `header` and are overridden per store via `branding.headerSelector` / `branding.mobileHeaderSelector` (mobile falls back to desktop). Consumed by both homepage specs, `pdp.mobile.cy.js`, and `assertMaxTouchTarget`. Likewise the mobile nav drawer: `MOBILE_NAV` in `devices.js` resolves via `mobileNavSelector()` (default `div.mobile-menu`; ADAP and AAP both override to `#mySidenav` via `branding.mobileNavSelector`).
@@ -63,13 +67,17 @@ npm run test:live
 
 ## Browser Baselines
 
-All specs (except `lighthouse.cy.js`) are browser-agnostic and pass in both Chrome and Firefox. `lighthouse.cy.js` skips itself automatically when run in Firefox.
+All specs (except `lighthouse.cy.js`) are browser-agnostic and pass in both Chrome and Firefox. `lighthouse.cy.js` skips itself automatically when run in anything but Chrome (so it now runs on every default invocation).
+
+**Chrome is the default for all entry points** — `npm test`, `npm run test:open`, `npm run test:live` hard-code `--browser chrome`, and `run-store.js`/`run-all.js` push `--browser chrome` onto the cypress args unless the caller already passed `--browser`. This means Lighthouse runs by default and several previously Electron-only skips (e.g. BESTCA's `skipMobileTouchTarget`) no longer apply on a normal run.
 
 ```bash
-# Chrome baseline (default — also runs Lighthouse)
-npx cypress run --browser chrome
+# Chrome baseline (the default everywhere — also runs Lighthouse)
+npm test                              # or any npm/launcher path
+npx cypress run --browser chrome      # explicit equivalent
 
-# Firefox baseline (lighthouse.cy.js is skipped automatically)
+# Firefox baseline (override; lighthouse.cy.js is skipped automatically)
+npm test -- --browser firefox
 npx cypress run --browser firefox
 ```
 

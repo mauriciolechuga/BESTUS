@@ -1,0 +1,74 @@
+============================================================
+  BEST ACCESS DOORS - WEBSITE TESTS
+  Quick start for non-technical users
+============================================================
+
+These tests act like a robot customer: they open the
+websites, fill out forms, click around, and check that
+everything still works. Everything runs in Google Chrome.
+
+You only need to use the three files in THIS folder that
+end in ".bat". Double-click them. That's it.
+
+
+------------------------------------------------------------
+  STEP 1 - ONE-TIME SETUP  (only the very first time)
+------------------------------------------------------------
+
+  Double-click:   First Time Setup.bat
+
+  It installs everything the tests need. This takes a few
+  minutes. When it says "ALL SET!", close the window.
+
+  If it says Node.js is not installed:
+    1. Go to   https://nodejs.org
+    2. Click the big green "LTS" button.
+    3. Run the downloaded installer, click Next until done.
+    4. Double-click "First Time Setup.bat" again.
+
+  You also need Google Chrome installed (most computers
+  already have it).  Get it at:  https://www.google.com/chrome
+
+
+------------------------------------------------------------
+  STEP 2 - RUN THE TESTS  (any time you want)
+------------------------------------------------------------
+
+  To test EVERY store, double-click:
+      Run All Tests.bat
+
+  To test just ONE store, double-click:
+      Run One Store.bat
+  ...then type the number of the store and press Enter.
+
+  Leave the window alone until it finishes. A black/white
+  window with scrolling text is normal - that's the tests
+  working.
+
+
+------------------------------------------------------------
+  STEP 3 - READ THE RESULTS
+------------------------------------------------------------
+
+  When it finishes, scroll up in the window to see:
+    - PASS / green checkmarks  = working
+    - FAIL / red text          = something is broken
+    - pending / skipped        = turned off on purpose
+                                 (not a problem)
+
+  Results are also saved to:   results\test-results.log
+
+  If something fails, a screenshot of the moment it broke
+  is saved in:   cypress\screenshots\
+
+
+------------------------------------------------------------
+  IF SOMETHING GOES WRONG
+------------------------------------------------------------
+
+  - Take a screenshot of the window (red text and all).
+  - Send it to whoever set this up for you.
+
+  Most problems are fixed by double-clicking
+  "First Time Setup.bat" once more.
+============================================================
