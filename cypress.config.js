@@ -45,6 +45,11 @@ module.exports = defineConfig({
       // Required inside setupNodeEvents so prepareAudit and lighthouse share the same
       // module instance (and thus the same internal launchArgs closure variable).
       const { lighthouse, prepareAudit } = require("@cypress-audit/lighthouse");
+      const { appendRunLog } = require("./scripts/writeRunLog");
+
+      // Append a proof-of-run block to results/test-results.log after every
+      // headless run (does not fire in `cypress open`).
+      on('after:run', (results) => appendRunLog(results, STORE));
 
       on('before:browser:launch', (browser, launchOptions) => {
         prepareAudit(launchOptions);
