@@ -28,15 +28,15 @@ echo  ============================================================
 echo   PICK A STORE TO TEST  (type the number, then press Enter)
 echo  ============================================================
 echo.
-echo    1.  BESTUS  - bestaccessdoors.com
+echo    1.  BESTUS  - Best Access Doors USA
 echo    2.  BESTCA  - Best Access Doors Canada
-echo    3.  ADAP    - acudoraccesspanels (ADAP)
-echo    4.  ADC     - access doors canada
-echo    5.  AAP     - acudoraccesspanels.com
-echo    6.  FSE     - firesafetyequipment.com
-echo    7.  BRH     - bestroofhatches.com
-echo    8.  CAD     - californiaaccessdoors.com
-echo    9.  PDA     - puertasdeacceso.com.mx
+echo    3.  ADAP    - Access Doors and Panels
+echo    4.  ADC     - Access Doors Canada
+echo    5.  AAP     - Acudor Access Panels
+echo    6.  FSE     - Fire Safety Equipment
+echo    7.  BRH     - Best Roof Hatches
+echo    8.  CAD     - California Access Doors
+echo    9.  PDA     - Puertas de Acceso
 echo.
 echo    0.  Quit
 echo.

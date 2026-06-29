@@ -120,31 +120,28 @@ The `npm` commands below do the exact same things and are for anyone who prefers
 
 > **Note:** The `npm` shortcuts below are configured in `package.json`. You can also call `npx cypress` directly if you prefer.
 
-### Option 1 — Fast & Safe (recommended for daily use)
+### Option 1 — Run every store (all tests, all stores)
+
+```
+npm run test:all
+npm run test:all -- --stores bestus,bestca
+```
+
+This is the full run — every test against every store. Stores run one after another (each gets its own browser session), failures don't stop the loop, and a pass/fail summary table prints at the end. Screenshots and videos are saved per store (`cypress/videos/bestca/`, etc.). Use `--stores` to limit to a comma-separated subset.
+
+Best for: a complete health check across all nine stores. (Double-click equivalent: **`Run All Tests.bat`**.)
+
+### Option 2 — Fast & Safe, default store only (recommended for daily use)
 
 ```
 npm test
 ```
 
-This runs all tests in the background (no browser window opens). It does **not** submit real forms — it intercepts the form submissions and fakes a successful response so no leads are created in the CRM.
+This runs all tests against the default store (BESTUS) in the background (no browser window opens). It does **not** submit real forms — it intercepts the form submissions and fakes a successful response so no leads are created in the CRM.
 
 Best for: quickly checking that nothing is broken.
 
-### Option 2 — Interactive (watch the tests run)
-
-```
-npm run test:open
-```
-
-This opens the Cypress app where you can pick which tests to run and watch them execute in a real browser window. Useful when you want to see exactly what's happening or when debugging a failing test.
-
-### Option 3 — Run a single test file
-
-```
-npm test -- --spec "cypress/e2e/contact-form.cy.js"
-```
-
-### Option 4 — Run a specific store
+### Option 3 — Run a specific store
 
 ```
 npm run test:store bestca
@@ -159,14 +156,19 @@ npx cross-env STORE=bestca cypress open
 
 (Restart `cypress open` after editing a store's JSON file — the config is read once at launch.)
 
-### Option 5 — Run every store
+### Option 4 — Interactive (watch the tests run)
 
 ```
-npm run test:all
-npm run test:all -- --stores bestus,bestca
+npm run test:open
 ```
 
-Stores run one after another (each gets its own browser session), failures don't stop the loop, and a pass/fail summary table prints at the end. Screenshots and videos are saved per store (`cypress/videos/bestca/`, etc.).
+This opens the Cypress app where you can pick which tests to run and watch them execute in a real browser window. Useful when you want to see exactly what's happening or when debugging a failing test.
+
+### Option 5 — Run a single test file
+
+```
+npm test -- --spec "cypress/e2e/contact-form.cy.js"
+```
 
 ### Option 6 — Live Submission (weekly smoke test only)
 

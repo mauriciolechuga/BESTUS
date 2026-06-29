@@ -46,8 +46,10 @@ if (!cypressArgs.includes('--browser')) cypressArgs.push('--browser', 'chrome');
 
 const results = [];
 
+console.log(`\n▶ Test run started ${new Date().toLocaleString()}  —  ${stores.length} store(s): ${stores.join(', ')}`);
+
 for (const store of stores) {
-  console.log(`\n${'═'.repeat(70)}\n▶ Store: ${store}\n${'═'.repeat(70)}\n`);
+  console.log(`\n${'═'.repeat(70)}\n▶ Store: ${store}  —  started ${new Date().toLocaleString()}\n${'═'.repeat(70)}\n`);
   const started = Date.now();
   const result = spawnSync('npx', ['cypress', 'run', ...cypressArgs], {
     stdio: 'inherit',
@@ -65,6 +67,6 @@ console.log(`\n${'═'.repeat(70)}\nSummary\n${'═'.repeat(70)}`);
 for (const { store, ok, minutes } of results) {
   console.log(`  ${ok ? '✔ PASS' : '✘ FAIL'}  ${store.padEnd(10)} ${minutes} min`);
 }
-console.log('');
+console.log(`\n▶ Test run finished ${new Date().toLocaleString()}\n`);
 
 process.exit(results.every((r) => r.ok) ? 0 : 1);

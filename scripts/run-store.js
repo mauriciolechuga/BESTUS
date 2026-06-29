@@ -31,7 +31,7 @@ if (!code || !stores.includes(code.toLowerCase())) {
 }
 
 const store = code.toLowerCase();
-console.log(`\n▶ Running Cypress for store "${store}"\n`);
+console.log(`\n▶ Running Cypress for store "${store}"  —  started ${new Date().toLocaleString()}\n`);
 
 // Default to Chrome unless the caller already passed --browser.
 if (!cypressArgs.includes('--browser')) cypressArgs.push('--browser', 'chrome');
@@ -41,5 +41,7 @@ const result = spawnSync('npx', ['cypress', 'run', ...cypressArgs], {
   shell: true, // required on Windows for npx
   env: { ...process.env, STORE: store },
 });
+
+console.log(`\n▶ Finished store "${store}"  —  ${new Date().toLocaleString()}\n`);
 
 process.exit(result.status === null ? 1 : result.status);
