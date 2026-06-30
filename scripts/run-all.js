@@ -81,6 +81,25 @@ function loadSummary(store) {
   }
 }
 
+// ANSI colors for the console only — the log file stays plain text.
+const C = {
+  reset: '\x1b[0m', green: '\x1b[32m', white: '\x1b[37m',
+  orange: '\x1b[38;5;208m', red: '\x1b[31m',
+};
+const useColor = process.stdout.isTTY || process.env.FORCE_COLOR;
+function paint(code, text) { return useColor ? `${code}${text}${C.reset}` : text; }
+// Tier by pass rate of executed tests (pending excluded):
+// green 100% · white >=80% · orange >=60% · red <60% (or no data).
+function storeColor(s) {
+  if (!s) return C.red;
+  const executed = s.totals.totalPassed + s.totals.totalFailed;
+  const rate = executed ? s.totals.totalPassed / executed : 0;
+  if (s.totals.totalFailed === 0) return C.green;
+  if (rate >= 0.80) return C.white;
+  if (rate >= 0.60) return C.orange;
+  return C.red;
+}
+
 const wallMinutes = ((Date.now() - runStarted) / 60000).toFixed(1);
 const testSeconds = results.reduce((sum, r) => {
   const s = loadSummary(r.store);
@@ -88,27 +107,35 @@ const testSeconds = results.reduce((sum, r) => {
 }, 0);
 const testTime = `${Math.floor(testSeconds / 60)}m ${Math.round(testSeconds % 60)}s`;
 
-// Build the aggregate summary (printed to console AND appended to the log).
-const summary = [];
-summary.push(RULE);
-summary.push(`RUN-ALL SUMMARY  |  ${new Date().toLocaleString()}  |  ${stores.length} store(s)`);
-summary.push(`Total test time: ${testTime}  |  Wall clock: ${wallMinutes} min`);
-summary.push(RULE);
+// Build the aggregate summary twice: plain[] for the log file, colored[] for
+// the console. Per-store lines are tinted by storeColor() (green/yellow/red).
+const plain = [];
+const colored = [];
+function push(line, color) {
+  plain.push(line);
+  colored.push(color ? paint(color, line) : line);
+}
+
+push(RULE);
+push(`RUN-ALL SUMMARY  |  ${new Date().toLocaleString()}  |  ${stores.length} store(s)`);
+push(`Total test time: ${testTime}  |  Wall clock: ${wallMinutes} min`);
+push(RULE);
 for (const { store, ok, minutes } of results) {
   const s = loadSummary(store);
+  const color = storeColor(s);
   const totals = s ? `${s.totals.totalFailed} failed / ${s.totals.totalTests}` : '(no data)';
-  summary.push(`  ${ok ? '✔ PASS' : '✘ FAIL'}  ${store.padEnd(10)} ${String(minutes).padStart(5)} min   ${totals}`);
+  push(`  ${ok ? '✔ PASS' : '✘ FAIL'}  ${store.padEnd(10)} ${String(minutes).padStart(5)} min   ${totals}`, color);
   if (s && s.failedSpecs.length) {
     for (const spec of s.failedSpecs) {
-      summary.push(`           ↳ ${spec.spec} (${spec.failures})`);
-      for (const t of spec.tests) summary.push(`               • ${t}`);
+      push(`           ↳ ${spec.spec} (${spec.failures})`, color);
+      for (const t of spec.tests) push(`               • ${t}`, color);
     }
   }
 }
-summary.push(RULE);
+push(RULE);
 
-const block = summary.join('\n');
-console.log(`\n${block}\n`);
+const block = plain.join('\n');
+console.log(`\n${colored.join('\n')}\n`);
 console.log(`▶ Test run finished ${new Date().toLocaleString()}\n`);
 
 // Persist the aggregate alongside the per-store blocks (best-effort).
