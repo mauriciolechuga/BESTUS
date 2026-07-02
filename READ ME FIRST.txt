@@ -7,8 +7,10 @@ These tests act like a robot customer: they open the
 websites, fill out forms, click around, and check that
 everything still works. Everything runs in Google Chrome.
 
-You only need to use the three files in THIS folder that
-end in ".bat". Double-click them. That's it.
+The EASIEST way is the Dashboard: a friendly page in your
+web browser with buttons and colored results. Just
+double-click one file. (The old ".bat" files still work
+too - see "OLD WAY" near the bottom.)
 
 
 ------------------------------------------------------------
@@ -31,35 +33,50 @@ end in ".bat". Double-click them. That's it.
 
 
 ------------------------------------------------------------
-  STEP 2 - RUN THE TESTS  (any time you want)
+  STEP 2 - OPEN THE DASHBOARD  (the easy way)
 ------------------------------------------------------------
 
-  To test EVERY store, double-click:
-      Run All Tests.bat
+  Double-click:   Test Dashboard.bat
 
-  To test just ONE store, double-click:
-      Run One Store.bat
-  ...then type the number of the store and press Enter.
+  Your web browser opens automatically. In the page:
+    1. Tick the store(s) you want to test (or "Select all").
+    2. Click  "Run selected".
+    3. Watch the colored cards fill in as each store finishes.
 
-  Leave the window alone until it finishes. A black/white
-  window with scrolling text is normal - that's the tests
-  working.
+  Green = all good.  Orange/Red = something is broken.
+  Click a red card to see the failing tests, open the
+  screenshot, or play the video of what happened.
+
+  Leave the small black window open while you work - it's
+  the engine. Closing it stops the dashboard.
 
 
 ------------------------------------------------------------
   STEP 3 - READ THE RESULTS
 ------------------------------------------------------------
 
-  When it finishes, scroll up in the window to see:
-    - PASS / green checkmarks  = working
-    - FAIL / red text          = something is broken
-    - pending / skipped        = turned off on purpose
-                                 (not a problem)
+  In the Dashboard, each store gets a card:
+    - PASS (green)   = working
+    - FAIL (red/orange) = something is broken - click to see
+    - pending / skipped = turned off on purpose (not a problem)
+
+  The "History" tab shows every past run.
 
   Results are also saved to:   results\test-results.log
+  Failure screenshots are in:  cypress\screenshots\
+  Failure videos are in:       cypress\videos\
 
-  If something fails, a screenshot of the moment it broke
-  is saved in:   cypress\screenshots\
+
+------------------------------------------------------------
+  OLD WAY - RUN FROM A BLACK WINDOW (still works)
+------------------------------------------------------------
+
+  To test EVERY store, double-click:   Run All Tests.bat
+  To test just ONE store, double-click: Run One Store.bat
+     ...then type the store number and press Enter.
+
+  A black/white window with scrolling text is normal.
+  When it finishes, scroll up to see PASS / FAIL.
 
 
 ------------------------------------------------------------

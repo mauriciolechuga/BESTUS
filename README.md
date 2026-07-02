@@ -104,9 +104,24 @@ You also need **Google Chrome** installed, since the tests run in Chrome by defa
 
 > **All tests run in Google Chrome by default.** Every command and launcher below uses Chrome automatically — you don't have to pass `--browser`. (Advanced users can still override with `--browser firefox`; `lighthouse.cy.js` skips itself outside Chrome.)
 
-### Easiest way — double-click launchers (no typing)
+### Easiest way — the Test Dashboard (a friendly page in your browser)
 
-If you're not comfortable with a terminal, you don't need one. Three Windows launcher files sit in the project folder. **Double-click them** — see **`READ ME FIRST.txt`** for the picture version.
+If you're not comfortable with a terminal, you don't need one. **Double-click `Test Dashboard.bat`** — a small engine window opens and your web browser pops up at `http://localhost:8420` with a point-and-click dashboard:
+
+- Tick the store(s) you want (or **Select all**) and click **Run selected**.
+- Watch **color-coded cards** fill in live as each store finishes — green = all good, red/orange = something broke.
+- Click a failed card to see the failing tests, **open the screenshot**, or **play the video** of what happened — no digging through folders.
+- The **History** tab lists every past run.
+- **Re-run failed** re-runs only the specs that failed.
+- A **Light/Dark** toggle (top-right) switches themes; your choice is remembered.
+
+Leave the small engine window open while you work — closing it stops the dashboard. See **`READ ME FIRST.txt`** for the picture version. (Terminal equivalent: `npm run dashboard`.)
+
+The dashboard is **stub-only** — it can never submit real forms or create CRM leads; live mode stays terminal-only (Option 6).
+
+### Also available — double-click launchers (no browser)
+
+Three older Windows launchers still work if you'd rather watch a plain black window:
 
 | Double-click this file | What it does |
 |---|---|
@@ -196,9 +211,11 @@ After running `npx cypress run`, you'll see a summary like this:
 - **failing** — tests that found a problem (the name tells you which form/page and what failed)
 - **pending** — tests skipped on purpose because the store's config doesn't include that feature yet; the test title says `[skipped: not configured for <STORE>]`
 
-If any tests fail, Cypress automatically saves a **screenshot** of the browser at the moment of failure. You can find these in the `cypress/screenshots/` folder.
+If any tests fail, Cypress automatically saves a **screenshot** of the browser at the moment of failure. You can find these in the `cypress/screenshots/<store>/` folder.
 
-Video recordings of each test run are saved to `cypress/videos/`.
+Video recordings of each test run are saved to `cypress/videos/<store>/`.
+
+**Easier:** the **Test Dashboard** (above) shows all of this without folder-digging — color-coded per-store cards, the failing test names, and the failure screenshot + video inline. It reads the same results files (`results/.run-summary/<store>.json` and `results/test-results.log`) that the runs produce.
 
 ### Skipped tests and how to enable them
 
@@ -268,6 +285,7 @@ Every store's `stores/<code>.json` documents its specifics in a `_notes` key; th
 ## Project Structure
 
 ```
+├── Test Dashboard.bat             Double-click: opens the friendly browser dashboard
 ├── First Time Setup.bat           Double-click once: installs everything (non-technical users)
 ├── Run All Tests.bat              Double-click: tests every store in Chrome
 ├── Run One Store.bat              Double-click: pick one store from a menu
@@ -279,9 +297,16 @@ Every store's `stores/<code>.json` documents its specifics in a `_notes` key; th
 │   ├── bestus.json                Fully configured (the reference example)
 │   └── bestca.json … pda.json     All nine stores fully configured
 │
+├── results/                       Run output (gitignored): test-results.log + .run-summary/*.json
+│
 ├── scripts/
 │   ├── run-store.js               Runs the suite for one store (npm run test:store <code>)
-│   └── run-all.js                 Runs every store sequentially with a summary table
+│   ├── run-all.js                 Runs every store sequentially with a summary table
+│   ├── writeRunLog.js             after:run hook — writes the log + per-store JSON sidecars
+│   └── dashboard/                 Local browser dashboard (npm run dashboard / Test Dashboard.bat)
+│       ├── server.js              Node http server: serves the UI, spawns the runners, streams results
+│       ├── storeNames.js          Friendly store display names
+│       └── public/                index.html + app.js + styles.css (light/dark, brand palette)
 │
 ├── cypress/
 │   ├── e2e/                       The actual tests (shared by all stores)
