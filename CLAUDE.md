@@ -38,7 +38,12 @@ npx cross-env STORE=bestca cypress open --browser chrome
 
 # Live submission mode (creates real Zoho CRM leads — use sparingly)
 npm run test:live
+
+# Friendly browser dashboard (non-technical front end; double-click "Test Dashboard.bat")
+npm run dashboard          # serves http://localhost:8420 (override port: DASHBOARD_PORT)
 ```
+
+**Test Dashboard** (`scripts/dashboard/`, launcher `Test Dashboard.bat`): a local browser UI for non-technical operators — pick stores, watch a live run, see color-coded per-store cards with inline failure screenshots/videos, run history, and one-click re-run of failed specs. It is purely additive and does **not** change how Cypress runs: the Node `http` server (built-ins only, zero new deps) *spawns* `scripts/run-all.js` / `scripts/run-store.js`, so the `after:run` hook keeps writing `results/.run-summary/<store>.json` (which the UI reads for card state) and `results/test-results.log` (which the History tab parses). Stub-only by design — the server strips `LIVE_SUBMIT`/`I_KNOW_THIS_IS_LIVE` from the child env, so the dashboard can never create real leads; live mode stays CLI-only. Store display names live in `scripts/dashboard/storeNames.js`. Front end is `scripts/dashboard/public/` (`index.html`/`app.js`/`styles.css`) — brand palette (blue `#498cbc`, yellow `#ffd200`, black/white) driven by CSS variables with a **light (default) / dark** theme toggle persisted to `localStorage("dashboard-theme")` and applied pre-paint by an inline `<head>` script; status-tier colors (green/red/orange) are intentionally non-brand for health legibility.
 
 ## Multi-Store Architecture
 
