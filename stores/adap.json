@@ -1,5 +1,19 @@
 {
-  "_notes": "Configured from the live site (June 2026). Quirks: /products/ root 301s to an external subdomain, so plp.main is the Access Doors category; no Pro Club; quote form lives at /new-request-a-quote/; theme differs from BESTUS (footer-v2, .Info-box contact column, plain .breadcrumbs, no sidebar .categories-left, no related-products carousel, product form in #crmWebToEntityForm).",
+  "_notes": "Configured from the live site (June 2026). Quirks: /products/ root 301s to an external subdomain, so plp.main is the Access Doors category; no Pro Club; quote form lives at /new-request-a-quote/; theme differs from BESTUS (footer-v2, .Info-box contact column, plain .breadcrumbs, no sidebar .categories-left, no related-products carousel, product form in #crmWebToEntityForm). Verified live July 2 2026: breadcrumbs carry a.breadcrumb-label (incl. Home) on PLP+PDP — breadcrumbHome/breadcrumbLabel filled; PLP pagination is AngularJS-rendered .ss-pagination-container > ul.pagination-list > li.pagination-item (active: .pagination-item--current, links: a.pagination-link, next: .pagination-item--next a, ?p=2) — plp.selectors.pagination filled; sort hash #/sort:searchspring_price:asc re-confirmed. LIGHTHOUSE (calibrated July 2 2026, live scores homepage a11y 83 / plp 73 / pdp 76): theme structurally below the 80 a11y default on plp/pdp -> accessibility 70 overrides there (homepage keeps the 80 default).",
+  "_absentFeatures": [
+    {
+      "configKey": "forms.proClub",
+      "fillWith": "{ \"path\": \"/<form-page>/\", \"submitUrlPattern\": \"**/forms.zohopublic.com/**/<ZohoFormName>/**/submit\" }",
+      "verifiedAbsent": "no Pro Club program on live site (June 2026 onboarding)",
+      "enables": "pro-club-form.cy.js"
+    },
+    {
+      "configKey": "forms.architectInquiries",
+      "fillWith": "{ \"path\": \"/<form-page>/\", \"submitUrlPattern\": \"**/forms.zohopublic.com/**/<ZohoFormName>/**/submit\" }",
+      "verifiedAbsent": "no /architects/ page on live site (June 2026 onboarding)",
+      "enables": "architect-form.cy.js"
+    }
+  ],
   "storeCode": "ADAP",
   "baseUrl": "https://www.accessdoorsandpanels.com",
   "homePath": "/",
@@ -8,11 +22,21 @@
     "headerSelector": ".desktop-header-section",
     "mobileHeaderSelector": ".iPad_header",
     "mobileNavSelector": "#mySidenav",
-    "overflowIgnore": ["[class*=\"yotpo\"]", ".scroller", ".zf-templateWidth"],
+    "overflowIgnore": [
+      "[class*=\"yotpo\"]",
+      ".scroller",
+      ".zf-templateWidth"
+    ],
     "copyrightText": "AccessDoorsAndPanels",
     "footerLocationText": "Saint Louis",
-    "warehousesLink": { "href": "/warehouses/", "text": "Warehouses" },
-    "imageHosts": ["accessdoorsandpanels.com", "bigcommerce.com"],
+    "warehousesLink": {
+      "href": "/warehouses/",
+      "text": "Warehouses"
+    },
+    "imageHosts": [
+      "accessdoorsandpanels.com",
+      "bigcommerce.com"
+    ],
     "partnerLinks": null,
     "footer": {
       "rootSelector": "footer.footer",
@@ -44,27 +68,36 @@
     "subcategory": "/products/popular-picks/fire-rated/",
     "selectors": {
       "breadcrumbs": ".breadcrumbs",
-      "breadcrumbHome": null,
+      "breadcrumbHome": "a.breadcrumb-label",
       "sidebar": ".page-sidebar",
       "sidebarBlocks": ".page-sidebar .ss-facet-container",
       "sidebarLinks": ".page-sidebar a.ss-list-link",
       "subcategoryBox": null,
-      "pagination": null
+      "pagination": {
+        "container": ".ss-pagination-container",
+        "active": ".pagination-item--current",
+        "links": "a.pagination-link",
+        "next": ".pagination-item--next a",
+        "pageTwoToken": "p=2"
+      }
     }
   },
   "products": {
     "default": "/18-x-18-fire-resistive-steel-access-door-milcor/",
-    "known": ["/18-x-18-fire-resistive-steel-access-door-milcor/"]
+    "known": [
+      "/18-x-18-fire-resistive-steel-access-door-milcor/"
+    ]
   },
   "forms": {
     "productInfo": {
-      "path": "default-product",
       "submitUrlPattern": "**/forms.zohopublic.com/**/ADAPProductForm/**/submit"
     },
     "quoteRequest": {
       "path": "/new-request-a-quote/",
       "submitUrlPattern": "**/forms.zohopublic.com/**/ADAPRequestAQuote/**/submit",
-      "optionalFields": ["Name_First"]
+      "optionalFields": [
+        "Name_First"
+      ]
     },
     "contact": {
       "path": "/contact-us/",
@@ -74,13 +107,19 @@
     "becomeVendor": {
       "path": "/bvl1/",
       "submitUrlPattern": "**/forms.zohopublic.com/**/ADAPcomApplyForVendor/**/submit"
-    }
+    },
+    "architectInquiries": null
   },
   "testEmailTemplate": "mauricio+{ts}@accessdoorsandpanels.com",
   "discovery": {
     "search": {
       "knownTerm": "fire-rated access door",
-      "expectedTokens": ["fire", "rated", "access", "door"],
+      "expectedTokens": [
+        "fire",
+        "rated",
+        "access",
+        "door"
+      ],
       "noResultsTerm": "zzzz-no-products-987654321"
     },
     "categories": [
@@ -106,14 +145,24 @@
     ],
     "selectors": {
       "breadcrumbs": ".breadcrumbs",
-      "breadcrumbHome": null,
-      "breadcrumbLabel": null,
+      "breadcrumbHome": "a.breadcrumb-label",
+      "breadcrumbLabel": ".breadcrumb-label",
       "galleryImage": "section[data-image-gallery] img",
       "description": ".productView-description",
       "relatedCarousel": null,
       "productInfoForm": "main .zf-templateWidth",
       "reviewsContainer": "#yotpo-reviews-main-widget",
       "pdfNewTab": false
+    }
+  },
+  "lighthouse": {
+    "thresholds": {
+      "plp": {
+        "accessibility": 70
+      },
+      "pdp": {
+        "accessibility": 70
+      }
     }
   }
 }

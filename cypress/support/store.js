@@ -146,8 +146,9 @@ const PLP_SELECTOR_DEFAULTS = {
   // are interleaved in the same grid — so it sets this to null to skip the per-card price check
   // (PDP/JSON-LD price coverage still applies on priced products). Nullable.
   cardPrice: '[class*="price"]',
-  // Detailed pagination markup (BESTUS SearchSpring template). Stores on the older
-  // template (ADAP: .ss-pagination-container/.pagination-item) set this to null —
+  // Detailed pagination markup (BESTUS SearchSpring template). Overridden per store —
+  // e.g. ADAP's older template uses .ss-pagination-container/li.pagination-item with ?p=2.
+  // Nullable: a store whose theme has no detailed pagination markup sets this to null —
   // the generic pagination-presence test and the discovery page-2 test still run.
   pagination: {
     container: '.ss__pagination',

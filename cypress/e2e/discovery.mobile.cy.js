@@ -57,7 +57,9 @@ describeIfStore(site.discovery, 'Product discovery mobile', () => {
         // results <h1>) — gate via discovery.search.resultsHaveHeading:false. The products check
         // below still proves the search rendered.
         if (discovery.search.resultsHaveHeading !== false) {
-          cy.get('h1.page-heading, .page-heading, h1').first().should('exist').invoke('text').should('not.be.empty');
+          // filter(':visible') mirrors assertDiscoveryPage/discovery.cy.js — some themes render
+          // hidden mobile-only headings (ADC/ADAP) that .first() would otherwise grab.
+          cy.get('h1.page-heading, .page-heading, h1').filter(':visible').first().should('exist').invoke('text').should('not.be.empty');
         }
         assertSearchResults(discovery.search.expectedTokens);
         cy.get(MOBILE_NAV).should('exist');

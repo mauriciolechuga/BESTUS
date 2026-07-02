@@ -190,7 +190,7 @@ export function assertDiscoveryPage({ heading } = {}) {
   assertProductCards(3);
 }
 
-export function applySortOption(label, urlFallback = { urlHash: '#/ps:calculated_price:asc' }) {
+export function applySortOption(label, urlFallback = {}) {
   // Normalise to a space-separated, alphanumeric phrase so "Price (Low to High)",
   // "Price: Low to High", etc. all reduce to "price low to high". Matching the contiguous
   // phrase (not loose tokens) is what distinguishes "low to high" from "high to low".
@@ -226,14 +226,21 @@ export function applySortOption(label, urlFallback = { urlHash: '#/ps:calculated
       return cy.wrap(action).click({ force: true }).then(() => waitForProducts());
     }
 
-    // Fallback: drive the sort via the URL. The live store is hash-routed
-    // (…/products/#/ps:calculated_price:asc); other stores may use a query param.
+    // Fallback: drive the sort via the URL — hash-routed SearchSpring stores pass
+    // urlHash (discovery.sort.urlHash); native-BC stores pass queryParam/queryValue
+    // (discovery.sort.queryParam/queryValue, e.g. ?sort=priceasc).
     return cy.location('href').then((href) => {
       const url = new URL(href);
       if (urlFallback.urlHash) {
         url.hash = urlFallback.urlHash;
       } else if (urlFallback.queryParam) {
         url.searchParams.set(urlFallback.queryParam, urlFallback.queryValue);
+      } else {
+        // Re-visiting the same URL would silently "pass" without sorting — fail loudly instead.
+        throw new Error(
+          `applySortOption: no sort select/action matched "${label}" and no URL fallback ` +
+            '(discovery.sort.urlHash or queryParam/queryValue) is configured for this store.'
+        );
       }
       return cy.visit(`${url.pathname}${url.search}${url.hash}`).then(() => waitForProducts());
     });
@@ -467,8 +474,8 @@ export function makeConsoleErrorSpy({ ignore = [] } = {}) {
       cy.then(() => {
         // Build the full text of a console.error call from ALL its args. The fetch wrapper logs
         // "[fetch failed] <url>" as the first arg and the Error (whose message is "Failed to
-        // fetch") as the second, so the ignore list must scan every arg — not just args[0] — or
-        // DEFAULT_IGNORE's "Failed to fetch" never matches third-party beacon noise (leadsy.ai, etc).
+        // fetch") as the second, so ignore substrings must scan every arg — not just args[0] —
+        // or a caller-supplied ignore entry could never match the wrapped-fetch error text.
         const callText = (args) =>
           args.map((a) => (a instanceof Error ? `${a.message} ${a.stack || ''}` : String(a))).join(' ');
         const calls = (ref.spy.args || []).filter(
