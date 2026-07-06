@@ -1,5 +1,25 @@
 {
   "_notes": "Configured June 2026. Standard BigCommerce theme (ul.productGrid, h1.page-heading, .breadcrumbs). No SearchSpring — native BC sort (?sort=priceasc) and search (search.php). Native BC search always returns results — no zero-result state. Products have prices (not quote-only). Footer: plain <footer> (no .tcsFooter), three sibling sections (footer-top / footer-bottom / footer-copyright), h3 headings in .box divs. Mobile nav is #menu (native BC toggle container). No sidebar on category pages. Subcategory boxes use li.subcategory_box / a.nameTitle / a.subcategory_image. PDP: #zoho_product_form for product info form, section[data-image-gallery] img for gallery, .productView-description for description. No related carousel, no Yotpo reviews, no SS recently-viewed.",
+  "_absentFeatures": [
+    {
+      "configKey": "forms.proClub",
+      "fillWith": "{ \"path\": \"/<form-page>/\", \"submitUrlPattern\": \"**/forms.zohopublic.com/**/<ZohoFormName>/**/submit\" }",
+      "verifiedAbsent": "no Pro Club program on live site (June 2026 onboarding)",
+      "enables": "pro-club-form.cy.js"
+    },
+    {
+      "configKey": "forms.becomeVendor",
+      "fillWith": "{ \"path\": \"/<form-page>/\", \"submitUrlPattern\": \"**/forms.zohopublic.com/**/<ZohoFormName>/**/submit\" }",
+      "verifiedAbsent": "no become-a-vendor page on live site (June 2026 onboarding)",
+      "enables": "become-vendor-form.cy.js"
+    },
+    {
+      "configKey": "discovery.search.noResultsTerm",
+      "fillWith": "\"zzzz-no-products-987654321\"",
+      "verifiedAbsent": "native BC search always returns results - no zero-result state exists; fill only if store adopts a search engine with a no-results page",
+      "enables": "discovery.cy.js no-results test"
+    }
+  ],
   "storeCode": "CAD",
   "baseUrl": "https://www.californiaaccessdoors.com",
   "homePath": "/",
@@ -7,15 +27,30 @@
   "branding": {
     "copyrightText": "California Access Doors",
     "footerLocationText": "San Francisco",
-    "warehousesLink": { "href": "/warehouses/", "text": "WAREHOUSES" },
-    "imageHosts": ["californiaaccessdoors.com", "bigcommerce.com"],
+    "warehousesLink": {
+      "href": "/warehouses/",
+      "text": "WAREHOUSES"
+    },
+    "imageHosts": [
+      "californiaaccessdoors.com",
+      "bigcommerce.com"
+    ],
     "partnerLinks": null,
     "mobileNavSelector": "#menu",
     "footer": {
       "rootSelector": "footer",
-      "sections": ["footer .footer-top", "footer .footer-bottom", "footer .footer-copyright"],
+      "sections": [
+        "footer .footer-top",
+        "footer .footer-bottom",
+        "footer .footer-copyright"
+      ],
       "headingSelector": "footer .box h3",
-      "headings": ["WHAT'S IN STORE", "SECURE SHOPPING", "MY ACCOUNT", "CONTACT INFO"],
+      "headings": [
+        "WHAT'S IN STORE",
+        "SECURE SHOPPING",
+        "MY ACCOUNT",
+        "CONTACT INFO"
+      ],
       "navLinks": "footer .box ul li a",
       "contactInfoBox": "footer .box:last-child",
       "minContactBoxes": 1,
@@ -57,13 +92,14 @@
   },
   "forms": {
     "productInfo": {
-      "path": "default-product",
       "submitUrlPattern": "**/forms.zohopublic.com/**/CADProductForm/**/submit"
     },
     "quoteRequest": {
       "path": "/quote-request/",
       "submitUrlPattern": "**/forms.zohopublic.com/**/CADRequestAQuote/**/submit",
-      "optionalFields": ["Name_First"]
+      "optionalFields": [
+        "Name_First"
+      ]
     },
     "contact": {
       "path": "/contact-us/",
@@ -80,7 +116,12 @@
   "discovery": {
     "search": {
       "knownTerm": "fire rated access door",
-      "expectedTokens": ["fire", "rated", "access", "door"],
+      "expectedTokens": [
+        "fire",
+        "rated",
+        "access",
+        "door"
+      ],
       "noResultsTerm": null,
       "pdpUrlClean": false
     },
@@ -94,7 +135,9 @@
     "sort": {
       "category": "/fire-rated-access-doors/",
       "label": "Price: Ascending",
-      "urlHash": null
+      "urlHash": null,
+      "queryParam": "sort",
+      "queryValue": "priceasc"
     }
   },
   "pdp": {

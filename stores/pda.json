@@ -1,4 +1,31 @@
 {
+  "_notes": "Spanish-language MX storefront. PLP main is /mas-vendidos/ (4 test products); /productos/entrega-rapida-en-mexico/ has enough products for pagination and sort. Categories are being implemented — revisit PLP main, subcategory, discovery categories, and sort/pagination paths once full category tree is live. Known intentional failures: (1) PLP subcategory /mas-vendidos/resistentes-al-fuego/ has 0 products; (2) seo.cy.js Product JSON-LD test fails — Product schema has no offers/priceCurrency/availability — BC admin must configure structured data. Klaviyo email popup present (force:true already in ZohoFormPage). No Pro Club / architects / product-info forms.",
+  "_absentFeatures": [
+    {
+      "configKey": "forms.productInfo",
+      "fillWith": "{ \"submitUrlPattern\": \"**/forms.zohopublic.com/**/<ZohoFormName>/**/submit\" } plus pdp.selectors.productInfoForm",
+      "verifiedAbsent": "PDPs have no Zoho product-info form (June 2026 onboarding)",
+      "enables": "product-form.cy.js + PDP form checks"
+    },
+    {
+      "configKey": "forms.proClub",
+      "fillWith": "{ \"path\": \"/<form-page>/\", \"submitUrlPattern\": \"**/forms.zohopublic.com/**/<ZohoFormName>/**/submit\" }",
+      "verifiedAbsent": "no Pro Club program on live site (June 2026 onboarding)",
+      "enables": "pro-club-form.cy.js"
+    },
+    {
+      "configKey": "forms.becomeVendor",
+      "fillWith": "{ \"path\": \"/<form-page>/\", \"submitUrlPattern\": \"**/forms.zohopublic.com/**/<ZohoFormName>/**/submit\" }",
+      "verifiedAbsent": "no become-a-vendor page on live site (June 2026 onboarding)",
+      "enables": "become-vendor-form.cy.js"
+    },
+    {
+      "configKey": "forms.architectInquiries",
+      "fillWith": "{ \"path\": \"/<form-page>/\", \"submitUrlPattern\": \"**/forms.zohopublic.com/**/<ZohoFormName>/**/submit\" }",
+      "verifiedAbsent": "no architects page on live site (June 2026 onboarding)",
+      "enables": "architect-form.cy.js"
+    }
+  ],
   "storeCode": "PDA",
   "baseUrl": "https://puertasdeacceso.com.mx",
   "homePath": "/",
@@ -6,15 +33,27 @@
   "branding": {
     "copyrightText": "Puertas de Acceso",
     "footerLocationText": null,
-    "warehousesLink": { "href": "/centros-de-distribucion/", "text": "Mapa de Almacenes" },
-    "imageHosts": ["puertasdeacceso.com.mx", "bigcommerce.com"],
+    "warehousesLink": {
+      "href": "/centros-de-distribucion/",
+      "text": "Mapa de Almacenes"
+    },
+    "imageHosts": [
+      "puertasdeacceso.com.mx",
+      "bigcommerce.com"
+    ],
     "partnerLinks": null,
     "currency": "MXN",
     "footer": {
       "rootSelector": "footer",
-      "sections": ["footer .Informacion-direccion", "footer .Copyright"],
+      "sections": [
+        "footer .Informacion-direccion",
+        "footer .Copyright"
+      ],
       "headingSelector": "footer h2",
-      "headings": ["Información:", "Dirección:"],
+      "headings": [
+        "Información:",
+        "Dirección:"
+      ],
       "navLinks": "footer .box ul li a",
       "contactInfoBox": "footer .box:last-child",
       "minContactBoxes": 1,
@@ -62,13 +101,18 @@
       "path": "/cotiza/",
       "noQuantityDropdown": true,
       "addressField": "SingleLine4",
-      "optionalFields": ["Name_Last"],
+      "optionalFields": [
+        "Name_Last"
+      ],
       "submitUrlPattern": "**/forms.zohopublic.com/**/PuertasdeAccesoSolicituddeCotizacin/**/submit"
     },
     "contact": {
       "path": "/contactenos/",
       "inquiryType": "Ventas y Productos",
-      "inquiryTypes": ["Ventas y Productos", "Servicio al Cliente y Pedidos Existentes"],
+      "inquiryTypes": [
+        "Ventas y Productos",
+        "Servicio al Cliente y Pedidos Existentes"
+      ],
       "submitUrlPattern": "**/forms.zohopublic.com/**/ContctanosPuertasdeAccesoNew/**/submit"
     },
     "proClub": null,
@@ -79,7 +123,9 @@
   "discovery": {
     "search": {
       "knownTerm": "test",
-      "expectedTokens": ["test"],
+      "expectedTokens": [
+        "test"
+      ],
       "noResultsTerm": "zzzz-no-products-987654321",
       "pdpUrlClean": false,
       "resultsHaveHeading": false
@@ -93,7 +139,9 @@
     "sort": {
       "category": "/productos/entrega-rapida-en-mexico/",
       "label": "Precio: ascendente",
-      "urlHash": null
+      "urlHash": null,
+      "queryParam": "sort",
+      "queryValue": "priceasc"
     }
   },
   "pdp": {
@@ -114,6 +162,5 @@
       "reviewsContainer": null,
       "productInfoForm": null
     }
-  },
-  "_notes": "Spanish-language MX storefront. PLP main is /mas-vendidos/ (4 test products); /productos/entrega-rapida-en-mexico/ has enough products for pagination and sort. Categories are being implemented — revisit PLP main, subcategory, discovery categories, and sort/pagination paths once full category tree is live. Known intentional failures: (1) PLP subcategory /mas-vendidos/resistentes-al-fuego/ has 0 products; (2) seo.cy.js Product JSON-LD test fails — Product schema has no offers/priceCurrency/availability — BC admin must configure structured data. Klaviyo email popup present (force:true already in ZohoFormPage). No Pro Club / architects / product-info forms."
+  }
 }

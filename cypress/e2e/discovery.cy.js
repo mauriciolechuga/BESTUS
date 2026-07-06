@@ -69,7 +69,11 @@ describeIfStore(site.discovery, 'Product discovery', () => {
       // sort to the top, so the visible grid often shows no prices. assertSortApplied verifies the
       // sort took effect (hash + re-rendered set) and checks ascending order only if prices show.
       getVisibleProductTitles().then((defaultOrder) => {
-        applySortOption(discovery.sort.label, { urlHash: discovery.sort.urlHash }).then(() => {
+        applySortOption(discovery.sort.label, {
+          urlHash: discovery.sort.urlHash,
+          queryParam: discovery.sort.queryParam,
+          queryValue: discovery.sort.queryValue,
+        }).then(() => {
           assertSortApplied(defaultOrder, { expectedHash: discovery.sort.urlHash });
         });
       });

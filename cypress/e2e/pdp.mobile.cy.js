@@ -85,6 +85,8 @@ ALL_DEVICES.forEach(({ name, width, height, touchTarget }) => {
     itIfStore(!(site.pdp && site.pdp.quoteOnly), 'quantity input is visible and defaults to 1', () => {
       cy.get('input[name="qty[]"]').should('be.visible').and('have.value', '1');
       // Stepper buttons are nullable — BESTCA's Snap theme has none (see PDP_SELECTOR_DEFAULTS).
+      // 'exist' (not 'be.visible') is deliberate: mobile specs assert DOM presence for elements
+      // themes hide at phone widths (see "Mobile Testing Pattern" in CLAUDE.md).
       if (sel.qtyIncrement) cy.get(sel.qtyIncrement).should('exist');
       if (sel.qtyDecrement) cy.get(sel.qtyDecrement).should('exist');
     }, 'store is quote-only — no price, no cart, no lead-time widget (pdp.quoteOnly)');
@@ -125,7 +127,7 @@ ALL_DEVICES.forEach(({ name, width, height, touchTarget }) => {
     // opens a Klaviyo popup that locks the body — under Electron this leaves zero header
     // interactive elements measurable as :visible (the 53px logo renders fine in real browsers).
     // branding.skipMobileTouchTarget skips it in Electron only; Chrome/Firefox still run it.
-    itIfStore(!(site.branding && site.branding.skipMobileTouchTarget && Cypress.browser.name === 'electron'), `interactive header elements meet minimum touch target height (${touchTarget}px)`, () => {
+    itIfStore(!(site.branding.skipMobileTouchTarget && Cypress.browser.name === 'electron'), `interactive header elements meet minimum touch target height (${touchTarget}px)`, () => {
       assertMaxTouchTarget(touchTarget);
     }, "header touch targets unmeasurable under Electron (skipMobileTouchTarget); runs in Chrome/Firefox");
   });

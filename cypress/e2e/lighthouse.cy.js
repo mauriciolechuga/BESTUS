@@ -29,37 +29,54 @@ const DESKTOP_OPTS = {
   throttlingMethod: "simulate",
 };
 
-// Thresholds reflect actual throttled-desktop scores with headroom for variance.
-// Unthrottled runs score higher; PageSpeed mobile runs score lower.
-// These BESTUS-baseline defaults are overridable per store via the top-level `lighthouse.thresholds`
-// in stores/<code>.json — different store themes have different baselines (e.g. ADC's "footer-new"
-// theme has real accessibility deficiencies that floor it in the high 60s/low 70s). Adjust the
-// per-store override (not these defaults) when a store's live-site baseline differs.
-const THRESHOLD_DEFAULTS = { performance: 50, accessibility: 80, seo: 70 };
-const THRESHOLDS = {
-  ...THRESHOLD_DEFAULTS,
-  ...((site.lighthouse && site.lighthouse.thresholds) || {}),
+// Standardized per-page-type floors (throttled desktop, headroom for variance),
+// calibrated against a full 27-audit sweep of all 9 live stores (July 2 2026):
+// - performance: homepage 50 (hero/carousel weight tolerated), PLP 45 (most at-risk —
+//   faceted nav, filters, product image/JS weight), PDP 50 (conversion-critical)
+// - accessibility 80: healthy themes score 80-98; structurally lower themes get
+//   per-store overrides (the sanctioned exception)
+// - best-practices 65: every BigCommerce storefront in the fleet scores 67-75
+//   (third-party cookies, console noise, legacy APIs are platform-level), so 65 is
+//   the honest floor; a drop below it means a NEW failing audit worth investigating
+// - seo 75: typical live scores are 83-92 with dips to 75; 75 keeps the check
+//   meaningful while letting healthy pages pass (FSE's missing homepage meta
+//   description scores 67 and correctly still fails)
+// Overridable per store and per page type via `lighthouse.thresholds.<homepage|plp|pdp>`
+// in stores/<code>.json — a theme-level structural floor (e.g. ADC's "footer-new"
+// accessibility) is the only sanctioned reason to lower one; adjust the per-store
+// override, not these defaults.
+const THRESHOLD_DEFAULTS = {
+  homepage: { performance: 50, accessibility: 80, "best-practices": 65, seo: 75 },
+  plp: { performance: 45, accessibility: 80, "best-practices": 65, seo: 75 },
+  pdp: { performance: 50, accessibility: 80, "best-practices": 65, seo: 75 },
 };
+
+function thresholdsFor(pageType) {
+  const overrides =
+    (site.lighthouse &&
+      site.lighthouse.thresholds &&
+      site.lighthouse.thresholds[pageType]) ||
+    {};
+  return { ...THRESHOLD_DEFAULTS[pageType], ...overrides };
+}
 
 describe("Lighthouse audit", () => {
   before(function () {
     if (Cypress.browser.name !== "chrome") this.skip();
   });
 
-  it.skip("homepage meets score thresholds", () => {
+  it("homepage meets score thresholds", () => {
     cy.visit(homePath());
-    cy.lighthouse(THRESHOLDS, DESKTOP_OPTS);
+    cy.lighthouse(thresholdsFor("homepage"), DESKTOP_OPTS);
   });
 
-  itIfStore(false, "PLP meets score thresholds", () => {
-    // site.plp instead of false to avoid skipping the test if the store has no PLPs
+  itIfStore(site.plp, "PLP meets score thresholds", () => {
     cy.visit(storePath(site.plp.main));
-    cy.lighthouse(THRESHOLDS, DESKTOP_OPTS);
+    cy.lighthouse(thresholdsFor("plp"), DESKTOP_OPTS);
   });
 
-  itIfStore(false, "a random PDP meets score thresholds", () => {
-    //site.pdp instead of false to avoid skipping the test if the store has no PDPs
+  itIfStore(site.pdp, "a random PDP meets score thresholds", () => {
     cy.visit(storePath(pickRandom(site.pdp.popular)));
-    cy.lighthouse(THRESHOLDS, DESKTOP_OPTS);
+    cy.lighthouse(thresholdsFor("pdp"), DESKTOP_OPTS);
   });
 });

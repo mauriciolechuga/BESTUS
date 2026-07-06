@@ -1,4 +1,19 @@
 {
+  "_notes": "Baseline/default store — relies on code defaults in store.js (no plp.selectors/pdp.selectors/branding.footer). July 2 2026: sort label corrected to the live wording \"Price: Low to High\" (hash #/ps:calculated_price:asc re-verified live — the ps: prefix is correct for this older SearchSpring template); contact/quote/proClub submitUrlPatterns tightened to named Zoho forms (BESTContactUs, BESTRequestQuote1, BestAccessDoorsProClubVIPProgramApplication).",
+  "_absentFeatures": [
+    {
+      "configKey": "forms.architectInquiries",
+      "fillWith": "{ \"path\": \"/<form-page>/\", \"submitUrlPattern\": \"**/forms.zohopublic.com/**/<ZohoFormName>/**/submit\" }",
+      "verifiedAbsent": "no /architects/ page on live site (June 2026 onboarding)",
+      "enables": "architect-form.cy.js"
+    },
+    {
+      "configKey": "forms.becomeVendor",
+      "fillWith": "{ \"path\": \"/<form-page>/\", \"submitUrlPattern\": \"**/forms.zohopublic.com/**/<ZohoFormName>/**/submit\" }",
+      "verifiedAbsent": "no become-a-vendor page on live site (June 2026 onboarding)",
+      "enables": "become-vendor-form.cy.js"
+    }
+  ],
   "storeCode": "BESTUS",
   "baseUrl": "https://www.bestaccessdoors.com",
   "homePath": "/",
@@ -6,13 +21,21 @@
   "branding": {
     "copyrightText": "Best Access Doors",
     "footerLocationText": "New York",
-    "warehousesLink": { "href": "/warehouses/", "text": "Warehouses" },
-    "imageHosts": ["bestaccessdoors.com", "bigcommerce.com"],
+    "warehousesLink": {
+      "href": "/warehouses/",
+      "text": "Warehouses"
+    },
+    "imageHosts": [
+      "bestaccessdoors.com",
+      "bigcommerce.com"
+    ],
     "partnerLinks": [
       "https://www.bimobject.com/en/best-access-doors?location=us",
       "https://www.rib-software.com/en/rib-speclink"
     ],
-    "overflowIgnore": ["[class*=\"yotpo\"]"]
+    "overflowIgnore": [
+      "[class*=\"yotpo\"]"
+    ]
   },
   "plp": {
     "main": "/products/",
@@ -22,31 +45,39 @@
   },
   "products": {
     "default": "/24-x-24-fire-rated-insulated-access-door-with-exposed-flange/",
-    "known": ["/24-x-24-fire-rated-insulated-access-door-with-exposed-flange/"]
+    "known": [
+      "/24-x-24-fire-rated-insulated-access-door-with-exposed-flange/"
+    ]
   },
   "forms": {
     "productInfo": {
-      "path": "default-product",
       "submitUrlPattern": "**/forms.zohopublic.com/**/BESTProductForm/**/submit"
     },
     "quoteRequest": {
       "path": "/request-a-quote/",
-      "submitUrlPattern": "**/forms.zohopublic.com/**/submit"
+      "submitUrlPattern": "**/forms.zohopublic.com/**/BESTRequestQuote1/**/submit"
     },
     "contact": {
       "path": "/contact-us/",
-      "submitUrlPattern": "**/forms.zohopublic.com/**/submit"
+      "submitUrlPattern": "**/forms.zohopublic.com/**/BESTContactUs/**/submit"
     },
     "proClub": {
       "path": "/pro-club-application/",
-      "submitUrlPattern": "**/forms.zohopublic.com/**/submit"
-    }
+      "submitUrlPattern": "**/forms.zohopublic.com/**/BestAccessDoorsProClubVIPProgramApplication/**/submit"
+    },
+    "architectInquiries": null,
+    "becomeVendor": null
   },
   "testEmailTemplate": "mauricio+{ts}@bestaccessdoors.com",
   "discovery": {
     "search": {
       "knownTerm": "fire-rated access door",
-      "expectedTokens": ["fire", "rated", "access", "door"],
+      "expectedTokens": [
+        "fire",
+        "rated",
+        "access",
+        "door"
+      ],
       "noResultsTerm": "zzzz-no-products-987654321"
     },
     "categories": [
@@ -58,7 +89,7 @@
     "multiPageCategory": "/products/",
     "sort": {
       "category": "/products/",
-      "label": "Price Low to High",
+      "label": "Price: Low to High",
       "urlHash": "#/ps:calculated_price:asc"
     }
   },

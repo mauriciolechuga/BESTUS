@@ -27,6 +27,7 @@
         <button class="tab active" data-tab="run">Run tests</button>
         <button class="tab" data-tab="history">History</button>
         <button id="theme-toggle" class="theme-toggle" type="button" title="Switch light/dark">🌙 Dark</button>
+        <button id="exit-btn" class="exit-btn" type="button" title="Stop everything and close the dashboard">⏻ Exit</button>
       </nav>
     </header>
 
@@ -46,6 +47,7 @@
           </div>
           <div class="run-actions">
             <button id="run-btn" class="primary" type="button" disabled>▶ Run selected</button>
+            <button id="stop-btn" class="danger" type="button" hidden>■ Stop run</button>
             <button id="rerun-btn" class="warn" type="button" hidden>↻ Re-run failed</button>
             <div id="status-line" class="status-line">Pick one or more stores, then press Run.</div>
           </div>

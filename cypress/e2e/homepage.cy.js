@@ -22,7 +22,7 @@ describe('Homepage', { testIsolation: false }, () => {
 
   it('loads with key elements visible', () => {
     cy.get(header).should('be.visible');
-    cy.get('footer').should('be.visible');
+    cy.get(footer.rootSelector).should('be.visible');
     cy.get('[class*="carousel"], [class*="hero"], [class*="banner"], main, [role="main"]').first().should('be.visible');
   });
 

@@ -121,6 +121,7 @@ ALL_DEVICES.forEach(({ name, width, height, touchTarget }) => {
 PHONES.forEach(({ name, width, height }) => {
   describe(`Homepage – ${name} landscape (${height}x${width})`, { testIsolation: false }, () => {
     before(() => {
+      blockThirdParty(); // testIsolation:false — intercepts must be registered in before() (see checks.js)
       cy.viewport(height, width); // landscape: swap width and height
       cy.visit(homePath());
     });

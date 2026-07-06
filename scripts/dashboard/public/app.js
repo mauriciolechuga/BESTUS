@@ -14,6 +14,7 @@
   const cards = new Map(); // code -> { root, statusEl, detailEl }
   let lastSummaries = {}; // code -> sidecar (for re-run failed)
   let running = false;
+  let es = null; // EventSource, held so the Exit button can close it
 
   // ── color tiers (mirror scripts/run-all.js storeColor) ────────────────────
   function tierOf(summary) {
@@ -182,9 +183,12 @@
       links.appendChild(vidToggle);
 
       for (const test of fs.tests || []) {
+        // Sidecar titles join describe/it segments with " › " for display, but
+        // Cypress names screenshot files with " -- " between segments.
+        const fileTitle = test.split(' › ').join(' -- ');
         const shotUrl =
           `/artifacts/screenshots/${code}/${encodeURIComponent(base)}/` +
-          encodeURIComponent(`${test} (failed).png`);
+          encodeURIComponent(`${fileTitle} (failed).png`);
         const a = el('a', 'link-btn', '🖼 screenshot');
         a.href = shotUrl;
         a.target = '_blank';
@@ -211,6 +215,8 @@
     running = on;
     updateRunButton();
     $('#rerun-btn').hidden = on || !hasFailures();
+    $('#stop-btn').hidden = !on;
+    $('#stop-btn').disabled = false;
     $('#status-line').textContent = on
       ? 'Running… leave this open. Each store takes several minutes.'
       : 'Run finished. See cards below.';
@@ -245,6 +251,29 @@
     postRun({ stores: sel }, sel);
   });
 
+  $('#stop-btn').addEventListener('click', async () => {
+    if (!confirm('Stop the current test run? Stores still in progress will have no results.')) return;
+    $('#stop-btn').disabled = true;
+    $('#status-line').textContent = 'Stopping… waiting for the test processes to close.';
+    try {
+      await fetch('/api/stop', { method: 'POST' });
+    } catch (e) {
+      $('#stop-btn').disabled = false;
+    }
+  });
+
+  $('#exit-btn').addEventListener('click', async () => {
+    if (!confirm('Exit the dashboard? This stops any running tests and closes the dashboard window.')) return;
+    if (es) es.close(); // stop SSE auto-reconnect before the server goes away
+    try {
+      await fetch('/api/exit', { method: 'POST' });
+    } catch (e) {
+      /* server may already be gone */
+    }
+    document.body.innerHTML =
+      '<div class="shutdown-msg">✔ Dashboard stopped.<br /><span>You can close this tab.</span></div>';
+  });
+
   $('#rerun-btn').addEventListener('click', () => {
     const specsByStore = {};
     for (const [code, s] of Object.entries(lastSummaries)) {
@@ -266,7 +295,7 @@
   }
 
   function connectStream() {
-    const es = new EventSource('/api/stream');
+    es = new EventSource('/api/stream');
     es.addEventListener('hello', (e) => {
       const d = JSON.parse(e.data);
       if (d.running) setRunning(true);
@@ -288,6 +317,22 @@
         }
       }
       setRunning(false);
+    });
+    es.addEventListener('run-stopped', (e) => {
+      const d = JSON.parse(e.data);
+      if (d.summaries) Object.assign(lastSummaries, d.summaries);
+      // Any card still queued/running never finished — mark it stopped.
+      for (const [, rec] of cards) {
+        const st = rec.statusEl.textContent;
+        if (st === 'queued' || st === 'running…') {
+          rec.root.className = 'card stopped';
+          rec.statusEl.textContent = 'stopped';
+          rec.detailEl.innerHTML = '';
+          rec.detailEl.appendChild(el('div', 'muted', 'Run was stopped before this store finished.'));
+        }
+      }
+      setRunning(false);
+      $('#status-line').textContent = 'Run stopped. You can start a new run.';
     });
     es.onerror = () => {
       /* EventSource auto-reconnects */

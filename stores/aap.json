@@ -1,5 +1,31 @@
 {
-  "_notes": "Configured June 2026. AAP runs the SearchSpring Snap theme (ul.ss__results, .ss__pagination__*). Category taxonomy: /fire-rated/, /flush/, /recessed/, etc. (no /products/ umbrella). No pro-club form (/pro-club-application/ 404s). No subcategory boxes on any category page (subcategoryBox: null). Qty stepper buttons absent (no data-action inc/dec; bare .form-increment input). Related carousel is SS recommendation (.ss__recommendation--carousel). Footer: bare <footer> with .box h3 headings, div.copyright for copyright text; phone in footer-bottom-col (1 tel: link). Mobile nav is #mySidenav.",
+  "_notes": "Configured June 2026. AAP runs the SearchSpring Snap theme (ul.ss__results, .ss__pagination__*). Category taxonomy: /fire-rated/, /flush/, /recessed/, etc. (no /products/ umbrella). No pro-club form (/pro-club-application/ 404s). No subcategory boxes on any category page (subcategoryBox: null). Qty stepper buttons absent (no data-action inc/dec; bare .form-increment input). Related carousel is SS recommendation (.ss__recommendation--carousel). Footer: bare <footer> with .box h3 headings, div.copyright for copyright text; phone in footer-bottom-col (1 tel: link). Mobile nav is #mySidenav. LIGHTHOUSE (calibrated July 2 2026, live scores homepage a11y 66 / plp 73 / pdp 64): theme structurally below the 80 a11y default -> per-page accessibility floors 60/70/60. Partly tied to the known sub-44px touch-target deficiency: when the AAP dev CSS fix ships, re-measure and raise these floors.",
+  "_absentFeatures": [
+    {
+      "configKey": "forms.proClub",
+      "fillWith": "{ \"path\": \"/<form-page>/\", \"submitUrlPattern\": \"**/forms.zohopublic.com/**/<ZohoFormName>/**/submit\" }",
+      "verifiedAbsent": "/pro-club-application/ returns 404 (verified June 2026)",
+      "enables": "pro-club-form.cy.js"
+    },
+    {
+      "configKey": "forms.becomeVendor",
+      "fillWith": "{ \"path\": \"/<form-page>/\", \"submitUrlPattern\": \"**/forms.zohopublic.com/**/<ZohoFormName>/**/submit\" }",
+      "verifiedAbsent": "no become-a-vendor page on live site (June 2026 onboarding)",
+      "enables": "become-vendor-form.cy.js"
+    },
+    {
+      "configKey": "forms.architectInquiries",
+      "fillWith": "{ \"path\": \"/<form-page>/\", \"submitUrlPattern\": \"**/forms.zohopublic.com/**/<ZohoFormName>/**/submit\" }",
+      "verifiedAbsent": "no /architects/ page on live site (June 2026 onboarding)",
+      "enables": "architect-form.cy.js"
+    },
+    {
+      "configKey": "plp.subcategory",
+      "fillWith": "\"/<parent-category>/<child-category>/\"",
+      "verifiedAbsent": "flat category taxonomy - no child categories exist (June 2026 onboarding)",
+      "enables": "plp.cy.js subcategory suite"
+    }
+  ],
   "storeCode": "AAP",
   "baseUrl": "https://www.acudoraccesspanels.com",
   "homePath": "/",
@@ -7,16 +33,32 @@
   "branding": {
     "copyrightText": "Acudor Access Panels",
     "footerLocationText": null,
-    "warehousesLink": { "href": "/warehouses/", "text": "Warehouses" },
-    "imageHosts": ["acudoraccesspanels.com", "bigcommerce.com"],
+    "warehousesLink": {
+      "href": "/warehouses/",
+      "text": "Warehouses"
+    },
+    "imageHosts": [
+      "acudoraccesspanels.com",
+      "bigcommerce.com"
+    ],
     "partnerLinks": null,
     "mobileNavSelector": "#mySidenav",
-    "overflowIgnore": ["[class*=\"yotpo\"]"],
+    "overflowIgnore": [
+      "[class*=\"yotpo\"]"
+    ],
     "footer": {
       "rootSelector": "footer",
-      "sections": ["footer .footer-top", "footer .copyright"],
+      "sections": [
+        "footer .footer-top",
+        "footer .copyright"
+      ],
       "headingSelector": "footer .box h3",
-      "headings": ["what’s in store", "SECURE SHOPPING", "MY ACCOUNT", "Contact us"],
+      "headings": [
+        "what’s in store",
+        "SECURE SHOPPING",
+        "MY ACCOUNT",
+        "Contact us"
+      ],
       "navLinks": "footer .box ul li a",
       "contactInfoBox": "footer .box",
       "minContactBoxes": 4,
@@ -59,7 +101,6 @@
   },
   "forms": {
     "productInfo": {
-      "path": "default-product",
       "submitUrlPattern": "**/forms.zohopublic.com/**/AAPProductForm/**/submit"
     },
     "quoteRequest": {
@@ -78,7 +119,12 @@
   "discovery": {
     "search": {
       "knownTerm": "fire rated access door",
-      "expectedTokens": ["fire", "rated", "access", "door"],
+      "expectedTokens": [
+        "fire",
+        "rated",
+        "access",
+        "door"
+      ],
       "noResultsTerm": "zzzz-no-products-987654321"
     },
     "categories": [
@@ -113,6 +159,20 @@
       "qtyIncrement": null,
       "qtyDecrement": null,
       "pdfNewTab": true
+    },
+    "_popularNote": "pdp.popular and products.known are independent lists and need not overlap; the 22-x-30 popular URL was verified live (200) July 2 2026."
+  },
+  "lighthouse": {
+    "thresholds": {
+      "homepage": {
+        "accessibility": 60
+      },
+      "plp": {
+        "accessibility": 70
+      },
+      "pdp": {
+        "accessibility": 60
+      }
     }
   }
 }

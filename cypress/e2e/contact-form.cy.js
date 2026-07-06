@@ -1,6 +1,6 @@
 import { ContactFormPage } from '../support/pages/ContactFormPage.js';
 import { getMultipartField } from '../support/utils/getMultipartField.js';
-import { getStore, describeIfStore } from '../support/store.js';
+import { getStore, describeIfStore, itIfStore } from '../support/store.js';
 
 const site = getStore();
 const contactForm = site.forms && site.forms.contact;
@@ -63,14 +63,17 @@ describeIfStore(contactForm, 'Contact Us form', () => {
       cy.interceptZoho('submit', submitPattern);
     });
 
-    it('lists both inquiry types in the dropdown', () => {
+    // Gated like quote-form's quantity dropdown: forms.contact.noInquiryDropdown skips the
+    // test on stores whose contact form has no select[name="Dropdown"]; forms.contact.inquiryTypes
+    // overrides the expected option wording per store (BESTUS wording is the default).
+    itIfStore(!(contactForm && contactForm.noInquiryDropdown), 'lists the expected inquiry types in the dropdown', () => {
       const inquiryTypes = (contactForm && contactForm.inquiryTypes) ||
         ['Sales & Products', 'Customer Service & Existing Orders'];
       cy.get('select[name="Dropdown"]').first().find('option').then(($options) => {
         const values = [...$options].map((o) => o.text.trim());
         inquiryTypes.forEach((type) => expect(values).to.include(type));
       });
-    });
+    }, "store's contact form has no inquiry-type dropdown (forms.contact.noInquiryDropdown)");
 
     it('shows an error when First Name is empty', () => {
       cy.uniqueEmail().then((email) => {

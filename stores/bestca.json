@@ -1,5 +1,19 @@
 {
-  "_notes": "Configured from the live site (June 2026). BESTCA runs a newer SearchSpring \"Snap\" storefront theme + CAD pricing, unlike BESTUS. Quirks: category taxonomy is /any-surface-access-doors/... (no /products/ — it 404s); product grid renders into ul.ss__results.ss__results--grid (not ul.productGrid); pagination uses .ss__pagination__* with ?page=2 query param; sort is a custom .ss__dropdown that hash-routes (#/sort:calculated_price:asc); breadcrumbs are plain .breadcrumbs (no home link); sidebar is a single-block .page-sidebar (so the >=2-block sidebar test is skipped via sidebar:null; the category tree is covered by bestSellers #treeView); PDP has no qty stepper buttons; reviews in #yotpo-reviews-main-widget; recently-viewed SearchSpring profile is \"similar\"; Product JSON-LD is present but priceCurrency is CAD.",
+  "_notes": "Configured from the live site (June 2026). BESTCA runs a newer SearchSpring \"Snap\" storefront theme + CAD pricing, unlike BESTUS. Quirks: category taxonomy is /any-surface-access-doors/... (no /products/ — it 404s); product grid renders into ul.ss__results.ss__results--grid (not ul.productGrid); pagination uses .ss__pagination__* with ?page=2 query param; sort is a custom .ss__dropdown that hash-routes (#/sort:calculated_price:asc); breadcrumbs are plain .breadcrumbs whose links (incl. the Home link) carry a.breadcrumb-label (verified live July 2 2026 — breadcrumbHome filled on plp/pdp selectors; the default .breadcrumb-label >=2 check also applies); sidebar is a single-block .page-sidebar (so the >=2-block sidebar test is skipped via sidebar:null; the category tree is covered by bestSellers #treeView); PDP has no qty stepper buttons; reviews in #yotpo-reviews-main-widget; recently-viewed SearchSpring profile is \"similar\"; Product JSON-LD is present but priceCurrency is CAD. Qty stepper absence re-verified live July 2 2026 (no button[data-action=inc/dec] in PDP HTML) — qtyIncrement/qtyDecrement stay null. Contact/quote/proClub submitUrlPatterns tightened to named Zoho forms July 2 2026 (BESTCAContactUsNew, BESTCARequestAQuote, BestAccessDoorsProClubCanadaApplication). LIGHTHOUSE (calibrated July 2 2026, live scores homepage a11y 70 / plp 78 / pdp 68): Snap theme is structurally below the 80 a11y default -> per-page accessibility floors 65/70/65 in lighthouse.thresholds.",
+  "_absentFeatures": [
+    {
+      "configKey": "forms.architectInquiries",
+      "fillWith": "{ \"path\": \"/<form-page>/\", \"submitUrlPattern\": \"**/forms.zohopublic.com/**/<ZohoFormName>/**/submit\" }",
+      "verifiedAbsent": "no /architects/ page on live site (June 2026 onboarding)",
+      "enables": "architect-form.cy.js"
+    },
+    {
+      "configKey": "forms.becomeVendor",
+      "fillWith": "{ \"path\": \"/<form-page>/\", \"submitUrlPattern\": \"**/forms.zohopublic.com/**/<ZohoFormName>/**/submit\" }",
+      "verifiedAbsent": "no become-a-vendor page on live site (June 2026 onboarding)",
+      "enables": "become-vendor-form.cy.js"
+    }
+  ],
   "storeCode": "BESTCA",
   "baseUrl": "https://www.bestaccessdoors.ca",
   "homePath": "/",
@@ -10,19 +24,27 @@
     "currency": "CAD",
     "mobileNavSelector": "div.Mobile_menu",
     "skipMobileTouchTarget": true,
-    "overflowIgnore": ["[class*=\"yotpo\"]"],
+    "overflowIgnore": [
+      "[class*=\"yotpo\"]"
+    ],
     "warehousesLink": {
       "href": "https://www.bestaccessdoors.ca/warehouses/",
       "text": "Warehouses"
     },
-    "imageHosts": ["bestaccessdoors.ca", "bigcommerce.com"],
+    "imageHosts": [
+      "bestaccessdoors.ca",
+      "bigcommerce.com"
+    ],
     "partnerLinks": [
       "https://www.bimobject.com/en/best-access-doors?location=us",
       "https://www.rib-software.com/en/rib-speclink"
     ],
     "footer": {
       "rootSelector": "footer.footer",
-      "sections": ["footer .footer-info", "footer .footer-copyright"],
+      "sections": [
+        "footer .footer-info",
+        "footer .footer-copyright"
+      ],
       "headingSelector": "footer .footer-info-heading",
       "headings": [
         "What's In Store",
@@ -46,7 +68,7 @@
     "subcategory": "/any-surface-access-doors/fire-rated-doors/drywall-flange/",
     "selectors": {
       "breadcrumbs": ".breadcrumbs",
-      "breadcrumbHome": null,
+      "breadcrumbHome": "a.breadcrumb-label",
       "sidebar": ".page-sidebar",
       "sidebarBlocks": ".page-sidebar .sidebarBlock",
       "sidebarBlocksMin": 1,
@@ -64,33 +86,43 @@
   },
   "products": {
     "default": "/12-x-12-fire-rated-un-insulated-access-door-with-flange/",
-    "known": ["/12-x-12-fire-rated-un-insulated-access-door-with-flange/"]
+    "known": [
+      "/12-x-12-fire-rated-un-insulated-access-door-with-flange/"
+    ]
   },
   "forms": {
     "productInfo": {
-      "path": "default-product",
       "submitUrlPattern": "**/forms.zohopublic.com/**/BESTCAProductForm/**/submit"
     },
     "quoteRequest": {
       "path": "/request-a-quote/",
-      "submitUrlPattern": "**/forms.zohopublic.com/**/submit",
-      "optionalFields": ["Name_First"]
+      "submitUrlPattern": "**/forms.zohopublic.com/**/BESTCARequestAQuote/**/submit",
+      "optionalFields": [
+        "Name_First"
+      ]
     },
     "contact": {
       "path": "/contact-us/",
-      "submitUrlPattern": "**/forms.zohopublic.com/**/submit"
+      "submitUrlPattern": "**/forms.zohopublic.com/**/BESTCAContactUsNew/**/submit"
     },
     "proClub": {
       "path": "/pro-club-application/",
-      "submitUrlPattern": "**/forms.zohopublic.com/**/submit",
+      "submitUrlPattern": "**/forms.zohopublic.com/**/BestAccessDoorsProClubCanadaApplication/**/submit",
       "hasCountry": false
-    }
+    },
+    "architectInquiries": null,
+    "becomeVendor": null
   },
   "testEmailTemplate": "mauricio+{ts}@bestaccessdoors.ca",
   "discovery": {
     "search": {
       "knownTerm": "fire-rated access door",
-      "expectedTokens": ["fire", "rated", "access", "door"],
+      "expectedTokens": [
+        "fire",
+        "rated",
+        "access",
+        "door"
+      ],
       "noResultsTerm": "zzzz-no-products-987654321"
     },
     "categories": [
@@ -117,7 +149,7 @@
     ],
     "selectors": {
       "breadcrumbs": ".breadcrumbs",
-      "breadcrumbHome": null,
+      "breadcrumbHome": "a.breadcrumb-label",
       "galleryImage": "section[data-image-gallery] img",
       "relatedCarousel": ".ss__recommendation--carousel",
       "reviewsContainer": "#yotpo-reviews-main-widget",
@@ -125,6 +157,19 @@
       "qtyIncrement": null,
       "qtyDecrement": null,
       "pdfNewTab": true
+    }
+  },
+  "lighthouse": {
+    "thresholds": {
+      "homepage": {
+        "accessibility": 65
+      },
+      "plp": {
+        "accessibility": 70
+      },
+      "pdp": {
+        "accessibility": 65
+      }
     }
   }
 }
