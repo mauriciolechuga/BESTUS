@@ -203,6 +203,23 @@ function broadcast(event, data) {
 // ── run orchestration ─────────────────────────────────────────────────────────
 
 let running = false; // single-run lock
+let currentChild = null; // in-flight runner process (null between jobs / when idle)
+let stopRequested = false; // set by /api/stop so runNext doesn't advance the queue
+
+// Kill the in-flight runner and its whole subtree. The runners call
+// spawnSync('npx', ..., { shell: true }), so the tree is
+// server → node run-*.js → cmd → npx → node → cypress → Chrome; a plain
+// child.kill() would orphan cypress + Chrome. taskkill /T takes the tree.
+function killRunTree() {
+  if (!currentChild) return false;
+  stopRequested = true;
+  if (process.platform === 'win32') {
+    spawn('taskkill', ['/pid', String(currentChild.pid), '/T', '/F']);
+  } else {
+    currentChild.kill('SIGKILL');
+  }
+  return true;
+}
 
 // Emit each stdout/stderr line, and watch for the runner's own "Store: <s>"
 // banner so we can flip cards to running and read the sidecar on completion.
@@ -305,6 +322,7 @@ function startRun({ stores, specsByStore }) {
       cwd: ROOT,
       env: childEnv,
     });
+    currentChild = child;
     // For per-store jobs, scope the watcher to that store; for run-all, all.
     const watchStores = job.store ? [job.store] : runStores;
     const stillOpen = wireChildOutput(child, watchStores);
@@ -313,6 +331,15 @@ function startRun({ stores, specsByStore }) {
       broadcast('line', { text: `[dashboard] failed to start runner: ${err.message}` });
     });
     child.on('close', () => {
+      currentChild = null;
+      if (stopRequested) {
+        // Operator hit STOP: don't advance the queue, just unlock.
+        stopRequested = false;
+        running = false;
+        broadcast('line', { text: '[dashboard] run stopped by operator.' });
+        broadcast('run-stopped', { summaries: readAllSidecars() });
+        return;
+      }
       // Reconcile: mark any watched store done from its sidecar.
       for (const code of watchStores) {
         if (remaining.has(code)) {
@@ -397,6 +424,23 @@ function handleApi(req, res, url) {
       sendJson(res, 202, { started: true, stores });
       startRun({ stores, specsByStore: normSpecs });
     });
+    return;
+  }
+
+  if (req.method === 'POST' && url.pathname === '/api/stop') {
+    if (!running || !currentChild) {
+      return sendJson(res, 409, { error: 'No run is in progress.' });
+    }
+    killRunTree();
+    return sendJson(res, 202, { stopping: true });
+  }
+
+  if (req.method === 'POST' && url.pathname === '/api/exit') {
+    killRunTree(); // no-op when idle
+    sendJson(res, 200, { exiting: true });
+    // Give the response (and any taskkill) a moment to flush, then exit 0 so
+    // the launcher .bat sees a clean shutdown and closes its window.
+    setTimeout(() => process.exit(0), 500);
     return;
   }
 

@@ -36,9 +36,13 @@ start "" cmd /c "timeout /t 2 >nul & start chrome http://localhost:8420"
 
 node scripts/dashboard/server.js
 
+REM Clean shutdown (Exit button in the dashboard) -> close this window.
+REM Anything else (crash, port in use) -> keep it open so the error is readable.
+if %errorlevel% equ 0 exit
+
 echo.
 echo  ============================================================
-echo   The dashboard has stopped.
+echo   The dashboard has stopped unexpectedly. See the error above.
 echo  ============================================================
 echo.
 pause
