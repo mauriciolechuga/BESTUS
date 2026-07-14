@@ -16,7 +16,9 @@ export class ProductFormPage extends ZohoFormPage {
   get path() { return this._path; }
 
   fillDetails(v) {
-    cy.get('textarea[name="MultiLine"]').clear().type(v);
+    // :visible — BESTUS PDPs render the product-info form twice (desktop + hidden
+    // responsive copy); target the one real (visible) MultiLine textarea.
+    cy.get('textarea[name="MultiLine"]:visible').clear({ force: true }).type(v, { force: true });
     return this;
   }
 

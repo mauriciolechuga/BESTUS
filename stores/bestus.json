@@ -1,5 +1,5 @@
 {
-  "_notes": "Baseline/default store — relies on code defaults in store.js (no plp.selectors/pdp.selectors/branding.footer). July 2 2026: sort label corrected to the live wording \"Price: Low to High\" (hash #/ps:calculated_price:asc re-verified live — the ps: prefix is correct for this older SearchSpring template); contact/quote/proClub submitUrlPatterns tightened to named Zoho forms (BESTContactUs, BESTRequestQuote1, BestAccessDoorsProClubVIPProgramApplication). KNOWN DEFICIENCY (July 6 2026): Pro Club is US-only but the live Zoho form's country dropdown also offers \"Canada\" — the allowed-countries test in pro-club-form.cy.js is intentionally failing until devs remove the Canada option from BestAccessDoorsProClubVIPProgramApplication. personaOverrides gives all BESTUS form tests a US address (the shared personas.json primary address is Canadian).",
+  "_notes": "Baseline/default store — relies on code defaults in store.js (no plp.selectors/pdp.selectors/branding.footer). July 2 2026: sort label corrected to the live wording \"Price: Low to High\" (hash #/ps:calculated_price:asc re-verified live — the ps: prefix is correct for this older SearchSpring template); contact/quote/proClub submitUrlPatterns tightened to named Zoho forms (BESTContactUs, BESTRequestQuote1, BestAccessDoorsProClubVIPProgramApplication). PRO CLUB (July 14 2026): the live country dropdown offers -Select- / Canada / United States; the Canada option is an intentional fallback (a Canadian applicant who submits gets an error screen linking to the CA Pro Club form), NOT a region-lock defect, so no allowedCountries restriction is set (the 'offers only allowed countries' test in pro-club-form.cy.js is gated off). personaOverrides gives all BESTUS form tests a US address (the shared personas.json primary address is Canadian).",
   "_absentFeatures": [
     {
       "configKey": "forms.architectInquiries",
@@ -63,8 +63,7 @@
     },
     "proClub": {
       "path": "/pro-club-application/",
-      "submitUrlPattern": "**/forms.zohopublic.com/**/BestAccessDoorsProClubVIPProgramApplication/**/submit",
-      "allowedCountries": ["United States"]
+      "submitUrlPattern": "**/forms.zohopublic.com/**/BestAccessDoorsProClubVIPProgramApplication/**/submit"
     },
     "architectInquiries": null,
     "becomeVendor": null

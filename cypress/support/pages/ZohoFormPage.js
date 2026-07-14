@@ -17,45 +17,52 @@ export class ZohoFormPage {
     return this;
   }
 
+  // `:visible` on every field selector: some themes (BESTUS PDPs) render the Zoho
+  // form twice — a visible desktop copy and a hidden responsive/mobile copy — so a
+  // bare name selector matches 2 elements and Cypress rejects .clear()/.type() on
+  // multiple. The hidden copy is :hidden (below-the-fold and overlay-covered fields
+  // stay :visible), so this reliably targets the one real form on single-form stores.
   fillFirstName(v) {
     // force: some store themes (AAP) use a Zoho floating-label template that covers
     // all text inputs, same pattern as fillPhone. Forced typing still drives the real
     // input and zf client-side validation.
-    cy.get('input[name="Name_First"]').scrollIntoView().clear({ force: true }).type(v, { force: true });
+    cy.get('input[name="Name_First"]:visible').scrollIntoView().clear({ force: true }).type(v, { force: true });
     return this;
   }
 
   fillLastName(v) {
-    cy.get('input[name="Name_Last"]').scrollIntoView().clear({ force: true }).type(v, { force: true });
+    cy.get('input[name="Name_Last"]:visible').scrollIntoView().clear({ force: true }).type(v, { force: true });
     return this;
   }
 
   fillCompany(v) {
-    cy.get('input[name="SingleLine"]').first().scrollIntoView().clear({ force: true }).type(v, { force: true });
+    cy.get('input[name="SingleLine"]:visible').first().scrollIntoView().clear({ force: true }).type(v, { force: true });
     return this;
   }
 
   fillEmail(v) {
-    cy.get('input[name="Email"]').scrollIntoView().clear({ force: true }).type(v, { force: true });
+    cy.get('input[name="Email"]:visible').scrollIntoView().clear({ force: true }).type(v, { force: true });
     return this;
   }
 
   fillPhone(code, number) {
     // Country code input is only present on some Zoho forms (e.g. quote form).
     cy.get('body').then(($body) => {
-      if ($body.find('input[name="PhoneNumber_countrycodeval"]').length) {
-        cy.get('input[name="PhoneNumber_countrycodeval"]').clear({ force: true }).type(code, { force: true });
+      if ($body.find('input[name="PhoneNumber_countrycodeval"]:visible').length) {
+        cy.get('input[name="PhoneNumber_countrycodeval"]:visible').clear({ force: true }).type(code, { force: true });
       }
     });
     // force: Zoho's floating label fully overlays this input (and ADAP PDPs add a
     // sticky product bar), so Cypress actionability rejects a field real users can
     // fill normally. Forced typing still drives the real input and zf validation.
-    cy.get('input[name="PhoneNumber_countrycode"]').scrollIntoView().clear({ force: true }).type(number, { force: true });
+    cy.get('input[name="PhoneNumber_countrycode"]:visible').scrollIntoView().clear({ force: true }).type(number, { force: true });
     return this;
   }
 
   submit() {
-    cy.get('button.zf-submitColor').click({ force: true });
+    // :visible + .first(): themes that render the form twice (BESTUS PDPs) also
+    // duplicate the submit button — click the one real (visible) button.
+    cy.get('button.zf-submitColor:visible').first().click({ force: true });
     return this;
   }
 

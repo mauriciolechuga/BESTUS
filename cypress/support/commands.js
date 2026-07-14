@@ -45,7 +45,12 @@ Cypress.Commands.add('interceptZoho', (alias, urlPattern) => {
  * scan all ancestors for an error/invalid class.
  */
 Cypress.Commands.add('expectFieldError', (selector) => {
+  // filter(':visible').first(): some themes (BESTUS PDPs) render the Zoho form twice
+  // (visible desktop + hidden responsive copy), so `selector` can match 2 fields —
+  // walk ancestors from the one real (visible) field.
   cy.get(selector)
+    .filter(':visible')
+    .first()
     .parents()
     .find('[class*="error"], [class*="invalid"], [class*="Error"]')
     .should('exist');

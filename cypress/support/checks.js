@@ -417,17 +417,28 @@ export function assertMetaTags() {
  */
 export function assertProductJsonLd() {
   cy.get('script[type="application/ld+json"]').then(($scripts) => {
-    const blocks = [...$scripts].map((el) => {
-      try { return JSON.parse(el.textContent); } catch { return null; }
-    }).filter(Boolean);
+    // Some themes wrap the real Product node in an array or an @graph container
+    // (BESTUS nests it in @graph alongside ItemPage/ItemList), so flatten both
+    // shapes before searching rather than only inspecting each script's top level.
+    const blocks = [...$scripts].flatMap((el) => {
+      let parsed;
+      try { parsed = JSON.parse(el.textContent); } catch { return []; }
+      if (Array.isArray(parsed)) return parsed;
+      if (Array.isArray(parsed['@graph'])) return parsed['@graph'];
+      return [parsed];
+    });
     // Third-party widgets (Yotpo, etc.) can inject their own Product blocks at runtime
     // that omit fields like sku. Require sku to ensure we match the site-rendered block.
-    const product = blocks.find((b) => b['@type'] === 'Product' && typeof b.sku === 'string');
+    const product = blocks.find((b) => b && b['@type'] === 'Product' && typeof b.sku === 'string');
     expect(product, 'JSON-LD Product block with sku').to.exist;
     expect(product.name, 'product name').to.be.a('string').and.not.be.empty;
     expect(product.sku, 'product sku').to.be.a('string').and.not.be.empty;
     expect(product.description, 'product description').to.be.a('string').and.not.be.empty;
-    expect(product.image, 'product image').to.be.a('string').and.not.be.empty;
+    // image may be a plain URL string, an ImageObject ({@type:"ImageObject", url,
+    // contentUrl}), or an array of either — the BESTUS @graph block uses ImageObject.
+    const rawImage = Array.isArray(product.image) ? product.image[0] : product.image;
+    const imageUrl = typeof rawImage === 'string' ? rawImage : (rawImage && (rawImage.url || rawImage.contentUrl));
+    expect(imageUrl, 'product image').to.be.a('string').and.not.be.empty;
     expect(product.offers?.price, 'offers.price').to.match(/^\d+(\.\d+)?$/);
     // Currency is store-dependent — BESTCA (Canada) emits CAD. Defaults to USD.
     const currency = (getStore().branding && getStore().branding.currency) || 'USD';

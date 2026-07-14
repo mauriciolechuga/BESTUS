@@ -58,7 +58,7 @@ describeIfStore(productForm && site.products, 'Product information form', () => 
     it('shows an error when First Name is empty', () => {
       cy.uniqueEmail().then((email) => {
         cy.fillPersona(page, { ...persona, firstName: 'SKIP' }, email);
-        cy.get('input[name="Name_First"]').clear();
+        cy.get('input[name="Name_First"]:visible').clear({ force: true });
         page.submit();
         cy.get('@submit.all').should('have.length', 0);
         cy.expectFieldError('input[name="Name_First"]');
@@ -68,7 +68,7 @@ describeIfStore(productForm && site.products, 'Product information form', () => 
     it('shows an error when Last Name is empty', () => {
       cy.uniqueEmail().then((email) => {
         cy.fillPersona(page, { ...persona, lastName: 'SKIP' }, email);
-        cy.get('input[name="Name_Last"]').clear();
+        cy.get('input[name="Name_Last"]:visible').clear({ force: true });
         page.submit();
         cy.get('@submit.all').should('have.length', 0);
         cy.expectFieldError('input[name="Name_Last"]');
@@ -78,7 +78,7 @@ describeIfStore(productForm && site.products, 'Product information form', () => 
     it('shows an error when Email is empty', () => {
       cy.uniqueEmail().then((email) => {
         cy.fillPersona(page, { ...persona }, email);
-        cy.get('input[name="Email"]').clear();
+        cy.get('input[name="Email"]:visible').clear({ force: true });
         page.submit();
         cy.get('@submit.all').should('have.length', 0);
         cy.expectFieldError('input[name="Email"]');
@@ -95,7 +95,7 @@ describeIfStore(productForm && site.products, 'Product information form', () => 
     it('shows an error when Details are empty', () => {
       cy.uniqueEmail().then((email) => {
         cy.fillPersona(page, { ...persona, details: 'SKIP' }, email);
-        cy.get('textarea[name="MultiLine"]').clear();
+        cy.get('textarea[name="MultiLine"]:visible').clear({ force: true });
         page.submit();
         cy.get('@submit.all').should('have.length', 0);
         cy.expectFieldError('textarea[name="MultiLine"]');
