@@ -1,6 +1,6 @@
 import { ProductFormPage } from '../support/pages/ProductFormPage.js';
 import { getMultipartField } from '../support/utils/getMultipartField.js';
-import { getStore, describeIfStore } from '../support/store.js';
+import { getStore, describeIfStore, storePersona } from '../support/store.js';
 
 const site = getStore();
 const productForm = site.forms && site.forms.productInfo;
@@ -11,7 +11,7 @@ describeIfStore(productForm && site.products, 'Product information form', () => 
   let persona;
 
   before(() => {
-    cy.fixture('personas').then((p) => { persona = p.primary; });
+    cy.fixture('personas').then((p) => { persona = storePersona(p.primary); });
   });
 
   beforeEach(() => {

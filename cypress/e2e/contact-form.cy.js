@@ -1,6 +1,6 @@
 import { ContactFormPage } from '../support/pages/ContactFormPage.js';
 import { getMultipartField } from '../support/utils/getMultipartField.js';
-import { getStore, describeIfStore, itIfStore } from '../support/store.js';
+import { getStore, describeIfStore, itIfStore, storePersona } from '../support/store.js';
 
 const site = getStore();
 const contactForm = site.forms && site.forms.contact;
@@ -11,7 +11,7 @@ describeIfStore(contactForm, 'Contact Us form', () => {
   let persona;
 
   before(() => {
-    cy.fixture('personas').then((p) => { persona = p.primary; });
+    cy.fixture('personas').then((p) => { persona = storePersona(p.primary); });
   });
 
   beforeEach(() => {

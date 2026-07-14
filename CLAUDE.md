@@ -119,9 +119,9 @@ Subclasses add form-specific fields:
 
 - `contact-form.cy.js` — submission success, payload validation, optional file attachment; validates inquiry type options and required fields. The inquiry-dropdown test is gated like quote-form's quantity test: `forms.contact.noInquiryDropdown: true` skips it, `forms.contact.inquiryTypes` overrides the expected option wording (BESTUS wording is the default)
 - `quote-form.cy.js` — submission success, payload validation; validates quantity options and required fields
-- `pro-club-form.cy.js` — submission success, non-US country support, payload validation; validates country dropdown default and required fields
+- `pro-club-form.cy.js` — submission success, payload validation (including that `Address_Country` is one of `forms.proClub.allowedCountries` when set); validates country dropdown default, required fields, and — where `allowedCountries` is set — that the dropdown offers only those countries. Pro Club is region-locked per store: BESTUS is US-only (`allowedCountries: ["United States"]` + `personaOverrides` US address), BESTCA Canada-only (its form has no country field at all — `hasCountry: false` — so country is implicit and the shared persona's Canadian address applies). The Zoho form has no client-side address validation, so the dropdown restriction is the only enforceable check. **Known site deficiency (test intentionally failing, July 6 2026)**: BESTUS's live dropdown also offers "Canada" — devs must remove the option from Zoho form `BestAccessDoorsProClubVIPProgramApplication`
 - `become-vendor-form.cy.js` — submission success, payload validation; minimal negative coverage (the only store with the form so far, ADAP at `/bvl1/`, uses a custom-built page posting to Zoho — no `zf-submitColor` button, details textarea named "Additional Details" — so client-side validation behavior is unconfirmed)
-- `architect-form.cy.js` — submission success, payload validation, negative paths (empty/malformed required fields). (`/architects/`, standard Zoho form `ADCcaArchitects`); BESTUS, BESTCA, ADAP and the rest have no architects form, so their `forms.architectInquiries` stays `null` and the spec shows as skipped there.
+- `architect-form.cy.js` — submission success, payload validation, negative paths (empty/malformed required fields). Runs on ADC (`/architects/`, standard Zoho form `ADCcaArchitects`) and CAD (`/architects/`, Zoho form `CADArchitects`); every other store has no architects form, so their `forms.architectInquiries` stays `null` and the spec shows as skipped there.
 - `product-form.cy.js` — submission success, payload validation; validates required fields including details textarea
 
 **Page/layout tests:**
@@ -137,14 +137,14 @@ Subclasses add form-specific fields:
 
 **SEO, accessibility & performance tests:**
 
-- `seo.cy.js` — on homepage, PLP, and a random PDP: asserts `<title>` and `<meta name="description">` are present and non-empty; on PDP also validates the `Product` JSON-LD block (name, sku, description, image, price, currency, availability)
+- `seo.cy.js` — on homepage, PLP, and a random PDP: asserts `<title>` and `<meta name="description">` are present and non-empty; on PDP also validates the `Product` JSON-LD block (name, sku, description, image, price, currency, availability). The JSON-LD test is gated on `pdp.productJsonLd !== false` — ADAP sets `productJsonLd: false` because its theme emits no Product JSON-LD at all (a real SEO gap, tracked as a visible skip rather than a permanent red)
 - `images.cy.js` — on a random PDP: asserts all product gallery images have non-empty `alt` attributes; on homepage and a random PDP: requests all same-domain images and asserts none return 4xx/5xx
 - `lighthouse.cy.js` — Chrome only (auto-skipped in Firefox); runs Lighthouse on homepage, PLP, and a random PDP against standardized per-page-type floors (homepage 50/80/65/75 for performance/accessibility/best-practices/SEO, PLP 45/80/65/75, PDP 50/80/65/75 — calibrated July 2026 against all 9 live stores). Overridable per store AND per page type via the top-level `lighthouse.thresholds.<homepage|plp|pdp>` in `stores/<code>.json` (see the thresholds bullet above for the current override list). Per the site-deficiency policy, a store failing a floor for fixable content stays failing and gets documented, not overridden — currently FSE homepage SEO (67, missing meta description) and BRH homepage performance (42, heavy page content)
 
 ### Fixtures and Store Configs
 
 - `stores/<code>.json` (NOT a Cypress fixture — loaded by Node in `cypress.config.js`) — canonical per-store source for base URL, `homePath`/`visitQuery` quirks, branding text, PLP paths/labels, form paths, Zoho submit URL glob patterns, product URLs (`products.known`), PDP URLs (`pdp.popular`), discovery inputs (`discovery`: search terms/`expectedTokens`, representative `categories`, `mobileCategory`, `multiPageCategory`, and `sort` label/param/value), and `testEmailTemplate`
-- `personas.json` — fake customer data used as form input; `primary` is the only persona currently defined; store-agnostic and shared by all stores
+- `personas.json` — fake customer data used as form input; `primary` is the only persona currently defined and is shared by all stores. A store can localize any persona field via a top-level `personaOverrides` object in its `stores/<code>.json`, merged over the fixture by `storePersona()` in `store.js` (used by all six form specs) — BESTUS overrides the fixture's Canadian address with a US one because its forms must carry US addresses
 
 ### Environment Variables
 

@@ -1,6 +1,6 @@
 import { QuoteFormPage } from '../support/pages/QuoteFormPage.js';
 import { getMultipartField } from '../support/utils/getMultipartField.js';
-import { getStore, describeIfStore, itIfStore } from '../support/store.js';
+import { getStore, describeIfStore, itIfStore, storePersona } from '../support/store.js';
 
 const site = getStore();
 const quoteForm = site.forms && site.forms.quoteRequest;
@@ -15,7 +15,7 @@ describeIfStore(quoteForm, 'Request a Quote form', () => {
   let persona;
 
   before(() => {
-    cy.fixture('personas').then((p) => { persona = p.primary; });
+    cy.fixture('personas').then((p) => { persona = storePersona(p.primary); });
   });
 
   beforeEach(() => {

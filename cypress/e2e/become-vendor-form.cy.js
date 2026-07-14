@@ -1,6 +1,6 @@
 import { BecomeVendorFormPage } from '../support/pages/BecomeVendorFormPage.js';
 import { getMultipartField } from '../support/utils/getMultipartField.js';
-import { getStore, describeIfStore } from '../support/store.js';
+import { getStore, describeIfStore, storePersona } from '../support/store.js';
 
 const site = getStore();
 const vendorForm = site.forms && site.forms.becomeVendor;
@@ -11,7 +11,7 @@ describeIfStore(vendorForm, 'Become a Vendor form', () => {
   let persona;
 
   before(() => {
-    cy.fixture('personas').then((p) => { persona = p.primary; });
+    cy.fixture('personas').then((p) => { persona = storePersona(p.primary); });
   });
 
   beforeEach(() => {

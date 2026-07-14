@@ -1,6 +1,6 @@
 import { ArchitectFormPage } from '../support/pages/ArchitectFormPage.js';
 import { getMultipartField } from '../support/utils/getMultipartField.js';
-import { getStore, describeIfStore } from '../support/store.js';
+import { getStore, describeIfStore, storePersona } from '../support/store.js';
 
 const site = getStore();
 const architectForm = site.forms && site.forms.architectInquiries;
@@ -11,7 +11,7 @@ describeIfStore(architectForm, 'Architects & Spec Writers form', () => {
   let persona;
 
   before(() => {
-    cy.fixture('personas').then((p) => { persona = p.primary; });
+    cy.fixture('personas').then((p) => { persona = storePersona(p.primary); });
   });
 
   beforeEach(() => {

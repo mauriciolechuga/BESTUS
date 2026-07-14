@@ -195,6 +195,16 @@ export function pdpSelectors() {
 }
 
 /**
+ * Merges the store's top-level `personaOverrides` (stores/<code>.json) over a
+ * persona fixture. Lets a store localize form input data — BESTUS overrides the
+ * shared fixture's Canadian address with a US one because its forms must be
+ * submitted with US addresses. Stores without the key get the fixture as-is.
+ */
+export function storePersona(base) {
+  return { ...base, ...(getStore().personaOverrides || {}) };
+}
+
+/**
  * Builds a visitable URL from a store-relative path, honoring the store's
  * visitQuery quirk (e.g. AAP requires ?redirect=disable on every visit).
  */
