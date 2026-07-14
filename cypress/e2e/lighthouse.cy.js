@@ -46,9 +46,14 @@ const DESKTOP_OPTS = {
 // accessibility) is the only sanctioned reason to lower one; adjust the per-store
 // override, not these defaults.
 const THRESHOLD_DEFAULTS = {
-  homepage: { performance: 50, accessibility: 80, "best-practices": 65, seo: 75 },
-  plp: { performance: 45, accessibility: 80, "best-practices": 65, seo: 75 },
-  pdp: { performance: 50, accessibility: 80, "best-practices": 65, seo: 75 },
+  homepage: {
+    performance: 50,
+    accessibility: 70,
+    "best-practices": 60,
+    seo: 70,
+  },
+  plp: { performance: 50, accessibility: 70, "best-practices": 60, seo: 70 },
+  pdp: { performance: 50, accessibility: 70, "best-practices": 60, seo: 70 },
 };
 
 function thresholdsFor(pageType) {

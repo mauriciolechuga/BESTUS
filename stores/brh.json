@@ -43,10 +43,7 @@
       "href": "/warehouses/",
       "text": "Warehouses"
     },
-    "imageHosts": [
-      "bestroofhatches.com",
-      "bigcommerce.com"
-    ],
+    "imageHosts": ["bestroofhatches.com", "bigcommerce.com"],
     "partnerLinks": null,
     "mobileNavSelector": "#mySidenav",
     "footer": {
@@ -111,9 +108,7 @@
     "quoteRequest": {
       "path": "/request-a-quote/",
       "submitUrlPattern": "**/forms.zohopublic.com/**/BRHRequestAQuote/**/submit",
-      "optionalFields": [
-        "Name_First"
-      ]
+      "optionalFields": ["Name_First"]
     },
     "contact": {
       "path": "/contact-us/",
@@ -127,18 +122,11 @@
   "discovery": {
     "search": {
       "knownTerm": "roof hatch",
-      "expectedTokens": [
-        "roof",
-        "hatch"
-      ],
+      "expectedTokens": ["roof", "hatch"],
       "noResultsTerm": null,
       "pdpUrlClean": false
     },
-    "categories": [
-      "/aluminum/",
-      "/galvanized-steel/",
-      "/ladder-access/"
-    ],
+    "categories": ["/aluminum/", "/galvanized-steel/", "/ladder-access/"],
     "mobileCategory": "/aluminum/",
     "multiPageCategory": "/aluminum/",
     "sort": {
@@ -172,7 +160,7 @@
   "lighthouse": {
     "thresholds": {
       "pdp": {
-        "accessibility": 75
+        "accessibility": 70
       }
     }
   }

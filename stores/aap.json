@@ -37,21 +37,13 @@
       "href": "/warehouses/",
       "text": "Warehouses"
     },
-    "imageHosts": [
-      "acudoraccesspanels.com",
-      "bigcommerce.com"
-    ],
+    "imageHosts": ["acudoraccesspanels.com", "bigcommerce.com"],
     "partnerLinks": null,
     "mobileNavSelector": "#mySidenav",
-    "overflowIgnore": [
-      "[class*=\"yotpo\"]"
-    ],
+    "overflowIgnore": ["[class*=\"yotpo\"]"],
     "footer": {
       "rootSelector": "footer",
-      "sections": [
-        "footer .footer-top",
-        "footer .copyright"
-      ],
+      "sections": ["footer .footer-top", "footer .copyright"],
       "headingSelector": "footer .box h3",
       "headings": [
         "what’s in store",
@@ -119,19 +111,10 @@
   "discovery": {
     "search": {
       "knownTerm": "fire rated access door",
-      "expectedTokens": [
-        "fire",
-        "rated",
-        "access",
-        "door"
-      ],
+      "expectedTokens": ["fire", "rated", "access", "door"],
       "noResultsTerm": "zzzz-no-products-987654321"
     },
-    "categories": [
-      "/fire-rated/",
-      "/flush/",
-      "/recessed/"
-    ],
+    "categories": ["/fire-rated/", "/flush/", "/recessed/"],
     "mobileCategory": "/fire-rated/",
     "multiPageCategory": "/fire-rated/",
     "sort": {
@@ -165,13 +148,13 @@
   "lighthouse": {
     "thresholds": {
       "homepage": {
-        "accessibility": 60
+        "accessibility": 70
       },
       "plp": {
         "accessibility": 70
       },
       "pdp": {
-        "accessibility": 60
+        "accessibility": 70
       }
     }
   }
