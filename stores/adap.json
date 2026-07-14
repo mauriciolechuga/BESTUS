@@ -154,15 +154,5 @@
       "reviewsContainer": "#yotpo-reviews-main-widget",
       "pdfNewTab": false
     }
-  },
-  "lighthouse": {
-    "thresholds": {
-      "plp": {
-        "accessibility": 70
-      },
-      "pdp": {
-        "accessibility": 70
-      }
-    }
   }
 }

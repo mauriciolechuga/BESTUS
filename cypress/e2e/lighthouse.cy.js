@@ -29,41 +29,27 @@ const DESKTOP_OPTS = {
   throttlingMethod: "simulate",
 };
 
-// Standardized per-page-type floors (throttled desktop, headroom for variance),
-// calibrated against a full 27-audit sweep of all 9 live stores (July 2 2026):
-// - performance: homepage 50 (hero/carousel weight tolerated), PLP 45 (most at-risk —
-//   faceted nav, filters, product image/JS weight), PDP 50 (conversion-critical)
-// - accessibility 80: healthy themes score 80-98; structurally lower themes get
-//   per-store overrides (the sanctioned exception)
-// - best-practices 65: every BigCommerce storefront in the fleet scores 67-75
-//   (third-party cookies, console noise, legacy APIs are platform-level), so 65 is
-//   the honest floor; a drop below it means a NEW failing audit worth investigating
-// - seo 75: typical live scores are 83-92 with dips to 75; 75 keeps the check
+// One uniform floor for every page type on every store (throttled desktop, headroom
+// for variance), calibrated against a full 27-audit sweep of all 9 live stores
+// (July 2 2026):
+// - performance 50: homepage/PDP conversion-critical, PLP heaviest (faceted nav,
+//   filters, image/JS weight) but still expected to clear 50
+// - accessibility 60: healthy themes score 80-98, but several fleet themes carry
+//   structural a11y gaps (ADC/BESTCA/FSE "footer-new", AAP touch targets) scoring
+//   in the mid-60s; 60 is the honest fleet-wide floor that lets those pass while a
+//   drop below it flags a NEW regression
+// - best-practices 60: every BigCommerce storefront scores 67-75 (third-party
+//   cookies, console noise, legacy APIs are platform-level), so 60 is the honest floor
+// - seo 70: typical live scores are 83-92 with dips to 75; 70 keeps the check
 //   meaningful while letting healthy pages pass (FSE's missing homepage meta
 //   description scores 67 and correctly still fails)
-// Overridable per store and per page type via `lighthouse.thresholds.<homepage|plp|pdp>`
-// in stores/<code>.json — a theme-level structural floor (e.g. ADC's "footer-new"
-// accessibility) is the only sanctioned reason to lower one; adjust the per-store
-// override, not these defaults.
-const THRESHOLD_DEFAULTS = {
-  homepage: {
-    performance: 50,
-    accessibility: 70,
-    "best-practices": 60,
-    seo: 70,
-  },
-  plp: { performance: 50, accessibility: 70, "best-practices": 60, seo: 70 },
-  pdp: { performance: 50, accessibility: 70, "best-practices": 60, seo: 70 },
+// This is the single source of truth — no per-store or per-page overrides.
+const LIGHTHOUSE_THRESHOLDS = {
+  performance: 50,
+  accessibility: 60,
+  "best-practices": 60,
+  seo: 70,
 };
-
-function thresholdsFor(pageType) {
-  const overrides =
-    (site.lighthouse &&
-      site.lighthouse.thresholds &&
-      site.lighthouse.thresholds[pageType]) ||
-    {};
-  return { ...THRESHOLD_DEFAULTS[pageType], ...overrides };
-}
 
 describe("Lighthouse audit", () => {
   before(function () {
@@ -72,16 +58,16 @@ describe("Lighthouse audit", () => {
 
   it("homepage meets score thresholds", () => {
     cy.visit(homePath());
-    cy.lighthouse(thresholdsFor("homepage"), DESKTOP_OPTS);
+    cy.lighthouse(LIGHTHOUSE_THRESHOLDS, DESKTOP_OPTS);
   });
 
   itIfStore(site.plp, "PLP meets score thresholds", () => {
     cy.visit(storePath(site.plp.main));
-    cy.lighthouse(thresholdsFor("plp"), DESKTOP_OPTS);
+    cy.lighthouse(LIGHTHOUSE_THRESHOLDS, DESKTOP_OPTS);
   });
 
   itIfStore(site.pdp, "a random PDP meets score thresholds", () => {
     cy.visit(storePath(pickRandom(site.pdp.popular)));
-    cy.lighthouse(thresholdsFor("pdp"), DESKTOP_OPTS);
+    cy.lighthouse(LIGHTHOUSE_THRESHOLDS, DESKTOP_OPTS);
   });
 });

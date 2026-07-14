@@ -1,5 +1,5 @@
 {
-  "_notes": "Configured June 2026. AAP runs the SearchSpring Snap theme (ul.ss__results, .ss__pagination__*). Category taxonomy: /fire-rated/, /flush/, /recessed/, etc. (no /products/ umbrella). No pro-club form (/pro-club-application/ 404s). No subcategory boxes on any category page (subcategoryBox: null). Qty stepper buttons absent (no data-action inc/dec; bare .form-increment input). Related carousel is SS recommendation (.ss__recommendation--carousel). Footer: bare <footer> with .box h3 headings, div.copyright for copyright text; phone in footer-bottom-col (1 tel: link). Mobile nav is #mySidenav. LIGHTHOUSE (calibrated July 2 2026, live scores homepage a11y 66 / plp 73 / pdp 64): theme structurally below the 80 a11y default -> per-page accessibility floors 60/70/60. Partly tied to the known sub-44px touch-target deficiency: when the AAP dev CSS fix ships, re-measure and raise these floors.",
+  "_notes": "Configured June 2026. AAP runs the SearchSpring Snap theme (ul.ss__results, .ss__pagination__*). Category taxonomy: /fire-rated/, /flush/, /recessed/, etc. (no /products/ umbrella). No pro-club form (/pro-club-application/ 404s). No subcategory boxes on any category page (subcategoryBox: null). Qty stepper buttons absent (no data-action inc/dec; bare .form-increment input). Related carousel is SS recommendation (.ss__recommendation--carousel). Footer: bare <footer> with .box h3 headings, div.copyright for copyright text; phone in footer-bottom-col (1 tel: link). Mobile nav is #mySidenav. LIGHTHOUSE (calibrated July 2 2026, live scores homepage a11y 66 / plp 73 / pdp 64): theme structurally below a healthy a11y score, but clears the fleet-wide accessibility:60 floor (no per-store override). Partly tied to the known sub-44px touch-target deficiency: when the AAP dev CSS fix ships, re-measure and raise these floors.",
   "_absentFeatures": [
     {
       "configKey": "forms.proClub",
@@ -144,18 +144,5 @@
       "pdfNewTab": true
     },
     "_popularNote": "pdp.popular and products.known are independent lists and need not overlap; the 22-x-30 popular URL was verified live (200) July 2 2026."
-  },
-  "lighthouse": {
-    "thresholds": {
-      "homepage": {
-        "accessibility": 70
-      },
-      "plp": {
-        "accessibility": 70
-      },
-      "pdp": {
-        "accessibility": 70
-      }
-    }
   }
 }

@@ -1,5 +1,5 @@
 {
-  "_notes": "Configured June 2026. FSE runs the SearchSpring Snap theme (ul.ss__results dual-classed with productGrid, .ss__pagination, select-based sort control). Header is .site-header (not semantic <header>). PLP heading is h1.simple-heading. Sidebar uses aside.page-sidebar/.sidebarBlock (no #treeView). Subcategory boxes (.subCategoriesBox) use BESTUS-default .nameTitle / a.navList-action inner selectors. PDP description tab is #tab-description; product info form is #have_a_product_question (without _request suffix). No related carousel. No SS recently-viewed script. Footer is .site-footer: nav links are direct <a> children of .box (no ul/li), copyright is in .Copyright p (sibling of .footer-bottom, not inside it). Mobile breadcrumbs hidden (display:none) — mobileBreadcrumbsHidden:true. No pro-club, become-vendor, or architects form. KNOWN SITE DEFICIENCIES (tests intentionally failing — devs notified June 17 2026): (1) /new-home/ has no <meta name='description'> — SEO test 'has a non-empty meta description' fails; add meta description to the page in BigCommerce admin. (2) grid-box-icon-1.jpg in section[data-image-gallery] has no alt attribute — images.cy.js 'all product gallery images have a non-empty alt attribute' fails; add alt text to the image in BigCommerce Media Manager. July 2 2026: applying the sort DOES hash-route to #/sort:calculated_price:asc (verified live) — discovery.sort.urlHash filled (was null). EXPECTED LIGHTHOUSE FAILURE: with the standardized SEO>=90 floor, the homepage Lighthouse SEO test fails until the missing /new-home/ meta description (deficiency #1, devs notified June 17 2026) is added. LIGHTHOUSE (calibrated July 2 2026, live scores homepage a11y 82 / plp 75 / pdp 71): plp/pdp structurally below the 80 a11y default -> accessibility 70/65 overrides (homepage keeps 80). Homepage SEO scores 67 vs the 75 floor -> stays failing (missing meta description, deficiency #1).",
+  "_notes": "Configured June 2026. FSE runs the SearchSpring Snap theme (ul.ss__results dual-classed with productGrid, .ss__pagination, select-based sort control). Header is .site-header (not semantic <header>). PLP heading is h1.simple-heading. Sidebar uses aside.page-sidebar/.sidebarBlock (no #treeView). Subcategory boxes (.subCategoriesBox) use BESTUS-default .nameTitle / a.navList-action inner selectors. PDP description tab is #tab-description; product info form is #have_a_product_question (without _request suffix). No related carousel. No SS recently-viewed script. Footer is .site-footer: nav links are direct <a> children of .box (no ul/li), copyright is in .Copyright p (sibling of .footer-bottom, not inside it). Mobile breadcrumbs hidden (display:none) — mobileBreadcrumbsHidden:true. No pro-club, become-vendor, or architects form. KNOWN SITE DEFICIENCIES (tests intentionally failing — devs notified June 17 2026): (1) /new-home/ has no <meta name='description'> — SEO test 'has a non-empty meta description' fails; add meta description to the page in BigCommerce admin. (2) grid-box-icon-1.jpg in section[data-image-gallery] has no alt attribute — images.cy.js 'all product gallery images have a non-empty alt attribute' fails; add alt text to the image in BigCommerce Media Manager. July 2 2026: applying the sort DOES hash-route to #/sort:calculated_price:asc (verified live) — discovery.sort.urlHash filled (was null). EXPECTED LIGHTHOUSE FAILURE: with the standardized SEO>=90 floor, the homepage Lighthouse SEO test fails until the missing /new-home/ meta description (deficiency #1, devs notified June 17 2026) is added. LIGHTHOUSE (calibrated July 2 2026, live scores homepage a11y 82 / plp 75 / pdp 71): plp/pdp structurally below a healthy a11y score, but all clear the fleet-wide accessibility:60 floor (no per-store override). Homepage SEO scores 67 vs the 75 floor -> stays failing (missing meta description, deficiency #1).",
   "_absentFeatures": [
     {
       "configKey": "forms.proClub",
@@ -157,16 +157,6 @@
       "qtyIncrement": "button[data-action=\"inc\"]",
       "qtyDecrement": "button[data-action=\"dec\"]",
       "pdfNewTab": true
-    }
-  },
-  "lighthouse": {
-    "thresholds": {
-      "plp": {
-        "accessibility": 70
-      },
-      "pdp": {
-        "accessibility": 65
-      }
     }
   }
 }

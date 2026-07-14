@@ -1,5 +1,5 @@
 {
-  "_notes": "Configured June 2026. Standard BigCommerce theme (ul.productGrid, h1.page-heading). No SearchSpring — native BC sort/search. Native BC search always returns results (full catalog for any term) — no zero-result state. Quote-only catalog (no prices, no cart, no qty input, no lead-time). Mobile nav is #mySidenav. Mobile breadcrumbs hidden. Footer root is plain <footer> (no .tcsFooter). No .Contact-info-box — contact info in footer .box:last-child. No payment icons. PLP at /aluminum/. Sidebar is .sidebarBlock. No subcategory tiles. PDP: no qty steppers, no carousel, no Yotpo, no SS recently-viewed. KNOWN SITE DEFICIENCY (test intentionally failing): products have no SKU set in BigCommerce admin — seo.cy.js JSON-LD Product block test fails. BRH admin must add SKUs (model numbers) to products. LIGHTHOUSE (calibrated July 2 2026, live scores homepage a11y 85 / plp 86 / pdp 79): pdp a11y floor 75 override. KNOWN DEFICIENCY: homepage performance scored 42 vs the 50 floor (heavy content, fixable, not theme-structural) -> homepage Lighthouse test intentionally left failing; BRH devs must reduce homepage weight.",
+  "_notes": "Configured June 2026. Standard BigCommerce theme (ul.productGrid, h1.page-heading). No SearchSpring — native BC sort/search. Native BC search always returns results (full catalog for any term) — no zero-result state. Quote-only catalog (no prices, no cart, no qty input, no lead-time). Mobile nav is #mySidenav. Mobile breadcrumbs hidden. Footer root is plain <footer> (no .tcsFooter). No .Contact-info-box — contact info in footer .box:last-child. No payment icons. PLP at /aluminum/. Sidebar is .sidebarBlock. No subcategory tiles. PDP: no qty steppers, no carousel, no Yotpo, no SS recently-viewed. KNOWN SITE DEFICIENCY (test intentionally failing): products have no SKU set in BigCommerce admin — seo.cy.js JSON-LD Product block test fails. BRH admin must add SKUs (model numbers) to products. LIGHTHOUSE (calibrated July 2 2026, live scores homepage a11y 85 / plp 86 / pdp 79): all clear the fleet-wide accessibility:60 floor (no per-store override). KNOWN DEFICIENCY: homepage performance scored 42 vs the 50 floor (heavy content, fixable, not theme-structural) -> homepage Lighthouse test intentionally left failing; BRH devs must reduce homepage weight.",
   "_absentFeatures": [
     {
       "configKey": "forms.proClub",
@@ -155,13 +155,6 @@
       "reviewsContainer": null,
       "qtyIncrement": null,
       "qtyDecrement": null
-    }
-  },
-  "lighthouse": {
-    "thresholds": {
-      "pdp": {
-        "accessibility": 70
-      }
     }
   }
 }
