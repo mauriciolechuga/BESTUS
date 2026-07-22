@@ -295,11 +295,17 @@ export function assertNoHorizontalOverflow(maxWidth) {
   // body.scrollWidth > viewport width means content spills off-screen, forcing the user
   // to scroll horizontally — the most common mobile layout bug. Allow 15px tolerance for
   // scrollbar width (6–15px varies by OS/browser), subpixel rendering, and carousel settle.
-  cy.window().then((win) => {
-    // Wait for content to stabilize by checking if document.body has finished laying out
-    cy.get('body').should('exist');
-    cy.get('html').should('exist');
-    const doc = win.document;
+  //
+  // Retryable on purpose: the check runs inside cy.get('body').should(...), so Cypress
+  // re-invokes the callback until it passes or the assertion timeout elapses. This absorbs
+  // transient layout states — notably a flash of unstyled content (FOUC) where an image
+  // with no width/height attribute renders at its natural width before the theme stylesheet
+  // clamps it (PDA's header logo is a CSS-only 128px but 418px intrinsic, which produced a
+  // phantom ~466px overflow on a single-shot measurement). A genuine overflow never settles,
+  // so it still fails once the retries time out.
+  cy.get('body').should(($body) => {
+    const doc = $body[0].ownerDocument;
+    const win = doc.defaultView;
     if (doc.body.scrollWidth <= maxWidth + 15) return;
 
     // body.scrollWidth also counts content clipped by an overflow-x:hidden/auto

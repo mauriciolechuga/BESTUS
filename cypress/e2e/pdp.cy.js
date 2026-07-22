@@ -62,10 +62,13 @@ describeIfStore(site.pdp, 'Product Detail Page', { testIsolation: false }, () =>
     cy.get(sel.description).invoke('text').should('not.be.empty');
   });
 
-  it('YouTube video iframe is present when a video section exists', () => {
+  it('YouTube video is present when a video section exists', () => {
     cy.get('body').then(($body) => {
       if ($body.find('.product-video').length) {
-        cy.get('.product-video iframe[data-src*="youtube"]').should('exist');
+        // Themes embed the video differently: BESTUS uses a lazy <iframe data-src=…youtube…>,
+        // ADAP uses the <lite-youtube videoid="…"> web component (which only injects the real
+        // iframe on click), and some use a plain <iframe src=…youtube…>. Accept any of them.
+        cy.get('.product-video iframe[data-src*="youtube"], .product-video iframe[src*="youtube"], .product-video lite-youtube[videoid]').should('exist');
       }
     });
   });

@@ -25,17 +25,12 @@
       "href": "/warehouses/",
       "text": "Warehouses"
     },
-    "imageHosts": [
-      "bestaccessdoors.com",
-      "bigcommerce.com"
-    ],
+    "imageHosts": ["bestaccessdoors.com", "bigcommerce.com"],
     "partnerLinks": [
       "https://www.bimobject.com/en/best-access-doors?location=us",
       "https://www.rib-software.com/en/rib-speclink"
     ],
-    "overflowIgnore": [
-      "[class*=\"yotpo\"]"
-    ]
+    "overflowIgnore": ["[class*=\"yotpo\"]"]
   },
   "plp": {
     "main": "/products/",
@@ -44,9 +39,23 @@
     "subcategory": "/products/popular-picks/fire-rated/"
   },
   "products": {
-    "default": "/24-x-24-fire-rated-insulated-access-door-with-exposed-flange/",
+    "default": "/22-x-30-fire-rated-insulated-access-door-with-exposed-flange/",
     "known": [
-      "/24-x-24-fire-rated-insulated-access-door-with-exposed-flange/"
+      "/24-x-24-fire-rated-insulated-access-door-with-exposed-flange/",
+      "/24-x-36-flush-universal-access-door-with-exposed-flange/",
+      "/24-x-36-invisa-hatch-drywall-inlay-with-fully-detachable-hatch-with-mud-in-flange/",
+      "/24-x-24-removable-access-panel-with-detachable-hatch-and-drywall-insert/",
+      "/12-x-12-aluminum-frame-drywall-inlay-access-panel-for-walls/",
+      "/24-x-24-flush-access-door-with-drywall-bead-flange/",
+      "/24-x-36-flush-panel-with-drywall-bead-flange/",
+      "/22-x-30-flush-removable-access-door-with-drywall-bead-flange/",
+      "/14-to-155-ezmag-adjustable-magnetic-closing-access-panel/",
+      "/16-x-24-universal-flush-premium-panel-with-flange/",
+      "/24-x-24-pop-out-radius-corner-gypsum-access-panel-for-ceilings/",
+      "/27-x-35-insulated-crawl-space-access-door/",
+      "/12-x-12-universal-economy-flush-metal-access-door/",
+      "/12-x-12-drywall-inlay-panel-for-wall-tiling/",
+      "/24-x-24-airtight-watertight-panel-prime-coated/"
     ]
   },
   "forms": {
@@ -79,18 +88,18 @@
   "discovery": {
     "search": {
       "knownTerm": "fire-rated access door",
-      "expectedTokens": [
-        "fire",
-        "rated",
-        "access",
-        "door"
-      ],
+      "expectedTokens": ["fire", "rated", "access", "door"],
       "noResultsTerm": "zzzz-no-products-987654321"
     },
     "categories": [
       "/products/",
       "/products/access-doors-panels/",
-      "/products/popular-picks/fire-rated/"
+      "/products/access-doors-panels/type/",
+      "/products/access-doors-panels/shop-by-size/",
+      "/shop-by-size/access-doors-panels/",
+      "/products/popular-picks/fire-rated/",
+      "/products/popular-picks/drywall/mud-in-flange/",
+      "/products/popular-picks/drywall/mud-in-flange/flush-access-door/"
     ],
     "mobileCategory": "/products/popular-picks/fire-rated/",
     "multiPageCategory": "/products/",
@@ -102,10 +111,21 @@
   },
   "pdp": {
     "popular": [
-      "/24-x-24-pop-out-radius-corner-gypsum-access-panel-for-ceilings/",
       "/22-x-30-fire-rated-insulated-access-door-with-exposed-flange/",
-      "/24-x-24-airtight-watertight-panel-prime-coated/",
-      "/24-x-24-flush-access-door-with-drywall-bead-flange/"
+      "/24-x-36-flush-universal-access-door-with-exposed-flange/",
+      "/24-x-36-invisa-hatch-drywall-inlay-with-fully-detachable-hatch-with-mud-in-flange/",
+      "/24-x-24-removable-access-panel-with-detachable-hatch-and-drywall-insert/",
+      "/24-x-24-aluminum-frame-drywall-inlay-access-panel-for-walls/",
+      "/24-x-24-flush-access-door-with-drywall-bead-flange/",
+      "/36-x-36-flush-panel-with-drywall-bead-flange/",
+      "/24-x-24-flush-removable-access-door-with-drywall-bead-flange/",
+      "/105-to-12-ezmag-adjustable-magnetic-closing-access-panel/",
+      "/16-x-24-universal-flush-premium-panel-with-flange/",
+      "/24-x-24-pop-out-radius-corner-gypsum-access-panel-for-ceilings/",
+      "/21-x-31-insulated-crawl-space-access-door/",
+      "/24-x-24-universal-economy-flush-metal-access-door/",
+      "/12-x-12-drywall-inlay-panel-for-wall-tiling/",
+      "/24-x-24-airtight-watertight-panel-prime-coated/"
     ]
   }
 }

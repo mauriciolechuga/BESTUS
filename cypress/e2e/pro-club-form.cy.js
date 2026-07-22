@@ -87,7 +87,7 @@ describeIfStore(proClubForm, 'Pro Club Application form', () => {
     it('shows an error when Email is empty', () => {
       cy.uniqueEmail().then((email) => {
         cy.fillPersona(page, { ...persona }, email);
-        cy.get('input[name="Email"]').clear();
+        cy.get('input[name="Email"]').clear({ force: true });
         page.submit();
         cy.get('@submit.all').should('have.length', 0);
         cy.expectFieldError('input[name="Email"]');

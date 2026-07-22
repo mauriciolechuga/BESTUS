@@ -98,7 +98,19 @@
     "known": [
       "/66-x-144-aluminum-quad-door-lightmax-smoke-vent-polycarb-dome-rooftop-close/",
       "/66-x-144-galvanized-steel-quad-door-acousticmax-50-smoke-vent-manual-winch/",
-      "/66-x-144-galvanized-steel-quad-door-acousticmax-50-smoke-vent-rooftop-close-with-electrical-opening-mechanism/"
+      "/66-x-144-galvanized-steel-quad-door-acousticmax-50-smoke-vent-rooftop-close-with-electrical-opening-mechanism/",
+      "/30-x-54-aluminum-ship-stair-access-roof-hatch-bilco/",
+      "/36-x-36-aluminum-ladder-access-roof-hatch-bilco/",
+      "/36-x-30-thermally-broken-domed-roof-hatch-bilco/",
+      "/4-0-x-4-0-ee-single-leaf-roof-hatch-galvanized-steel-cover-and-curb-milcor/",
+      "/3-0-x-3-0-ee-single-leaf-roof-hatch-galvanized-steel-cover-and-curb-milcor/",
+      "/36-x-30-galvanized-steel-miami-dade-approved-roof-hatch-bilco/",
+      "/24-x-38-fixed-deck-mounted-skylight-laminated-glass-fakro/",
+      "/36-x-30-thermally-broken-ladder-access-roof-hatch-type-s-bilco/",
+      "/30-x-36-roof-access-hatch-elmdor/",
+      "/24-x-36-roof-access-hatch-elmdor/",
+      "/30-x-54-galvanized-steel-versamount-roof-hatch-bilco/",
+      "/36-x-30-aluminum-double-domed-roof-hatch-bilco/"
     ]
   },
   "forms": {
@@ -126,7 +138,7 @@
       "noResultsTerm": null,
       "pdpUrlClean": false
     },
-    "categories": ["/aluminum/", "/galvanized-steel/", "/ladder-access/"],
+    "categories": ["/aluminum/", "/galvanized-steel/", "/ladder-access/", "/bilco/", "/smoke-vents/", "/domed/", "/miami-dade/", "/shop-by-size/"],
     "mobileCategory": "/aluminum/",
     "multiPageCategory": "/aluminum/",
     "sort": {
@@ -144,7 +156,19 @@
     "popular": [
       "/66-x-144-aluminum-quad-door-lightmax-smoke-vent-polycarb-dome-rooftop-close/",
       "/66-x-144-galvanized-steel-quad-door-acousticmax-50-smoke-vent-manual-winch/",
-      "/66-x-144-galvanized-steel-quad-door-acousticmax-50-smoke-vent-rooftop-close-with-electrical-opening-mechanism/"
+      "/66-x-144-galvanized-steel-quad-door-acousticmax-50-smoke-vent-rooftop-close-with-electrical-opening-mechanism/",
+      "/30-x-54-aluminum-ship-stair-access-roof-hatch-bilco/",
+      "/36-x-36-aluminum-ladder-access-roof-hatch-bilco/",
+      "/36-x-30-thermally-broken-domed-roof-hatch-bilco/",
+      "/4-0-x-4-0-ee-single-leaf-roof-hatch-galvanized-steel-cover-and-curb-milcor/",
+      "/3-0-x-3-0-ee-single-leaf-roof-hatch-galvanized-steel-cover-and-curb-milcor/",
+      "/36-x-30-galvanized-steel-miami-dade-approved-roof-hatch-bilco/",
+      "/24-x-38-fixed-deck-mounted-skylight-laminated-glass-fakro/",
+      "/36-x-30-thermally-broken-ladder-access-roof-hatch-type-s-bilco/",
+      "/30-x-36-roof-access-hatch-elmdor/",
+      "/24-x-36-roof-access-hatch-elmdor/",
+      "/30-x-54-galvanized-steel-versamount-roof-hatch-bilco/",
+      "/36-x-30-aluminum-double-domed-roof-hatch-bilco/"
     ],
     "selectors": {
       "breadcrumbs": ".breadcrumbs",

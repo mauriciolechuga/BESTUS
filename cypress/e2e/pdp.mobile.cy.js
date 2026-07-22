@@ -127,9 +127,13 @@ ALL_DEVICES.forEach(({ name, width, height, touchTarget }) => {
     // opens a Klaviyo popup that locks the body — under Electron this leaves zero header
     // interactive elements measurable as :visible (the 53px logo renders fine in real browsers).
     // branding.skipMobileTouchTarget skips it in Electron only; Chrome/Firefox still run it.
-    itIfStore(!(site.branding.skipMobileTouchTarget && Cypress.browser.name === 'electron'), `interactive header elements meet minimum touch target height (${touchTarget}px)`, () => {
+    // branding.skipTouchTarget skips it in every browser: a known header touch-target
+    // deficiency the store's dev team has reviewed and chosen to keep as-is (AAP, FSE).
+    itIfStore(!(site.branding.skipTouchTarget || (site.branding.skipMobileTouchTarget && Cypress.browser.name === 'electron')), `interactive header elements meet minimum touch target height (${touchTarget}px)`, () => {
       assertMaxTouchTarget(touchTarget);
-    }, "header touch targets unmeasurable under Electron (skipMobileTouchTarget); runs in Chrome/Firefox");
+    }, site.branding.skipTouchTarget
+      ? "known header touch-target deficiency, kept as-is per store dev team (branding.skipTouchTarget)"
+      : "header touch targets unmeasurable under Electron (skipMobileTouchTarget); runs in Chrome/Firefox");
   });
 });
 

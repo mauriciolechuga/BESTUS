@@ -54,7 +54,7 @@ describeIfStore(architectForm, 'Architects & Spec Writers form', () => {
     it('shows an error when First Name is empty', () => {
       cy.uniqueEmail().then((email) => {
         cy.fillPersona(page, { ...persona, firstName: 'SKIP' }, email);
-        cy.get('input[name="Name_First"]').clear();
+        cy.get('input[name="Name_First"]').clear({ force: true });
         page.submit();
         cy.get('@submit.all').should('have.length', 0);
         cy.expectFieldError('input[name="Name_First"]');
@@ -64,7 +64,7 @@ describeIfStore(architectForm, 'Architects & Spec Writers form', () => {
     it('shows an error when Last Name is empty', () => {
       cy.uniqueEmail().then((email) => {
         cy.fillPersona(page, { ...persona, lastName: 'SKIP' }, email);
-        cy.get('input[name="Name_Last"]').clear();
+        cy.get('input[name="Name_Last"]').clear({ force: true });
         page.submit();
         cy.get('@submit.all').should('have.length', 0);
         cy.expectFieldError('input[name="Name_Last"]');
@@ -74,7 +74,7 @@ describeIfStore(architectForm, 'Architects & Spec Writers form', () => {
     it('shows an error when Email is empty', () => {
       cy.uniqueEmail().then((email) => {
         cy.fillPersona(page, { ...persona }, email);
-        cy.get('input[name="Email"]').clear();
+        cy.get('input[name="Email"]').clear({ force: true });
         page.submit();
         cy.get('@submit.all').should('have.length', 0);
         cy.expectFieldError('input[name="Email"]');

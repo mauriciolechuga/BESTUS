@@ -1,5 +1,5 @@
 {
-  "_notes": "Spanish-language MX storefront. PLP main is /mas-vendidos/ (4 test products); /productos/entrega-rapida-en-mexico/ has enough products for pagination and sort. Categories are being implemented — revisit PLP main, subcategory, discovery categories, and sort/pagination paths once full category tree is live. Known intentional failures: (1) PLP subcategory /mas-vendidos/resistentes-al-fuego/ has 0 products; (2) seo.cy.js Product JSON-LD test fails — Product schema has no offers/priceCurrency/availability — BC admin must configure structured data. Klaviyo email popup present (force:true already in ZohoFormPage). No Pro Club / architects / product-info forms.",
+  "_notes": "Spanish-language MX storefront. Real product catalog now live — pdp.popular/products.known hold 20 live (HTTP 200, verified July 21 2026) real product PDPs (was 4 test/placeholder products). PLP main is /mas-vendidos/; /productos/entrega-rapida-en-mexico/ has enough products for pagination and sort. Categories are being implemented — revisit PLP main, subcategory, discovery categories, and sort/pagination paths once full category tree is live. Known intentional failures: (1) PLP subcategory /mas-vendidos/resistentes-al-fuego/ has 0 products; (2) seo.cy.js Product JSON-LD test fails — Product schema has no offers/priceCurrency/availability — BC admin must configure structured data (re-verify against the real-product PDPs). Klaviyo email popup present (force:true already in ZohoFormPage). No Pro Club / architects / product-info forms. PENDING discovery.categories (valid slugs, HTTP 200, but <3 products as of July 21 2026 so they fail assertProductCards(3) — add to discovery.categories once inventory is assigned; re-check count via `curl -s <url> | grep -oc data-entity-id`): /productos/ (1), /numeros-de-modelo/ (1), /numeros-de-modelo/pa-ba-5xpa-3000/ (1), /numeros-de-modelo/pa-ba-afl/ (1), /productos/puertas-y-paneles-de-acceso/ (1), /mas-vendidos/para-exterior/ (0), /mas-vendidos/para-muros-de-tablaroca/ (0), /mas-vendidos/resistentes-al-fuego/ (0), /mas-vendidos/para-techo-y-atico/ (0), /mas-vendidos/uso-general/ (0), /productos/rejillas-para-puertas-y-kits-de-ventanas/ (0), /productos/compuertas-de-desahogo-de-humo/ (0), /productos/cajas-para-valvulas/ (0), /productos/trampillas-de-piso-y-techo/ (0), /productos/cubiertas-de-ventilacion/ (0).",
   "_absentFeatures": [
     {
       "configKey": "forms.productInfo",
@@ -87,12 +87,28 @@
     }
   },
   "products": {
-    "default": "/test-proposito/",
+    "default": "/30-x-30-puerta-de-acceso-exterior/",
     "known": [
-      "/test-proposito/",
-      "/test-mex-product-with-option-and-modifier/",
-      "/test-modifier-one-13-50/",
-      "/test-modifier-two-5-50/"
+      "/30-x-30-puerta-de-acceso-exterior/",
+      "/12-x-12-puerta-de-acceso-exterior/",
+      "/36-x-48-puerta-de-acceso-exterior/",
+      "/8-x-8-puerta-de-acceso-al-ras-para-tablaroca/",
+      "/24-x-24-puerta-de-acceso-plomada-para-proteccion-radiologica/",
+      "/8-x-8-puerta-de-acceso-cortafuego-aislada/",
+      "/24-x-24-registro-de-acceso-de-yeso-reforzado-con-fibra-de-vidrio-esquinas-redondeadas/",
+      "/8-x-8-puerta-de-acceso-exterior/",
+      "/20-x-20-registro-recesado-de-1-2-con-marco-de-aluminio-y-panel-de-tablaroca/",
+      "/14-x-14-panel-de-acceso-plastico-al-ras/",
+      "/24-x-24-puerta-de-acceso-hermetica-y-estanca-al-agua/",
+      "/8-x-8-puerta-de-acceso-desmontable-con-burlete-perimetral/",
+      "/16-x-16-panel-de-acceso-liviano-para-interior-y-exterior-aluminio/",
+      "/24-x-36-puerta-de-acceso-con-empaque-hermetico/",
+      "/8-x-8-invisa-hatch-panel-de-acceso-con-inserto-de-tablaroca-para-muros-con-azulejo/",
+      "/18-x-18-puerta-de-acceso-cortafuego-aislada/",
+      "/24-x-24-puerta-de-acceso-cortafuego-aislada/",
+      "/12-x-12-puerta-de-acceso-cortafuego-aislada/",
+      "/24-x-24-panel-de-acceso-para-plafon-de-tablaroca/",
+      "/8-x-8-registro-universal-al-ras/"
     ]
   },
   "forms": {
@@ -132,7 +148,10 @@
     },
     "categories": [
       "/mas-vendidos/",
-      "/productos/entrega-rapida-en-mexico/"
+      "/productos/entrega-rapida-en-mexico/",
+      "/numeros-de-modelo/pa-ba-uap/",
+      "/numeros-de-modelo/pa-ba-fri/",
+      "/numeros-de-modelo/pa-ba-ivt/"
     ],
     "mobileCategory": "/mas-vendidos/",
     "multiPageCategory": "/productos/entrega-rapida-en-mexico/",
@@ -147,10 +166,26 @@
   "pdp": {
     "recentlyViewedProfile": null,
     "popular": [
-      "/test-proposito/",
-      "/test-mex-product-with-option-and-modifier/",
-      "/test-modifier-one-13-50/",
-      "/test-modifier-two-5-50/"
+      "/30-x-30-puerta-de-acceso-exterior/",
+      "/12-x-12-puerta-de-acceso-exterior/",
+      "/36-x-48-puerta-de-acceso-exterior/",
+      "/8-x-8-puerta-de-acceso-al-ras-para-tablaroca/",
+      "/24-x-24-puerta-de-acceso-plomada-para-proteccion-radiologica/",
+      "/8-x-8-puerta-de-acceso-cortafuego-aislada/",
+      "/24-x-24-registro-de-acceso-de-yeso-reforzado-con-fibra-de-vidrio-esquinas-redondeadas/",
+      "/8-x-8-puerta-de-acceso-exterior/",
+      "/20-x-20-registro-recesado-de-1-2-con-marco-de-aluminio-y-panel-de-tablaroca/",
+      "/14-x-14-panel-de-acceso-plastico-al-ras/",
+      "/24-x-24-puerta-de-acceso-hermetica-y-estanca-al-agua/",
+      "/8-x-8-puerta-de-acceso-desmontable-con-burlete-perimetral/",
+      "/16-x-16-panel-de-acceso-liviano-para-interior-y-exterior-aluminio/",
+      "/24-x-36-puerta-de-acceso-con-empaque-hermetico/",
+      "/8-x-8-invisa-hatch-panel-de-acceso-con-inserto-de-tablaroca-para-muros-con-azulejo/",
+      "/18-x-18-puerta-de-acceso-cortafuego-aislada/",
+      "/24-x-24-puerta-de-acceso-cortafuego-aislada/",
+      "/12-x-12-puerta-de-acceso-cortafuego-aislada/",
+      "/24-x-24-panel-de-acceso-para-plafon-de-tablaroca/",
+      "/8-x-8-registro-universal-al-ras/"
     ],
     "selectors": {
       "breadcrumbs": ".breadcrumbs",
