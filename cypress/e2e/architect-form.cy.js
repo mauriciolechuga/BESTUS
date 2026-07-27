@@ -56,7 +56,7 @@ describeIfStore(architectForm, 'Architects & Spec Writers form', () => {
         cy.fillPersona(page, { ...persona, firstName: 'SKIP' }, email);
         cy.get('input[name="Name_First"]').clear({ force: true });
         page.submit();
-        cy.get('@submit.all').should('have.length', 0);
+        cy.expectNoSubmission();
         cy.expectFieldError('input[name="Name_First"]');
       });
     });
@@ -66,7 +66,7 @@ describeIfStore(architectForm, 'Architects & Spec Writers form', () => {
         cy.fillPersona(page, { ...persona, lastName: 'SKIP' }, email);
         cy.get('input[name="Name_Last"]').clear({ force: true });
         page.submit();
-        cy.get('@submit.all').should('have.length', 0);
+        cy.expectNoSubmission();
         cy.expectFieldError('input[name="Name_Last"]');
       });
     });
@@ -76,7 +76,7 @@ describeIfStore(architectForm, 'Architects & Spec Writers form', () => {
         cy.fillPersona(page, { ...persona }, email);
         cy.get('input[name="Email"]').clear({ force: true });
         page.submit();
-        cy.get('@submit.all').should('have.length', 0);
+        cy.expectNoSubmission();
         cy.expectFieldError('input[name="Email"]');
       });
     });
@@ -84,13 +84,13 @@ describeIfStore(architectForm, 'Architects & Spec Writers form', () => {
     it('shows an error when Email is malformed', () => {
       cy.fillPersona(page, persona, 'not-an-email');
       page.submit();
-      cy.get('@submit.all').should('have.length', 0);
+      cy.expectNoSubmission();
       cy.expectFieldError('input[name="Email"]');
     });
 
     it('does not submit the form when required fields are missing', () => {
       page.submit();
-      cy.get('@submit.all').should('have.length', 0);
+      cy.expectNoSubmission();
     });
   });
 });

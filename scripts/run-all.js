@@ -13,6 +13,7 @@ const { spawnSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 const { SUMMARY_DIR } = require('./writeRunLog');
+const { resolveCypressBin } = require('./resolveCypressBin');
 
 const storesDir = path.join(__dirname, '..', 'stores');
 const LOG_FILE = path.join(__dirname, '..', 'results', 'test-results.log');
@@ -60,9 +61,8 @@ console.log(`\n▶ Test run started ${new Date().toLocaleString()}  —  ${store
 for (const store of stores) {
   console.log(`\n${'═'.repeat(70)}\n▶ Store: ${store}  —  started ${new Date().toLocaleString()}\n${'═'.repeat(70)}\n`);
   const started = Date.now();
-  const result = spawnSync('npx', ['cypress', 'run', ...cypressArgs], {
+  const result = spawnSync(process.execPath, [resolveCypressBin(), 'run', ...cypressArgs], {
     stdio: 'inherit',
-    shell: true, // required on Windows for npx
     env: { ...process.env, STORE: store },
   });
   results.push({

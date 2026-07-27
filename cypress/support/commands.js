@@ -40,20 +40,37 @@ Cypress.Commands.add('interceptZoho', (alias, urlPattern) => {
 });
 
 /**
+ * Asserts a form did NOT submit. `cy.get('@submit.all').should('have.length', 0)`
+ * on its own passes the instant it's checked — 0 requests have matched *so far* —
+ * so it gives no window for a slightly-delayed/async POST (e.g. a race between
+ * the click handler and Zoho's client-side validation) to land and be caught.
+ * This waits briefly first so a late submission actually has a chance to fire
+ * before we assert none did.
+ */
+Cypress.Commands.add('expectNoSubmission', (alias = 'submit') => {
+  cy.wait(500);
+  cy.get(`@${alias}.all`).should('have.length', 0);
+});
+
+/**
  * Asserts a Zoho validation error is shown for the field matched by `selector`.
- * Zoho renders errors in a sibling or ancestor container (not always an <li>), so we
- * scan all ancestors for an error/invalid class.
+ * Zoho pre-renders every field's error `<p class="zf-errorMessage" style="display:none;">`
+ * into the DOM unconditionally and only toggles it visible on failure — so this must
+ * assert visibility, not mere existence (the element "exists" whether or not validation
+ * ever ran). It's also scoped to the field's own `.zf-tempFrmWrapper` (Zoho's own
+ * per-field container, not a theme class) rather than searching the whole page, so it
+ * can't match some other field's error placeholder or a hidden duplicate-form copy.
  */
 Cypress.Commands.add('expectFieldError', (selector) => {
   // filter(':visible').first(): some themes (BESTUS PDPs) render the Zoho form twice
   // (visible desktop + hidden responsive copy), so `selector` can match 2 fields —
-  // walk ancestors from the one real (visible) field.
+  // walk from the one real (visible) field.
   cy.get(selector)
     .filter(':visible')
     .first()
-    .parents()
+    .closest('.zf-tempFrmWrapper')
     .find('[class*="error"], [class*="invalid"], [class*="Error"]')
-    .should('exist');
+    .should('be.visible');
 });
 
 /**
