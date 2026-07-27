@@ -16,6 +16,11 @@
   let running = false;
   let es = null; // EventSource, held so the Exit button can close it
 
+  // Read once from the <meta> tag server.js injects into index.html on every request —
+  // required as a header on state-changing POST calls (see requireToken in server.js).
+  const DASHBOARD_TOKEN =
+    (document.querySelector('meta[name="dashboard-token"]') || {}).content || '';
+
   // ── color tiers (mirror scripts/run-all.js storeColor) ────────────────────
   function tierOf(summary) {
     if (!summary) return 'nodata';
@@ -235,7 +240,7 @@
     setRunning(true);
     const res = await fetch('/api/run', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'X-Dashboard-Token': DASHBOARD_TOKEN },
       body: JSON.stringify(payload),
     });
     if (!res.ok) {
@@ -256,7 +261,7 @@
     $('#stop-btn').disabled = true;
     $('#status-line').textContent = 'Stopping… waiting for the test processes to close.';
     try {
-      await fetch('/api/stop', { method: 'POST' });
+      await fetch('/api/stop', { method: 'POST', headers: { 'X-Dashboard-Token': DASHBOARD_TOKEN } });
     } catch (e) {
       $('#stop-btn').disabled = false;
     }
@@ -266,7 +271,7 @@
     if (!confirm('Exit the dashboard? This stops any running tests and closes the dashboard window.')) return;
     if (es) es.close(); // stop SSE auto-reconnect before the server goes away
     try {
-      await fetch('/api/exit', { method: 'POST' });
+      await fetch('/api/exit', { method: 'POST', headers: { 'X-Dashboard-Token': DASHBOARD_TOKEN } });
     } catch (e) {
       /* server may already be gone */
     }

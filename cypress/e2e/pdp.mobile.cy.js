@@ -45,6 +45,8 @@ ALL_DEVICES.forEach(({ name, width, height, touchTarget }) => {
     before(() => {
       blockThirdParty();
       cy.viewport(width, height);
+      cy.task('log', `[pdp.mobile.cy.js] PDP under test (${name}): ${pdpUrl}`);
+      cy.log(`**PDP under test:** ${pdpUrl}`);
       cy.visit(pdpUrl, { onBeforeLoad: consoleErrors.onBeforeLoad });
     });
 
@@ -145,6 +147,8 @@ PHONES.forEach(({ name, width, height }) => {
     before(() => {
       blockThirdParty();
       cy.viewport(height, width); // landscape: swap width and height
+      cy.task('log', `[pdp.mobile.cy.js] PDP under test (${name} landscape): ${pdpUrl}`);
+      cy.log(`**PDP under test:** ${pdpUrl}`);
       cy.visit(pdpUrl);
     });
 
