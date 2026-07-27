@@ -43,6 +43,16 @@ function availableStores() {
     .sort();
 }
 
+// Real, on-disk spec paths (e.g. "cypress/e2e/homepage.cy.js") — used to
+// validate --spec values from POST /api/run before they reach a child process.
+function availableSpecs() {
+  const e2eDir = path.join(ROOT, 'cypress', 'e2e');
+  return fs
+    .readdirSync(e2eDir, { recursive: true, withFileTypes: true })
+    .filter((e) => e.isFile() && e.name.endsWith('.cy.js'))
+    .map((e) => path.relative(ROOT, path.join(e.parentPath, e.name)).split(path.sep).join('/'));
+}
+
 // Strip ANSI color codes so the browser log pane stays clean text.
 // eslint-disable-next-line no-control-regex
 const ANSI_RE = /\x1b\[[0-9;]*m/g;
@@ -206,10 +216,10 @@ let running = false; // single-run lock
 let currentChild = null; // in-flight runner process (null between jobs / when idle)
 let stopRequested = false; // set by /api/stop so runNext doesn't advance the queue
 
-// Kill the in-flight runner and its whole subtree. The runners call
-// spawnSync('npx', ..., { shell: true }), so the tree is
-// server → node run-*.js → cmd → npx → node → cypress → Chrome; a plain
-// child.kill() would orphan cypress + Chrome. taskkill /T takes the tree.
+// Kill the in-flight runner and its whole subtree. The runners spawn the
+// Cypress CLI directly via node, so the tree is
+// server → node run-*.js → node (cypress bin) → Chrome; a plain child.kill()
+// would orphan cypress + Chrome. taskkill /T takes the tree.
 function killRunTree() {
   if (!currentChild) return false;
   stopRequested = true;
@@ -410,13 +420,19 @@ function handleApi(req, res, url) {
       stores = stores.filter((s) => all.includes(s));
       if (!stores.length) return sendJson(res, 400, { error: 'No valid stores selected.' });
 
-      // Normalize specsByStore keys to lowercase validated stores.
+      // Normalize specsByStore keys to lowercase validated stores, and drop
+      // any spec string that isn't a real file on disk — these values flow
+      // into a child process's --spec argument, so this is a security
+      // boundary, not just a UX nicety.
+      const realSpecs = new Set(availableSpecs());
       let normSpecs = null;
       if (specsByStore) {
         normSpecs = {};
         for (const [k, v] of Object.entries(specsByStore)) {
           const code = String(k).toLowerCase();
-          if (all.includes(code) && Array.isArray(v) && v.length) normSpecs[code] = v;
+          if (!all.includes(code) || !Array.isArray(v)) continue;
+          const specs = v.filter((s) => realSpecs.has(String(s)));
+          if (specs.length) normSpecs[code] = specs;
         }
         if (!Object.keys(normSpecs).length) normSpecs = null;
       }
@@ -479,7 +495,9 @@ server.on('error', (err) => {
   throw err;
 });
 
-server.listen(PORT, () => {
+// Bind to localhost only — this server accepts unauthenticated run/stop/exit
+// commands, so it must never be reachable from other devices on the network.
+server.listen(PORT, '127.0.0.1', () => {
   console.log(
     `\n  ============================================================\n` +
       `   TEST DASHBOARD running\n` +

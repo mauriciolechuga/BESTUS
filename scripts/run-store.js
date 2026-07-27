@@ -11,6 +11,7 @@
 const { spawnSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
+const { resolveCypressBin } = require('./resolveCypressBin');
 
 const storesDir = path.join(__dirname, '..', 'stores');
 
@@ -36,9 +37,8 @@ console.log(`\n▶ Running Cypress for store "${store}"  —  started ${new Date
 // Default to Chrome unless the caller already passed --browser.
 if (!cypressArgs.includes('--browser')) cypressArgs.push('--browser', 'chrome');
 
-const result = spawnSync('npx', ['cypress', 'run', ...cypressArgs], {
+const result = spawnSync(process.execPath, [resolveCypressBin(), 'run', ...cypressArgs], {
   stdio: 'inherit',
-  shell: true, // required on Windows for npx
   env: { ...process.env, STORE: store },
 });
 

@@ -57,7 +57,7 @@ describeIfStore(vendorForm, 'Become a Vendor form', () => {
 
     it('does not submit the form when required fields are missing', () => {
       page.submit();
-      cy.get('@submit.all').should('have.length', 0);
+      cy.expectNoSubmission();
     });
   });
 });

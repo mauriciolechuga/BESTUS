@@ -48,16 +48,62 @@ export const waitForProducts = (min = 1) =>
 /** Picks a random element from a non-empty list. */
 export const pickRandom = (list) => list[Math.floor(Math.random() * list.length)];
 
+// Noisy third-party analytics / ad / visitor-tracking hosts (GA, GTM, Meta, Reddit, Spotify,
+// Taboola, leadsy, PageSense, Geotargetly, etc.). Derived by auditing every resource the live
+// site loads (see the throwaway cypress/e2e/_audit-hosts.cy.js). Store-functional vendors
+// (SearchSpring search API, Yotpo reviews, Zoho forms, PayPal, fonts, library CDNs) are
+// deliberately excluded. Regexes (not globs) so they match the request's subdomain host, e.g.
+// www.google-analytics.com or wvbknd.leadsy.ai — a glob matching the host as a path segment
+// would not, because the host is a single URL authority segment, not a path segment.
+//
+// Single source of truth for two consumers: blockThirdParty() stubs these hosts' network
+// requests, and e2e.js's uncaught:exception handler checks a thrown error's stack against this
+// same list so it only suppresses exceptions actually sourced from these known vendor scripts.
+// Most entries stub to an empty 204 (`body` omitted); a few need a real script body instead,
+// because the live site's own first-party bootstrap code assumes the blocked script already ran
+// and executes a follow-up call against a global it defines — see the gaconnector entry below
+// for a documented example.
+export const THIRD_PARTY_HOSTS = [
+  // Analytics / tag managers
+  { pattern: /google-analytics\.com/ },
+  { pattern: /googletagmanager\.com/ },
+  { pattern: /analytics\.google\.com/ },
+  {
+    // GA Connector — lead-source tracking. The live site's own inline bootstrap loads this
+    // script then, 3s later, unconditionally calls `gaconnector2.track(id)` assuming it already
+    // defined that global — stubbing an empty body leaves it undefined, throwing a first-party
+    // ReferenceError. Serve a no-op stand-in instead so the site's own call succeeds silently.
+    pattern: /gaconnector\.com/,
+    body: 'window.gaconnector2 = window.gaconnector2 || { track: function () {} };',
+  },
+  { pattern: /pagesense/ }, // Zoho PageSense heatmaps (cdn.pagesense.io + *.zoho.com collectors)
+
+  // Ad / social pixels
+  { pattern: /facebook\.(com|net)/ }, // Meta pixel (fbevents.js + www.facebook.com)
+  { pattern: /reddit\.com/ },         // Reddit Ads pixel
+  { pattern: /redditstatic\.com/ },
+  { pattern: /spotify\.com/ },        // Spotify ad pixel (pixels.spotify.com + pixel.byspotify.com)
+  { pattern: /taboola\.com/ },        // Taboola content/ad network
+
+  // Visitor tracking / fingerprinting / affiliate
+  { pattern: /leadsy\.ai/ },
+  { pattern: /iesnare\.com/ },        // iovation/LexisNexis device fingerprinting
+  { pattern: /geotargetly/ },         // Geotargetly geo personalization
+  { pattern: /affiliatly\.com/ },     // Affiliatly affiliate tracking
+
+  // Vendor sub-trackers — the functional API/UI for each vendor stays loaded, only its
+  // tracking beacons are stubbed.
+  { pattern: /analytics\.searchspring\.net/ }, // SearchSpring analytics (search API kept)
+  { pattern: /beacon\.searchspring\.io/ },     // SearchSpring beacon (search API kept)
+  { pattern: /salesiq\.zohopublic\.com/ },     // Zoho SalesIQ live-chat widget
+  { pattern: /clarity\.ms/ },                  // Microsoft Clarity session recording
+  { pattern: /ipapi\.co/ },                    // ipapi.co geo-IP (PDA locale detection)
+];
+
 /**
- * Stubs noisy third-party analytics / ad / visitor-tracking beacons (GA, GTM, Meta, Reddit,
- * Spotify, Taboola, leadsy, PageSense, Geotargetly, etc. — full list inline below) with an empty
- * 204 so their fetches resolve cleanly instead of rejecting and logging "Failed to fetch" to
- * console.error. The host list was derived by auditing every resource the live site loads (see the
- * throwaway cypress/e2e/_audit-hosts.cy.js). Store-functional vendors (SearchSpring search API,
- * Yotpo reviews, Zoho forms, PayPal, fonts, library CDNs) are deliberately NOT blocked.
- * Regexes (not globs) are used so they match the request's subdomain host, e.g.
- * www.google-analytics.com or wvbknd.leadsy.ai — a glob matching the host as a path segment would
- * not, because the host is a single URL authority segment, not a path segment.
+ * Stubs every THIRD_PARTY_HOSTS request so it resolves cleanly instead of rejecting and logging
+ * "Failed to fetch" to console.error — an empty 204 by default, or a real script `body` for the
+ * few hosts where that's not enough (see THIRD_PARTY_HOSTS above).
  *
  * Registered globally in e2e.js `beforeEach` for specs that visit inside each test. Mobile specs
  * that share one visit under `testIsolation:false` must ALSO call this at the top of their `before()`
@@ -65,36 +111,46 @@ export const pickRandom = (list) => list[Math.floor(Math.random() * list.length)
  * unintercepted and fail the console-error check.
  */
 export function blockThirdParty() {
-  const stub = { statusCode: 204, body: '' };
-
-  // Analytics / tag managers
-  cy.intercept(/google-analytics\.com/, stub);
-  cy.intercept(/googletagmanager\.com/, stub);
-  cy.intercept(/analytics\.google\.com/, stub);
-  cy.intercept(/gaconnector\.com/, stub);            // GA Connector — lead-source tracking
-  cy.intercept(/pagesense/, stub);                   // Zoho PageSense heatmaps (cdn.pagesense.io + *.zoho.com collectors)
-
-  // Ad / social pixels
-  cy.intercept(/facebook\.(com|net)/, stub);         // Meta pixel (fbevents.js + www.facebook.com)
-  cy.intercept(/reddit\.com/, stub);                 // Reddit Ads pixel
-  cy.intercept(/redditstatic\.com/, stub);
-  cy.intercept(/spotify\.com/, stub);                // Spotify ad pixel (pixels.spotify.com + pixel.byspotify.com)
-  cy.intercept(/taboola\.com/, stub);                // Taboola content/ad network
-
-  // Visitor tracking / fingerprinting / affiliate
-  cy.intercept(/leadsy\.ai/, stub);
-  cy.intercept(/iesnare\.com/, stub);                // iovation/LexisNexis device fingerprinting
-  cy.intercept(/geotargetly/, stub);                 // Geotargetly geo personalization
-  cy.intercept(/affiliatly\.com/, stub);             // Affiliatly affiliate tracking
-
-  // Vendor sub-trackers — the functional API/UI for each vendor stays loaded, only its
-  // tracking beacons are stubbed.
-  cy.intercept(/analytics\.searchspring\.net/, stub); // SearchSpring analytics (search API kept)
-  cy.intercept(/beacon\.searchspring\.io/, stub);     // SearchSpring beacon (search API kept)
-  cy.intercept(/salesiq\.zohopublic\.com/, stub);     // Zoho SalesIQ live-chat widget
-  cy.intercept(/clarity\.ms/, stub);                  // Microsoft Clarity session recording
-  cy.intercept(/ipapi\.co/, stub);                    // ipapi.co geo-IP (PDA locale detection)
+  THIRD_PARTY_HOSTS.forEach(({ pattern, body }) => {
+    cy.intercept(
+      pattern,
+      body
+        ? { statusCode: 200, headers: { 'content-type': 'application/javascript' }, body }
+        : { statusCode: 204, body: '' }
+    );
+  });
 }
+
+// Scripts with a known, already-triaged bug of their own — either a vendor script we
+// deliberately leave loaded for real (network-blocking it, like THIRD_PARTY_HOSTS, would break
+// the thing we're testing) or a first-party asset with a confirmed, low-severity defect pending
+// a fix. Consumed only by e2e.js's uncaught:exception handler, never by blockThirdParty() — these
+// scripts still run for real, we just don't want their known bug to fail unrelated tests.
+// Each entry matches by `stackPattern` (when the browser gives a real, attributable stack) or
+// `messagePattern` (for a browser-redacted error with no stack at all — same-origin scripts can
+// still lose their stack this way when loaded as a raw external <script src>, e.g. the
+// tracking_code.js entry below).
+export const KNOWN_BUGGY_SCRIPTS = [
+  {
+    // Zoho SalesIQ chat widget UI bundle. Its `float~modern` chunk has an internal bug
+    // ("Cannot read properties of undefined (reading 'float')") that can throw when a page
+    // navigates away while the widget is still initializing — observed live on a BESTUS PLP
+    // card click through to its PDP. A real bug in Zoho's widget, not ours to fix.
+    stackPattern: /static\.zohocdn\.com/,
+  },
+  {
+    // BESTUS's /content/assets/js/tracking_code.js (loaded only on /request-a-quote/) is
+    // deployed with literal <script>/</script> wrapper tags still inside the file content — a
+    // Zoho UTM/lead-tracking snippet meant for inline embedding, mistakenly saved as a
+    // standalone external file. Loaded via <script src>, the browser parses the raw text as JS
+    // and chokes on the leading '<', throwing this exact SyntaxError with no stack at all (same
+    // redacted shape as a cross-origin error, even though it's same-origin) — so there's no
+    // stack/host to match on, only this message. Confirmed low-severity: the real Zoho
+    // form/submission is unaffected, only this script's own UTM-attribution cookie logic never
+    // runs on that page (see stores/bestus.json _notes for the fix).
+    messagePattern: /Unexpected token '<'/,
+  },
+];
 
 /**
  * Asserts the first `limit` product cards each have an image, title, link — and a $-price

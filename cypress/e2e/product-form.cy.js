@@ -60,7 +60,7 @@ describeIfStore(productForm && site.products, 'Product information form', () => 
         cy.fillPersona(page, { ...persona, firstName: 'SKIP' }, email);
         cy.get('input[name="Name_First"]:visible').clear({ force: true });
         page.submit();
-        cy.get('@submit.all').should('have.length', 0);
+        cy.expectNoSubmission();
         cy.expectFieldError('input[name="Name_First"]');
       });
     });
@@ -70,7 +70,7 @@ describeIfStore(productForm && site.products, 'Product information form', () => 
         cy.fillPersona(page, { ...persona, lastName: 'SKIP' }, email);
         cy.get('input[name="Name_Last"]:visible').clear({ force: true });
         page.submit();
-        cy.get('@submit.all').should('have.length', 0);
+        cy.expectNoSubmission();
         cy.expectFieldError('input[name="Name_Last"]');
       });
     });
@@ -80,7 +80,7 @@ describeIfStore(productForm && site.products, 'Product information form', () => 
         cy.fillPersona(page, { ...persona }, email);
         cy.get('input[name="Email"]:visible').clear({ force: true });
         page.submit();
-        cy.get('@submit.all').should('have.length', 0);
+        cy.expectNoSubmission();
         cy.expectFieldError('input[name="Email"]');
       });
     });
@@ -88,7 +88,7 @@ describeIfStore(productForm && site.products, 'Product information form', () => 
     it('shows an error when Email is malformed', () => {
       cy.fillPersona(page, persona, 'not-an-email');
       page.submit();
-      cy.get('@submit.all').should('have.length', 0);
+      cy.expectNoSubmission();
       cy.expectFieldError('input[name="Email"]');
     });
 
@@ -97,14 +97,14 @@ describeIfStore(productForm && site.products, 'Product information form', () => 
         cy.fillPersona(page, { ...persona, details: 'SKIP' }, email);
         cy.get('textarea[name="MultiLine"]:visible').clear({ force: true });
         page.submit();
-        cy.get('@submit.all').should('have.length', 0);
+        cy.expectNoSubmission();
         cy.expectFieldError('textarea[name="MultiLine"]');
       });
     });
 
     it('does not submit the form when required fields are missing', () => {
       page.submit();
-      cy.get('@submit.all').should('have.length', 0);
+      cy.expectNoSubmission();
     });
   });
 });
