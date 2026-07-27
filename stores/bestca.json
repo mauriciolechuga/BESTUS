@@ -102,11 +102,13 @@
     },
     "quoteRequest": {
       "path": "/request-a-quote/",
+      "quantityOptions": ["I don't know", "1", "2", "3", "4", "5+"],
       "submitUrlPattern": "**/forms.zohopublic.com/**/BESTCARequestAQuote/**/submit",
       "optionalFields": ["Name_First"]
     },
     "contact": {
       "path": "/contact-us/",
+      "inquiryTypes": ["Sales & Products", "Customer Service & Existing Orders"],
       "submitUrlPattern": "**/forms.zohopublic.com/**/BESTCAContactUsNew/**/submit"
     },
     "proClub": {

@@ -70,7 +70,10 @@ describe("Lighthouse audit", () => {
   });
 
   itIfStore(site.pdp, "a random PDP meets score thresholds", () => {
-    cy.visit(storePath(pickRandom(site.pdp.popular)));
+    const pdpUrl = storePath(pickRandom(site.pdp.popular));
+    cy.task('log', `[lighthouse.cy.js] PDP under test: ${pdpUrl}`);
+    cy.log(`**PDP under test:** ${pdpUrl}`);
+    cy.visit(pdpUrl);
     cy.lighthouse(LIGHTHOUSE_THRESHOLDS, DESKTOP_OPTS);
   });
 });

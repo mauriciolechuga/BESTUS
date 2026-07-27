@@ -37,7 +37,10 @@ describeIfStore(site.plp, 'SEO – PLP', { testIsolation: false }, () => {
 // ─── Product Detail Page ───────────────────────────────────────────────────────
 describeIfStore(site.pdp, 'SEO – PDP', { testIsolation: false }, () => {
   before(() => {
-    cy.visit(storePath(pickRandom(site.pdp.popular)));
+    const pdpUrl = storePath(pickRandom(site.pdp.popular));
+    cy.task('log', `[seo.cy.js] PDP under test: ${pdpUrl}`);
+    cy.log(`**PDP under test:** ${pdpUrl}`);
+    cy.visit(pdpUrl);
   });
 
   it('has a non-empty <title>', () => {

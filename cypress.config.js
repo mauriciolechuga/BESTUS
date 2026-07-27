@@ -20,6 +20,39 @@ for (const key of ["storeCode", "baseUrl", "homePath"]) {
   if (!site[key]) throw new Error(`stores/${STORE}.json is missing required key "${key}"`);
 }
 
+// Non-throwing schema-shape check: catches a typo'd top-level or forms.* key (e.g. "frms"
+// instead of "forms") that would otherwise silently produce an identical-looking
+// "[skipped: not configured for CODE]" title in every gated spec — indistinguishable from a
+// deliberately-null section. Warns only, never throws: an unrecognized key must never break
+// an otherwise-working config. Extend both lists when a new top-level or forms.* section is
+// introduced (see the Nullable-section contract in CLAUDE.md).
+const KNOWN_TOP_LEVEL_KEYS = [
+  "storeCode", "baseUrl", "homePath", "visitQuery", "branding", "plp", "products",
+  "discovery", "pdp", "forms", "testEmailTemplate", "personaOverrides",
+  "_todo", "_notes", "_absentFeatures",
+];
+const KNOWN_FORMS_KEYS = [
+  "contact", "quoteRequest", "proClub", "productInfo", "architectInquiries", "becomeVendor",
+];
+for (const key of Object.keys(site)) {
+  if (!KNOWN_TOP_LEVEL_KEYS.includes(key)) {
+    console.warn(
+      `[stores/${STORE}.json] unrecognized top-level key "${key}" — typo? ` +
+      `(expected one of: ${KNOWN_TOP_LEVEL_KEYS.join(", ")})`
+    );
+  }
+}
+if (site.forms && typeof site.forms === "object") {
+  for (const key of Object.keys(site.forms)) {
+    if (!KNOWN_FORMS_KEYS.includes(key)) {
+      console.warn(
+        `[stores/${STORE}.json] unrecognized "forms.${key}" — typo? ` +
+        `(expected one of: ${KNOWN_FORMS_KEYS.join(", ")})`
+      );
+    }
+  }
+}
+
 module.exports = defineConfig({
   allowCypressEnv: true,
   // Retry failed tests in `cypress run` to absorb transient live-site flake; never retry
@@ -62,7 +95,16 @@ module.exports = defineConfig({
         }
         return launchOptions;
       });
-      on('task', { lighthouse: lighthouse() });
+      on('task', {
+        lighthouse: lighthouse(),
+        // Minimal PDP-pick attribution for pickRandom()-based specs — console.log from a task
+        // reaches this process's real stdout (unlike cy.log, invisible in headless `cypress run`,
+        // this suite's default mode). Purely informational; never affects pass/fail.
+        log: (message) => {
+          console.log(message);
+          return null;
+        },
+      });
     }
   },
 });

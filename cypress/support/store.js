@@ -146,6 +146,16 @@ const PLP_SELECTOR_DEFAULTS = {
   // are interleaved in the same grid — so it sets this to null to skip the per-card price check
   // (PDP/JSON-LD price coverage still applies on priced products). Nullable.
   cardPrice: '[class*="price"]',
+  // Remaining per-card inner elements: image, title text, and link. No fleet store has
+  // needed to override these yet (every theme's card partial shares this markup), but they're
+  // routed through the same plp.selectors override contract as productCard/cardPrice so a
+  // future theme drift doesn't require a checks.js code change. cardLink is kept as ONE
+  // combined-selector string (not split into two keys) — matches the exact current hardcoded
+  // behavior: whichever of the two anchors wraps a link on this theme's card, .first() below
+  // picks it.
+  cardImage: '.card-figure img',
+  cardTitle: '.card-title',
+  cardLink: '.card-figure a, .card-title a',
   // Detailed pagination markup (BESTUS SearchSpring template). Overridden per store —
   // e.g. ADAP's older template uses .ss-pagination-container/li.pagination-item with ?p=2.
   // Nullable: a store whose theme has no detailed pagination markup sets this to null —

@@ -10,7 +10,6 @@ import { getStore, homePath, footerConfig, pdpSelectors, plpSelectors, anyHeader
 // "Snap" ul.ss__results) — read it from the store's PLP selectors. Exported so specs that
 // reference the grid directly (plp navigation, discovery handoff) stay in sync.
 export const productCardSelector = () => plpSelectors().productCard;
-const PRODUCT_TITLE = '.card-title';
 // Container that holds a card's price(s). We read EVERY $-amount inside it and take the minimum
 // (see readCardPrice) rather than targeting one element, because the live store's price markup
 // varies by product: a sale card glues RRP+sale ("$75.96$54.25"), a multi-variant/range card shows
@@ -158,14 +157,14 @@ export const KNOWN_BUGGY_SCRIPTS = [
  * (price-less) cards, so it sets plp.selectors.cardPrice to null to skip the price check.
  */
 export function assertProductCards(limit = 3) {
-  const cardPrice = plpSelectors().cardPrice;
+  const { cardImage, cardTitle, cardLink, cardPrice } = plpSelectors();
   cy.get(productCardSelector()).each(($li, i) => {
     if (i >= limit) return false;
     cy.wrap($li).within(() => {
-      cy.get('.card-figure img').should('exist').invoke('attr', 'src').should('not.be.empty');
-      cy.get(PRODUCT_TITLE).invoke('text').should('not.be.empty');
+      cy.get(cardImage).should('exist').invoke('attr', 'src').should('not.be.empty');
+      cy.get(cardTitle).invoke('text').should('not.be.empty');
       if (cardPrice) cy.get(cardPrice).invoke('text').should('match', /\$[\d,]+(\.\d{2})?/);
-      cy.get('.card-figure a, .card-title a')
+      cy.get(cardLink)
         .first()
         .invoke('attr', 'href')
         .should('not.be.empty')
@@ -175,8 +174,9 @@ export function assertProductCards(limit = 3) {
 }
 
 export function getVisibleProductTitles(limit = 12) {
+  const { cardTitle } = plpSelectors();
   return cy.get(productCardSelector()).then(($cards) =>
-    [...$cards].slice(0, limit).map((card) => normaliseText(card.querySelector(PRODUCT_TITLE)?.textContent || ''))
+    [...$cards].slice(0, limit).map((card) => normaliseText(card.querySelector(cardTitle)?.textContent || ''))
   );
 }
 
@@ -313,6 +313,7 @@ export function applySortOption(label, urlFallback = {}) {
  * test when the page is all price-less. cy.get(...).should(cb) retries to wait out the re-render.
  */
 export function assertSortApplied(previousTitles, { expectedHash } = {}) {
+  const { cardTitle } = plpSelectors();
   if (expectedHash) {
     const key = expectedHash.replace(/^#\/?/, '');
     cy.location('hash', { timeout: 20000 }).should('include', key);
@@ -321,7 +322,7 @@ export function assertSortApplied(previousTitles, { expectedHash } = {}) {
     const cards = [...$cards];
     const titles = cards
       .slice(0, previousTitles.length)
-      .map((c) => normaliseText(c.querySelector(PRODUCT_TITLE)?.textContent || ''));
+      .map((c) => normaliseText(c.querySelector(cardTitle)?.textContent || ''));
     expect(titles, 'grid re-rendered to a different product order after sorting').to.not.deep.eq(previousTitles);
 
     const prices = cards.map((c) => readCardPrice(c)).filter((p) => p !== null);

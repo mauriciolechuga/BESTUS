@@ -20,6 +20,7 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
 const { spawn } = require('child_process');
 
 const { SUMMARY_DIR } = require('../writeRunLog');
@@ -32,6 +33,14 @@ const LOG_FILE = path.join(ROOT, 'results', 'test-results.log');
 const SCREENSHOTS_DIR = path.join(ROOT, 'cypress', 'screenshots');
 const VIDEOS_DIR = path.join(ROOT, 'cypress', 'videos');
 const PORT = Number(process.env.DASHBOARD_PORT) || 8420;
+
+// One-time random secret for this dashboard process's lifetime. Injected into the served
+// HTML (see the '/' handler below) and required as a header on state-changing POST routes,
+// so a CSRF page or another local process can't silently trigger a run/stop/exit — it would
+// have to already be able to read this same-origin page's DOM, which cross-origin JS cannot
+// (no CORS headers are ever sent). Regenerates on every server restart; that's fine for a
+// local, single-operator tool with no persistence requirement.
+const DASHBOARD_TOKEN = crypto.randomBytes(24).toString('hex');
 
 // ── helpers ────────────────────────────────────────────────────────────────
 
@@ -99,6 +108,15 @@ function sendJson(res, status, obj) {
 function sendText(res, status, text) {
   res.writeHead(status, { 'Content-Type': 'text/plain; charset=utf-8' });
   res.end(text);
+}
+
+// Gate for state-changing POST routes — see DASHBOARD_TOKEN above for the rationale.
+function requireToken(req, res) {
+  if (req.headers['x-dashboard-token'] !== DASHBOARD_TOKEN) {
+    sendJson(res, 403, { error: 'Missing or invalid dashboard token.' });
+    return false;
+  }
+  return true;
 }
 
 // Serve a file, but only if it resolves inside `root` (path-traversal guard).
@@ -397,6 +415,7 @@ function handleApi(req, res, url) {
   }
 
   if (req.method === 'POST' && url.pathname === '/api/run') {
+    if (!requireToken(req, res)) return;
     if (running) return sendJson(res, 409, { error: 'A run is already in progress.' });
     let body = '';
     req.on('data', (c) => {
@@ -444,6 +463,7 @@ function handleApi(req, res, url) {
   }
 
   if (req.method === 'POST' && url.pathname === '/api/stop') {
+    if (!requireToken(req, res)) return;
     if (!running || !currentChild) {
       return sendJson(res, 409, { error: 'No run is in progress.' });
     }
@@ -452,6 +472,7 @@ function handleApi(req, res, url) {
   }
 
   if (req.method === 'POST' && url.pathname === '/api/exit') {
+    if (!requireToken(req, res)) return;
     killRunTree(); // no-op when idle
     sendJson(res, 200, { exiting: true });
     // Give the response (and any taskkill) a moment to flush, then exit 0 so
@@ -478,8 +499,22 @@ const server = http.createServer((req, res) => {
     return serveFile(res, VIDEOS_DIR, rel, { range: req.headers.range });
   }
 
-  // Static UI.
-  let rel = url.pathname === '/' ? 'index.html' : url.pathname.replace(/^\/+/, '');
+  // index.html carries the per-session dashboard token, so it can't be served as a static
+  // file — read + inject it fresh on every request (still just fs.readFile, no templating dep).
+  if (url.pathname === '/' || url.pathname === '/index.html') {
+    return fs.readFile(path.join(PUBLIC_DIR, 'index.html'), 'utf8', (err, html) => {
+      if (err) return sendText(res, 404, 'Not found');
+      const injected = html.replace(
+        '</head>',
+        `    <meta name="dashboard-token" content="${DASHBOARD_TOKEN}" />\n  </head>`
+      );
+      res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+      res.end(injected);
+    });
+  }
+
+  // Static UI (app.js, styles.css, etc.).
+  const rel = url.pathname.replace(/^\/+/, '');
   return serveFile(res, PUBLIC_DIR, rel);
 });
 

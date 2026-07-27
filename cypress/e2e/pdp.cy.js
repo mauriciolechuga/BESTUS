@@ -11,7 +11,10 @@ describeIfStore(site.pdp, 'Product Detail Page', { testIsolation: false }, () =>
 
   before(() => {
     blockThirdParty();
-    cy.visit(storePath(pickRandom(site.pdp.popular)), { onBeforeLoad: consoleErrors.onBeforeLoad });
+    const pdpUrl = storePath(pickRandom(site.pdp.popular));
+    cy.task('log', `[pdp.cy.js] PDP under test: ${pdpUrl}`);
+    cy.log(`**PDP under test:** ${pdpUrl}`);
+    cy.visit(pdpUrl, { onBeforeLoad: consoleErrors.onBeforeLoad });
   });
 
   // ─── Page structure ────────────────────────────────────────────────────────

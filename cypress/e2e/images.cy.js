@@ -41,7 +41,10 @@ function assertNoBrokenImages() {
 // ─── Alt attributes — PDP ─────────────────────────────────────────────────────
 describeIfStore(site.pdp, 'Image alt attributes – PDP', { testIsolation: false }, () => {
   before(() => {
-    cy.visit(storePath(pickRandom(site.pdp.popular)));
+    const pdpUrl = storePath(pickRandom(site.pdp.popular));
+    cy.task('log', `[images.cy.js alt-check] PDP under test: ${pdpUrl}`);
+    cy.log(`**PDP under test:** ${pdpUrl}`);
+    cy.visit(pdpUrl);
   });
 
   it('all product gallery images have a non-empty alt attribute', () => {
@@ -69,7 +72,10 @@ describe('Broken images – Homepage', { testIsolation: false }, () => {
 // ─── Broken images — PDP ─────────────────────────────────────────────────────
 describeIfStore(site.pdp, 'Broken images – PDP', { testIsolation: false }, () => {
   before(() => {
-    cy.visit(storePath(pickRandom(site.pdp.popular)));
+    const pdpUrl = storePath(pickRandom(site.pdp.popular));
+    cy.task('log', `[images.cy.js broken-images] PDP under test: ${pdpUrl}`);
+    cy.log(`**PDP under test:** ${pdpUrl}`);
+    cy.visit(pdpUrl);
   });
 
   it('all site images return a non-error status code', () => {
