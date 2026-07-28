@@ -1,4 +1,4 @@
-import { assertMetaTags, assertProductJsonLd, pickRandom } from '../support/checks.js';
+import { assertMetaTags, assertProductJsonLd, blockThirdParty, pickRandom } from '../support/checks.js';
 import { getStore, describeIfStore, itIfStore, storePath, homePath } from '../support/store.js';
 
 const site = getStore();
@@ -7,6 +7,7 @@ const PLP = site.plp && storePath(site.plp.main);
 // ─── Homepage ──────────────────────────────────────────────────────────────────
 describe('SEO – Homepage', { testIsolation: false }, () => {
   before(() => {
+    blockThirdParty();
     cy.visit(homePath());
   });
 
@@ -22,6 +23,7 @@ describe('SEO – Homepage', { testIsolation: false }, () => {
 // ─── Product Listing Page ──────────────────────────────────────────────────────
 describeIfStore(site.plp, 'SEO – PLP', { testIsolation: false }, () => {
   before(() => {
+    blockThirdParty();
     cy.visit(PLP);
   });
 
@@ -37,6 +39,7 @@ describeIfStore(site.plp, 'SEO – PLP', { testIsolation: false }, () => {
 // ─── Product Detail Page ───────────────────────────────────────────────────────
 describeIfStore(site.pdp, 'SEO – PDP', { testIsolation: false }, () => {
   before(() => {
+    blockThirdParty();
     const pdpUrl = storePath(pickRandom(site.pdp.popular));
     cy.task('log', `[seo.cy.js] PDP under test: ${pdpUrl}`);
     cy.log(`**PDP under test:** ${pdpUrl}`);

@@ -179,6 +179,14 @@ export function plpSelectors() {
 // breadcrumbLabel, relatedCarousel, productInfoForm) make their checks skip when null.
 // Overridden per store via pdp.selectors (see stores/adap.json).
 const PDP_SELECTOR_DEFAULTS = {
+  // Core Stencil/BigCommerce PDP structure. Every fleet store is Stencil today so these
+  // hold as-is, but they live here (not hardcoded in the specs) so a future custom-theme
+  // store can override them via pdp.selectors like every other PDP selector. Non-nullable.
+  title: 'h1.productView-title',
+  price: '[data-product-price-without-tax]',
+  addToCart: '#form-action-addToCart',
+  qtyInput: 'input[name="qty[]"]',
+  sku: '[data-product-sku]',
   breadcrumbs: '.breadcrumbs.new_breadcrumbs',
   breadcrumbHome: 'a.breadcrumb-home',
   breadcrumbLabel: '.breadcrumb-label',

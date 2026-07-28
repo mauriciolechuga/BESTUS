@@ -1,4 +1,4 @@
-import { pickRandom } from '../support/checks.js';
+import { blockThirdParty, pickRandom } from '../support/checks.js';
 import { getStore, describeIfStore, storePath, homePath } from '../support/store.js';
 
 const site = getStore();
@@ -41,6 +41,7 @@ function assertNoBrokenImages() {
 // ─── Alt attributes — PDP ─────────────────────────────────────────────────────
 describeIfStore(site.pdp, 'Image alt attributes – PDP', { testIsolation: false }, () => {
   before(() => {
+    blockThirdParty();
     const pdpUrl = storePath(pickRandom(site.pdp.popular));
     cy.task('log', `[images.cy.js alt-check] PDP under test: ${pdpUrl}`);
     cy.log(`**PDP under test:** ${pdpUrl}`);
@@ -61,6 +62,7 @@ describeIfStore(site.pdp, 'Image alt attributes – PDP', { testIsolation: false
 // ─── Broken images — Homepage ─────────────────────────────────────────────────
 describe('Broken images – Homepage', { testIsolation: false }, () => {
   before(() => {
+    blockThirdParty();
     cy.visit(homePath());
   });
 
@@ -72,6 +74,7 @@ describe('Broken images – Homepage', { testIsolation: false }, () => {
 // ─── Broken images — PDP ─────────────────────────────────────────────────────
 describeIfStore(site.pdp, 'Broken images – PDP', { testIsolation: false }, () => {
   before(() => {
+    blockThirdParty();
     const pdpUrl = storePath(pickRandom(site.pdp.popular));
     cy.task('log', `[images.cy.js broken-images] PDP under test: ${pdpUrl}`);
     cy.log(`**PDP under test:** ${pdpUrl}`);

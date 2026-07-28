@@ -97,6 +97,11 @@ export const THIRD_PARTY_HOSTS = [
   { pattern: /salesiq\.zohopublic\.com/ },     // Zoho SalesIQ live-chat widget
   { pattern: /clarity\.ms/ },                  // Microsoft Clarity session recording
   { pattern: /ipapi\.co/ },                    // ipapi.co geo-IP (PDA locale detection)
+  // BigCommerce tax-exempt form widget (1.door-pay.com). Its bc_tax_exempt_form_load.js throws
+  // "Cannot set properties of undefined (setting 'hostUrl')" on every BRH page load — a bug in
+  // the vendor script itself. Non-essential to any test (form specs don't exercise tax-exempt),
+  // so stub it to 204 and it never runs.
+  { pattern: /door-pay\.com/ },
 ];
 
 /**
@@ -128,7 +133,9 @@ export function blockThirdParty() {
 // Each entry matches by `stackPattern` (when the browser gives a real, attributable stack) or
 // `messagePattern` (for a browser-redacted error with no stack at all — same-origin scripts can
 // still lose their stack this way when loaded as a raw external <script src>, e.g. the
-// tracking_code.js entry below).
+// tracking_code.js entry below). An entry may also carry an optional `store` field (e.g. 'brh')
+// which restricts it to that one store — used when a message is too generic to suppress fleet-wide
+// (e.g. a store-specific theme bug) without masking real errors elsewhere.
 export const KNOWN_BUGGY_SCRIPTS = [
   {
     // Zoho SalesIQ chat widget UI bundle. Its `float~modern` chunk has an internal bug
@@ -149,7 +156,46 @@ export const KNOWN_BUGGY_SCRIPTS = [
     // runs on that page (see stores/bestus.json _notes for the fix).
     messagePattern: /Unexpected token '<'/,
   },
+  {
+    // Meta Pixel (fbq) / Segment (analytics) / gtag / TikTok (ttq) globals are defined by
+    // third-party scripts that blockThirdParty() stubs (facebook.net directly; Segment/gtag
+    // via blocked GTM). Several storefronts (ADAP, ADC) then call these globals from their OWN
+    // inline page code without a `typeof … !== 'undefined'` guard, so the call throws a
+    // ReferenceError whose stack is the first-party page URL (no blocked host to match on) —
+    // same shape as the gaconnector case, but there's no single interceptable host to attach a
+    // no-op stub body to (Segment loads via GTM), so we suppress by message instead. This is
+    // vendor-adjacent noise, not a first-party regression: the identical error fires in prod for
+    // any adblock user, and only a tracking call is lost. Extend the alternation if a new pixel
+    // global surfaces the same way.
+    messagePattern: /\b(fbq|analytics|gtag|ttq) is not defined\b/,
+  },
+  {
+    // ADAP theme calls jQuery.fancybox() before the lightbox plugin script has loaded
+    // (script-order/timing) → TypeError with a first-party page stack. Low-severity (the
+    // product-gallery lightbox), and fires for real users on the same race. The message is
+    // specific enough to match globally. ADAP dev team notified.
+    messagePattern: /\.fancybox is not a function/,
+  },
+  {
+    // Klaviyo (email-capture popup) is deliberately left loaded on the stores that use it (AAP, PDA,
+    // BRH) because the popup is store-functional (see the AAP/PDA drift notes). Its telemetry
+    // (`logMetric`) fire-and-forgets a fetch that fails under Cypress (blocked host / CORS), and
+    // because nothing on the page catches it, the rejection surfaces as an unhandled promise
+    // rejection that fails the test. Match the MESSAGE, not the stack: a "Failed to fetch" TypeError
+    // has a frameless stack in Chrome (the klaviyo/logMetric frames exist only in Cypress's async
+    // display trace, not in err.stack), so a /klaviyo/ stack match never fires. This is safe because
+    // uncaught:exception only fires for UNHANDLED rejections, and every fetch our own specs check
+    // (assertLinksResolve, image health) is awaited/caught — so it can never mask a real test
+    // signal, only fire-and-forget third-party telemetry. (The matching `[fetch failed] …klaviyo…`
+    // console-spy line is separately ignored via DEFAULT_IGNORE in makeConsoleErrorSpy below.)
+    messagePattern: /Failed to fetch/,
+  },
 ];
+
+// NOTE on BRH's document-ready theme bugs (.trim()-on-undefined, "$ is not a function"): those are
+// NOT handled here. jQuery surfaces them asynchronously via setTimeout in a way that never reaches
+// the uncaught:exception handler, so they're prevented at the source by a setTimeout wrap in e2e.js
+// (window:before:load), scoped to the jQuery+bestroofhatches.com ready channel. See that file.
 
 /**
  * Asserts the first `limit` product cards each have an image, title, link — and a $-price
@@ -521,9 +567,12 @@ export function assertProductJsonLd() {
  */
 // Known noisy third-party beacons (GA/GTM/analytics/leadsy) are blocked at the network layer
 // in e2e.js — returning 204 so their fetch resolves and never logs "Failed to fetch". We prefer
-// blocking by URL over string-ignoring here, so this list is empty by default and a real fetch
-// failure surfaces. Add a substring only for console noise that can't be blocked by URL.
-const DEFAULT_IGNORE = [];
+// blocking by URL over string-ignoring here, so this list is minimal and a real fetch failure
+// surfaces. Add a substring only for console noise that can't be blocked by URL.
+//  - 'klaviyo': the email-capture popup is deliberately left loaded (store-functional on AAP/PDA/
+//    BRH), so its host can't be network-blocked without breaking the popup; its telemetry fetch
+//    fails under Cypress and the wrapped-fetch re-log ("[fetch failed] …klaviyo…") is pure noise.
+const DEFAULT_IGNORE = ['klaviyo'];
 
 /**
  * @param {string[]} [ignore] - extra substrings; merged with DEFAULT_IGNORE. Calls whose

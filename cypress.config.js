@@ -72,7 +72,18 @@ module.exports = defineConfig({
     screenshotsFolder: `cypress/screenshots/${STORE}`,
     video: true,
     videosFolder: `cypress/videos/${STORE}`,
-    env: { site, STORE },
+    // Forward + coerce the live-submit gate vars. Cypress only auto-imports CYPRESS_-prefixed
+    // OS env vars, so the plain LIVE_SUBMIT/I_KNOW_THIS_IS_LIVE that test:live (and the double-gate
+    // in commands.js) rely on would otherwise never reach Cypress.env() — leaving live mode a dead
+    // gate that silently stays stubbed. Coercing "true"→true here (not the raw string) keeps the
+    // strict `=== true` double-gate honest: both must be genuinely set. The dashboard strips both
+    // vars from the child env before spawn, so a dashboard run coerces to false → stub-only.
+    env: {
+      site,
+      STORE,
+      LIVE_SUBMIT: process.env.LIVE_SUBMIT === "true",
+      I_KNOW_THIS_IS_LIVE: process.env.I_KNOW_THIS_IS_LIVE === "true",
+    },
 
     setupNodeEvents(on, config) {
       // Required inside setupNodeEvents so prepareAudit and lighthouse share the same

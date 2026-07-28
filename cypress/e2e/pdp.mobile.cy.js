@@ -72,11 +72,11 @@ ALL_DEVICES.forEach(({ name, width, height, touchTarget }) => {
     }, "store theme hides breadcrumbs on mobile (pdp.mobileBreadcrumbsHidden)");
 
     it('shows a non-empty product title', () => {
-      cy.get('h1.productView-title').invoke('text').should('not.be.empty');
+      cy.get(sel.title).invoke('text').should('not.be.empty');
     });
 
     itIfStore(!(site.pdp && site.pdp.quoteOnly), 'displays a sale price', () => {
-      cy.get('[data-product-price-without-tax]').invoke('text').should('match', /\$[\d,]+(\.\d{2})?/);
+      cy.get(sel.price).invoke('text').should('match', /\$[\d,]+(\.\d{2})?/);
     }, 'store is quote-only — no price, no cart, no lead-time widget (pdp.quoteOnly)');
 
     it('shows at least one product image with a valid src', () => {
@@ -85,7 +85,7 @@ ALL_DEVICES.forEach(({ name, width, height, touchTarget }) => {
     });
 
     itIfStore(!(site.pdp && site.pdp.quoteOnly), 'quantity input is visible and defaults to 1', () => {
-      cy.get('input[name="qty[]"]').should('be.visible').and('have.value', '1');
+      cy.get(sel.qtyInput).should('be.visible').and('have.value', '1');
       // Stepper buttons are nullable — BESTCA's Snap theme has none (see PDP_SELECTOR_DEFAULTS).
       // 'exist' (not 'be.visible') is deliberate: mobile specs assert DOM presence for elements
       // themes hide at phone widths (see "Mobile Testing Pattern" in CLAUDE.md).
@@ -94,7 +94,7 @@ ALL_DEVICES.forEach(({ name, width, height, touchTarget }) => {
     }, 'store is quote-only — no price, no cart, no lead-time widget (pdp.quoteOnly)');
 
     itIfStore(!(site.pdp && site.pdp.quoteOnly), 'Add to Cart button is visible and not disabled', () => {
-      cy.get('#form-action-addToCart').should('be.visible').and('not.be.disabled');
+      cy.get(sel.addToCart).should('be.visible').and('not.be.disabled');
     }, 'store is quote-only — no price, no cart, no lead-time widget (pdp.quoteOnly)');
 
     it('description section is present and has content', () => {
@@ -106,7 +106,7 @@ ALL_DEVICES.forEach(({ name, width, height, touchTarget }) => {
     }, "store theme has no related-products carousel (pdp.selectors.relatedCarousel is null)");
 
     it('SKU is displayed', () => {
-      cy.get('[data-product-sku]').invoke('text').should('not.be.empty');
+      cy.get(sel.sku).invoke('text').should('not.be.empty');
     });
 
     itIfStore(!(site.pdp && site.pdp.quoteOnly), 'lead time / stock status is displayed', () => {
@@ -157,7 +157,7 @@ PHONES.forEach(({ name, width, height }) => {
     });
 
     it('shows a non-empty product title', () => {
-      cy.get('h1.productView-title').invoke('text').should('not.be.empty');
+      cy.get(sel.title).invoke('text').should('not.be.empty');
     });
 
     it('has no horizontal overflow', () => {
