@@ -9,6 +9,45 @@ beforeEach(() => {
   blockThirdParty();
 });
 
+// --- BRH document-ready theme bugs --------------------------------------------------------------
+// BRH's own theme JS has MULTIPLE bugs in its jQuery document-ready callbacks — it calls .trim() on
+// an undefined value while iterating headings, and calls `$(...)` when `$` is not a function, both
+// throwing on BRH pages (first-party theme bugs — see stores/brh.json _notes; BRH devs notified).
+// jQuery processes `.ready()`/Deferred callbacks asynchronously via `window.setTimeout`, and when a
+// ready callback throws, the error propagates out of that timer as an uncaught error. Confirmed
+// live (multiple fresh runs) that these do NOT reach the uncaught:exception handler below in any
+// suppressible way (neither message nor stack match there, nor a capture-phase error listener). So
+// instead of catching the error after it's uncaught, we prevent it: window:before:load runs in the
+// fresh AUT window before any page script, and here we wrap that window's setTimeout so a throw
+// from inside the jQuery-driven ready/Deferred chain is caught in the timer callback and never
+// becomes uncaught. Scoped by STACK (not message) to exactly that channel — the error must have
+// been thrown through jQuery (code.jquery.com frames) on a BRH theme callback (bestroofhatches.com
+// frames) — so trim, "$ is not a function", and any further ready-callback bug in this same theme
+// are all covered without masking an unrelated error (which would lack that jQuery+host stack).
+// Remove once BRH fixes its theme scripts.
+const isBrhReadyThrow = (e) => {
+  const stack = (e && e.stack) || '';
+  return /code\.jquery\.com/.test(stack) && /bestroofhatches\.com/.test(stack);
+};
+Cypress.on('window:before:load', (win) => {
+  if (!/bestroofhatches\.com/.test(win.location.hostname)) return;
+  const nativeSetTimeout = win.setTimeout;
+  win.setTimeout = function (handler, timeout, ...rest) {
+    if (typeof handler !== 'function') {
+      return nativeSetTimeout.apply(this, arguments);
+    }
+    const guarded = function () {
+      try {
+        return handler.apply(this, arguments);
+      } catch (e) {
+        if (isBrhReadyThrow(e)) return undefined;
+        throw e;
+      }
+    };
+    return nativeSetTimeout.call(this, guarded, timeout, ...rest);
+  };
+});
+
 // Suppress uncaught exceptions, but only when they're attributable to a third party (or a known,
 // already-triaged first-party defect) rather than a first-party regression. Three cases:
 //  1. A cross-origin script (no CORS headers) throws — the browser redacts all detail per the

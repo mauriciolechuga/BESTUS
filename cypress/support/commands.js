@@ -74,7 +74,11 @@ Cypress.Commands.add('expectFieldError', (selector) => {
 });
 
 /**
- * Asserts hrefs under `selector` resolve without a 404. Skips in-page (#), tel:,
+ * Asserts hrefs under `selector` resolve. Same-origin links are strict — any status >= 400 is
+ * broken (matching images.cy.js's `< 400` image-health check). External links (other origins,
+ * which we don't control) are lenient — only genuine dead/error codes fail; bot/auth blocks
+ * (401/403/405/429/999) that a plain cy.request provokes but a real user never sees are tolerated.
+ * Skips in-page (#), tel:,
  * mailto:, and non-http(s) (javascript: etc.) links, plus any href containing a
  * token in `exclude`. Links are deduplicated by origin+path+query (hash dropped).
  *
@@ -128,7 +132,7 @@ Cypress.Commands.add('assertLinksResolve', (selector, options = {}) => {
           toCheck.slice(i, i + 10).map(async (url) => {
             try {
               const res = await fetch(url, { redirect: 'follow' });
-              if (res.status === 404) broken.push(`${url} -> 404`);
+              if (res.status >= 400) broken.push(`${url} -> ${res.status}`);
             } catch (e) {
               broken.push(`${url} -> ${e.message}`);
             }
@@ -141,8 +145,17 @@ Cypress.Commands.add('assertLinksResolve', (selector, options = {}) => {
       ).to.be.empty;
     });
 
+    // External links (sites we don't control): a plain cy.request carries no browser UA/cookies,
+    // so social/partner hosts routinely answer bot requests with 401/403/405/429/999 that a real
+    // user never sees. Treat only genuine dead/error codes as broken; tolerate those bot/auth
+    // blocks. Same-origin links above stay strict (< 400) — that's the signal we actually own.
+    const OK_EXTERNAL = new Set([401, 403, 405, 429, 999]);
     external.forEach((url) => {
-      cy.request({ url, failOnStatusCode: false }).its('status').should('not.eq', 404);
+      cy.request({ url, failOnStatusCode: false })
+        .its('status')
+        .should((s) => {
+          expect(s < 400 || OK_EXTERNAL.has(s), `external link status ${s}: ${url}`).to.be.true;
+        });
     });
   });
 });
