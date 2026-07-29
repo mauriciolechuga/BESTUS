@@ -117,7 +117,7 @@
     },
     "architectInquiries": null
   },
-  "testEmailTemplate": "mauricio+{ts}@accessdoorsandpanels.com",
+  "testEmailTemplate": "testingQA+{ts}@bestaccessdoors.com",
   "discovery": {
     "search": {
       "knownTerm": "fire-rated access door",

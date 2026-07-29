@@ -41,4 +41,8 @@ export const TABLETS = [
 
 export const ALL_DEVICES = [...PHONES, ...TABLETS];
 
+// Evaluated at module-import time — relies on Cypress.env('site') already being
+// populated (config is env-injected before spec module evaluation, so getStore()
+// resolves here). Safe under a live Cypress run; would capture a stale/undefined
+// value if this module were ever imported outside one.
 export const MOBILE_NAV = mobileNavSelector();

@@ -55,7 +55,9 @@ Cypress.on('window:before:load', (win) => {
 //     ("...error was thrown from a cross origin script...") rather than the browser's bare
 //     "Script error.", so match on Cypress's wording, not the raw browser message. On these live
 //     storefronts this fires constantly from vendor scripts we don't control, so it's expected
-//     noise. (Note: same-origin scripts CAN also lose their stack this way — see case 3.)
+//     noise. (Note: same-origin scripts CAN also lose their stack this way — see case 3.) The
+//     same SOP redaction also arrives as an unhandled REJECTION with a non-Error reject value,
+//     which Cypress wraps as "An unknown error has occurred: [object Object]" — matched too.
 //  2. A real, attributable error (message + stack) whose stack traces back to a known third-party
 //     host blockThirdParty() stubs at the network layer (THIRD_PARTY_HOSTS).
 //  3. An error matching a KNOWN_BUGGY_SCRIPTS entry — either by stack (a vendor script we
@@ -66,7 +68,18 @@ Cypress.on('window:before:load', (win) => {
 // known vendors/defects — is treated as first-party and allowed to fail the test as normal.
 Cypress.on('uncaught:exception', (err) => {
   Cypress.log({ name: 'Uncaught Error', message: err.message });
-  const isRedactedCrossOrigin = /cross origin script/i.test(err.message);
+  // A redacted cross-origin failure has two shapes: a THROWN error (Cypress wording
+  // ".../cross origin script/...") and an unhandled REJECTION whose reject value is a
+  // non-Error object — Cypress's makeErrFromObj wraps the latter as "An unknown error has
+  // occurred: [object Object]" (no "cross origin script" wording). Both are SOP-stripped of
+  // all first-party detail, so both are suppressed here. (FSE: SearchSpring's cross-origin
+  // Snap bundle throws `t.isImmediatePropagationStopped is not a function` on product-card
+  // click → arrives as the opaque-rejection shape.) A genuine first-party regression throws
+  // an Error with a real message+stack and never produces the opaque wrapper, so this stays
+  // safe. See CLAUDE.md Global Setup + stores/fse.json _notes.
+  const isRedactedCrossOrigin =
+    /cross origin script/i.test(err.message) ||
+    /an unknown error has occurred/i.test(err.message);
   const stack = err.stack || '';
   const isKnownThirdParty = THIRD_PARTY_HOSTS.some(({ pattern }) => pattern.test(stack));
   const isKnownBuggyScript = KNOWN_BUGGY_SCRIPTS.some(

@@ -135,7 +135,7 @@
     "becomeVendor": null,
     "architectInquiries": null
   },
-  "testEmailTemplate": "mauricio+{ts}@puertasdeacceso.com.mx",
+  "testEmailTemplate": "testingQA+{ts}@bestaccessdoors.com",
   "discovery": {
     "search": {
       "knownTerm": "test",

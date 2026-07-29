@@ -131,7 +131,7 @@
       "submitUrlPattern": "**/forms.zohopublic.com/**/CADArchitects/**/submit"
     }
   },
-  "testEmailTemplate": "mauricio+{ts}@californiaaccessdoors.com",
+  "testEmailTemplate": "testingQA+{ts}@bestaccessdoors.com",
   "discovery": {
     "search": {
       "knownTerm": "fire rated access door",

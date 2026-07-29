@@ -87,7 +87,7 @@
     "zip": "77001",
     "country": "United States"
   },
-  "testEmailTemplate": "mauricio+{ts}@bestaccessdoors.com",
+  "testEmailTemplate": "testingQA+{ts}@bestaccessdoors.com",
   "discovery": {
     "search": {
       "knownTerm": "fire-rated access door",

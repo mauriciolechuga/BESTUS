@@ -6,8 +6,10 @@ const site = getStore();
 const quoteForm = site.forms && site.forms.quoteRequest;
 const submitPattern = quoteForm && quoteForm.submitUrlPattern;
 // Fields some stores' Zoho forms genuinely don't require (read from the form's
-// zf_MandArray) — their empty-field validation tests skip there. ADAP's quote
-// form requires Name_Last but not Name_First.
+// zf_MandArray) — their empty-field validation tests skip there. Each store's value
+// mirrors its live form, not an oversight: 6 stores mark Name_First optional
+// (adc/adap/bestca/brh/cad/fse), pda marks Name_Last optional, and bestus/aap omit
+// the key entirely (both names required, so both empty-field tests run).
 const optionalFields = (quoteForm && quoteForm.optionalFields) || [];
 
 describeIfStore(quoteForm, 'Request a Quote form', () => {
