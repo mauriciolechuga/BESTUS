@@ -65,9 +65,4 @@ export class ZohoFormPage {
     cy.get('button.zf-submitColor:visible').first().click({ force: true });
     return this;
   }
-
-  expectSuccess() {
-    cy.contains(/thank you|received|we'll be in touch/i).should('be.visible');
-    return this;
-  }
 }

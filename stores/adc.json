@@ -115,7 +115,7 @@
       "submitUrlPattern": "**/forms.zohopublic.com/**/ADCcaArchitects/**/submit"
     }
   },
-  "testEmailTemplate": "mauricio+{ts}@accessdoorscanada.ca",
+  "testEmailTemplate": "testingQA+{ts}@bestaccessdoors.com",
   "discovery": {
     "search": {
       "knownTerm": "vision lite",

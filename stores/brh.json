@@ -132,7 +132,7 @@
     "becomeVendor": null,
     "architectInquiries": null
   },
-  "testEmailTemplate": "mauricio+{ts}@bestroofhatches.com",
+  "testEmailTemplate": "testingQA+{ts}@bestaccessdoors.com",
   "discovery": {
     "search": {
       "knownTerm": "roof hatch",

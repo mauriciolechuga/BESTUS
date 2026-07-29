@@ -89,8 +89,9 @@ Cypress.Commands.add('expectFieldError', (selector) => {
  * External links are few and stay on serial cy.request (fetch would hit CORS).
  *
  * @param {string} selector — e.g. 'header a[href]'
- * @param {{ exclude?: string[], sample?: number|false }} options — `exclude`: substrings
- *   to skip (e.g. ['amazon','facebook']); `sample`: max same-origin links per run
+ * @param {{ exclude?: string[], sample?: number|false }} options — `exclude`: host
+ *   substrings to skip (matched against the link's resolved hostname, e.g.
+ *   ['amazon','facebook']); `sample`: max same-origin links per run
  *   (default 50, pass false to always check all)
  */
 Cypress.Commands.add('assertLinksResolve', (selector, options = {}) => {
@@ -106,7 +107,6 @@ Cypress.Commands.add('assertLinksResolve', (selector, options = {}) => {
     [...$links].forEach((a) => {
       const href = a.getAttribute('href');
       if (!href || href.startsWith('#') || href.startsWith('tel:') || href.startsWith('mailto:')) return;
-      if (exclude.some((token) => href.includes(token))) return;
       let url;
       try {
         url = new URL(href, Cypress.config('baseUrl'));
@@ -114,6 +114,9 @@ Cypress.Commands.add('assertLinksResolve', (selector, options = {}) => {
         return;
       }
       if (url.protocol !== 'http:' && url.protocol !== 'https:') return;
+      // Match exclude tokens against the resolved HOST, not the raw href — a substring
+      // test on the full href skips first-party slugs like /amazon-locker-access-door.
+      if (exclude.some((token) => url.hostname.includes(token))) return;
       const target = url.origin + url.pathname + url.search;
       if (seen.has(target)) return;
       seen.add(target);

@@ -118,7 +118,7 @@
     "becomeVendor": null,
     "architectInquiries": null
   },
-  "testEmailTemplate": "mauricio+{ts}@acudoraccesspanels.com",
+  "testEmailTemplate": "testingQA+{ts}@bestaccessdoors.com",
   "discovery": {
     "search": {
       "knownTerm": "fire rated access door",

@@ -44,7 +44,7 @@ describeIfStore(contactForm, 'Contact Us form', () => {
       });
     });
 
-    // Requires cypress/fixtures/files/sample.pdf — unskip once confirmed working
+    // Requires cypress/fixtures/files/sample.pdf (present in repo).
     it('accepts an optional file attachment', () => {
       cy.uniqueEmail().then((email) => {
         cy.interceptZoho('submit', submitPattern);

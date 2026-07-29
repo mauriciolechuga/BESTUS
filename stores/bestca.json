@@ -119,7 +119,7 @@
     "architectInquiries": null,
     "becomeVendor": null
   },
-  "testEmailTemplate": "mauricio+{ts}@bestaccessdoors.ca",
+  "testEmailTemplate": "testingQA+{ts}@bestaccessdoors.com",
   "discovery": {
     "search": {
       "knownTerm": "fire-rated access door",

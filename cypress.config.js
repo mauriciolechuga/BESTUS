@@ -6,6 +6,11 @@ const path = require("path");
 // object is injected into Cypress.env('site') so specs can read it synchronously
 // at module-evaluation time (required for describe vs describe.skip gating).
 const STORE = (process.env.STORE || "bestus").toLowerCase();
+// Sanitize before it reaches a filesystem path: block ../ traversal and any
+// non-store input before path.join (defense-in-depth; existsSync is a weak gate).
+if (!/^[a-z0-9_-]+$/.test(STORE)) {
+  throw new Error(`Invalid STORE "${STORE}": only a-z, 0-9, hyphen, underscore allowed.`);
+}
 const storesDir = path.join(__dirname, "stores");
 const storeFile = path.join(storesDir, `${STORE}.json`);
 if (!fs.existsSync(storeFile)) {
