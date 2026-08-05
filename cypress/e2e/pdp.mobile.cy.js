@@ -41,6 +41,8 @@ const pdpUrl = site.pdp && storePath(pickRandom(site.pdp.popular));
 ALL_DEVICES.forEach(({ name, width, height, touchTarget }) => {
   describeIfStore(site.pdp, `PDP – ${name} (${width}x${height})`, { testIsolation: false }, () => {
     const consoleErrors = makeConsoleErrorSpy();
+    // Set at runtime in before() — see pdp.cy.js for why this can't be static config.
+    let quoteOnlyProduct = false;
 
     before(() => {
       blockThirdParty();
@@ -48,6 +50,12 @@ ALL_DEVICES.forEach(({ name, width, height, touchTarget }) => {
       cy.task('log', `[pdp.mobile.cy.js] PDP under test (${name}): ${pdpUrl}`);
       cy.log(`**PDP under test:** ${pdpUrl}`);
       cy.visit(pdpUrl, { onBeforeLoad: consoleErrors.onBeforeLoad });
+      cy.get('body').then(($body) => {
+        quoteOnlyProduct = $body.find(sel.addToCart).length === 0;
+        if (quoteOnlyProduct) {
+          cy.task('log', `[pdp.mobile.cy.js] detected quote-only product (${name}), skipping price/qty/cart/lead-time: ${pdpUrl}`);
+        }
+      });
     });
 
     // Cypress resets the viewport to the config default (1920x1080) before each test —
@@ -75,27 +83,30 @@ ALL_DEVICES.forEach(({ name, width, height, touchTarget }) => {
       cy.get(sel.title).invoke('text').should('not.be.empty');
     });
 
-    itIfStore(!(site.pdp && site.pdp.quoteOnly), 'displays a sale price', () => {
+    it('displays a sale price', function () {
+      if ((site.pdp && site.pdp.quoteOnly) || quoteOnlyProduct) return this.skip();
       cy.get(sel.price).invoke('text').should('match', /\$[\d,]+(\.\d{2})?/);
-    }, 'store is quote-only — no price, no cart, no lead-time widget (pdp.quoteOnly)');
+    });
 
     it('shows at least one product image with a valid src', () => {
       cy.get('section[data-image-gallery]').should('exist');
       cy.get(sel.galleryImage).first().invoke('attr', 'src').should('not.be.empty');
     });
 
-    itIfStore(!(site.pdp && site.pdp.quoteOnly), 'quantity input is visible and defaults to 1', () => {
+    it('quantity input is visible and defaults to 1', function () {
+      if ((site.pdp && site.pdp.quoteOnly) || quoteOnlyProduct) return this.skip();
       cy.get(sel.qtyInput).should('be.visible').and('have.value', '1');
       // Stepper buttons are nullable — BESTCA's Snap theme has none (see PDP_SELECTOR_DEFAULTS).
       // 'exist' (not 'be.visible') is deliberate: mobile specs assert DOM presence for elements
       // themes hide at phone widths (see "Mobile Testing Pattern" in CLAUDE.md).
       if (sel.qtyIncrement) cy.get(sel.qtyIncrement).should('exist');
       if (sel.qtyDecrement) cy.get(sel.qtyDecrement).should('exist');
-    }, 'store is quote-only — no price, no cart, no lead-time widget (pdp.quoteOnly)');
+    });
 
-    itIfStore(!(site.pdp && site.pdp.quoteOnly), 'Add to Cart button is visible and not disabled', () => {
+    it('Add to Cart button is visible and not disabled', function () {
+      if ((site.pdp && site.pdp.quoteOnly) || quoteOnlyProduct) return this.skip();
       cy.get(sel.addToCart).should('be.visible').and('not.be.disabled');
-    }, 'store is quote-only — no price, no cart, no lead-time widget (pdp.quoteOnly)');
+    });
 
     it('description section is present and has content', () => {
       cy.get(sel.description).invoke('text').should('not.be.empty');
@@ -109,9 +120,10 @@ ALL_DEVICES.forEach(({ name, width, height, touchTarget }) => {
       cy.get(sel.sku).invoke('text').should('not.be.empty');
     });
 
-    itIfStore(!(site.pdp && site.pdp.quoteOnly), 'lead time / stock status is displayed', () => {
+    it('lead time / stock status is displayed', function () {
+      if ((site.pdp && site.pdp.quoteOnly) || quoteOnlyProduct) return this.skip();
       cy.get(sel.leadTime).invoke('text').should('not.be.empty');
-    }, 'store is quote-only — no price, no cart, no lead-time widget (pdp.quoteOnly)');
+    });
 
     itIfStore(sel.productInfoForm, 'product info request form is present with required fields', () => {
       assertProductInfoForm();

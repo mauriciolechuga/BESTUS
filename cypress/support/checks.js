@@ -522,9 +522,11 @@ export function assertMetaTags() {
 /**
  * Finds the JSON-LD block with @type "Product" and asserts the key fields observed on
  * live PDPs: name, sku, description, image, offers.price, offers.priceCurrency,
- * offers.availability.
+ * offers.availability. Pass requirePrice:false for a call-for-pricing (quote-only)
+ * product, where offers.price is legitimately absent — name/sku/description/image
+ * still apply, since those survive on quote-only PDPs (e.g. BRH's un-gated SKU check).
  */
-export function assertProductJsonLd() {
+export function assertProductJsonLd({ requirePrice = true } = {}) {
   cy.get('script[type="application/ld+json"]').then(($scripts) => {
     // Some themes wrap the real Product node in an array or an @graph container
     // (BESTUS nests it in @graph alongside ItemPage/ItemList), so flatten both
@@ -548,11 +550,13 @@ export function assertProductJsonLd() {
     const rawImage = Array.isArray(product.image) ? product.image[0] : product.image;
     const imageUrl = typeof rawImage === 'string' ? rawImage : (rawImage && (rawImage.url || rawImage.contentUrl));
     expect(imageUrl, 'product image').to.be.a('string').and.not.be.empty;
-    expect(product.offers?.price, 'offers.price').to.match(/^\d+(\.\d+)?$/);
-    // Currency is store-dependent — BESTCA (Canada) emits CAD. Defaults to USD.
-    const currency = (getStore().branding && getStore().branding.currency) || 'USD';
-    expect(product.offers?.priceCurrency, 'offers.priceCurrency').to.equal(currency);
-    expect(product.offers?.availability, 'offers.availability').to.be.a('string').and.not.be.empty;
+    if (requirePrice) {
+      expect(product.offers?.price, 'offers.price').to.match(/^\d+(\.\d+)?$/);
+      // Currency is store-dependent — BESTCA (Canada) emits CAD. Defaults to USD.
+      const currency = (getStore().branding && getStore().branding.currency) || 'USD';
+      expect(product.offers?.priceCurrency, 'offers.priceCurrency').to.equal(currency);
+      expect(product.offers?.availability, 'offers.availability').to.be.a('string').and.not.be.empty;
+    }
   });
 }
 

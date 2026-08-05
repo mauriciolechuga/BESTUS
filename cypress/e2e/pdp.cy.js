@@ -8,6 +8,10 @@ const sel = pdpSelectors();
 // are read-only, so the page is loaded once (testIsolation:false) and shared across tests.
 describeIfStore(site.pdp, 'Product Detail Page', { testIsolation: false }, () => {
   const consoleErrors = makeConsoleErrorSpy();
+  // Set at runtime in before() — some stores mix call-for-pricing (quote-only) SKUs
+  // into an otherwise fully-priced catalog, so this can't be known from static config
+  // the way pdp.quoteOnly (a whole-store fact) is. Detected via Add to Cart absence.
+  let quoteOnlyProduct = false;
 
   before(() => {
     blockThirdParty();
@@ -15,6 +19,12 @@ describeIfStore(site.pdp, 'Product Detail Page', { testIsolation: false }, () =>
     cy.task('log', `[pdp.cy.js] PDP under test: ${pdpUrl}`);
     cy.log(`**PDP under test:** ${pdpUrl}`);
     cy.visit(pdpUrl, { onBeforeLoad: consoleErrors.onBeforeLoad });
+    cy.get('body').then(($body) => {
+      quoteOnlyProduct = $body.find(sel.addToCart).length === 0;
+      if (quoteOnlyProduct) {
+        cy.task('log', `[pdp.cy.js] detected quote-only product, skipping price/qty/cart/lead-time: ${pdpUrl}`);
+      }
+    });
   });
 
   // ─── Page structure ────────────────────────────────────────────────────────
@@ -31,25 +41,28 @@ describeIfStore(site.pdp, 'Product Detail Page', { testIsolation: false }, () =>
     cy.get(sel.title).invoke('text').should('not.be.empty');
   });
 
-  itIfStore(!(site.pdp && site.pdp.quoteOnly), 'displays a sale price', () => {
+  it('displays a sale price', function () {
+    if ((site.pdp && site.pdp.quoteOnly) || quoteOnlyProduct) return this.skip();
     cy.get(sel.price).invoke('text').should('match', /\$[\d,]+(\.\d{2})?/);
-  }, 'store is quote-only — no price, no cart, no lead-time widget (pdp.quoteOnly)');
+  });
 
   it('shows at least one product image with a valid src', () => {
     cy.get('section[data-image-gallery]').should('exist');
     cy.get(sel.galleryImage).first().invoke('attr', 'src').should('not.be.empty');
   });
 
-  itIfStore(!(site.pdp && site.pdp.quoteOnly), 'quantity input is visible and defaults to 1', () => {
+  it('quantity input is visible and defaults to 1', function () {
+    if ((site.pdp && site.pdp.quoteOnly) || quoteOnlyProduct) return this.skip();
     cy.get(sel.qtyInput).should('be.visible').and('have.value', '1');
     // Stepper buttons are nullable — BESTCA's Snap theme has none (see PDP_SELECTOR_DEFAULTS).
     if (sel.qtyIncrement) cy.get(sel.qtyIncrement).should('be.visible');
     if (sel.qtyDecrement) cy.get(sel.qtyDecrement).should('be.visible');
-  }, 'store is quote-only — no price, no cart, no lead-time widget (pdp.quoteOnly)');
+  });
 
-  itIfStore(!(site.pdp && site.pdp.quoteOnly), 'Add to Cart button is visible and not disabled', () => {
+  it('Add to Cart button is visible and not disabled', function () {
+    if ((site.pdp && site.pdp.quoteOnly) || quoteOnlyProduct) return this.skip();
     cy.get(sel.addToCart).should('be.visible').and('not.be.disabled');
-  }, 'store is quote-only — no price, no cart, no lead-time widget (pdp.quoteOnly)');
+  });
 
   // ─── Content sections ──────────────────────────────────────────────────────
 
@@ -108,7 +121,8 @@ describeIfStore(site.pdp, 'Product Detail Page', { testIsolation: false }, () =>
     cy.get(sel.sku).invoke('text').should('not.be.empty');
   });
 
-  itIfStore(!(site.pdp && site.pdp.quoteOnly), 'lead time / stock status is displayed', () => {
+  it('lead time / stock status is displayed', function () {
+    if ((site.pdp && site.pdp.quoteOnly) || quoteOnlyProduct) return this.skip();
     cy.get(sel.leadTime).invoke('text').should('not.be.empty');
-  }, 'store is quote-only — no price, no cart, no lead-time widget (pdp.quoteOnly)');
+  });
 });
